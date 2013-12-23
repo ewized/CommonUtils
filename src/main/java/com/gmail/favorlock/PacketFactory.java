@@ -1,10 +1,7 @@
 package com.gmail.favorlock;
 
-import com.gmail.favorlock.ServerHandler;
 import com.gmail.favorlock.util.CommonReflection;
 import org.bukkit.Location;
-
-import java.lang.reflect.Field;
 
 public class PacketFactory {
 
