@@ -1,5 +1,6 @@
 package com.gmail.favorlock.entity;
 
+import com.gmail.favorlock.ServerHandler;
 import com.gmail.favorlock.util.CommonReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class EntityHandler {
 
@@ -52,6 +54,36 @@ public class EntityHandler {
         }
 
         return nmsEntity;
+    }
+
+    public static Object getWatcher(Entity entity, boolean visible, float health, String name) {
+        Class<?> clazz = ServerHandler.getCraftClass("DataWatcher");
+        Object watcher = null;
+
+        try {
+            Object nmsEntity = getHandle(entity);
+            watcher = clazz.getConstructors()[0].newInstance(nmsEntity);
+
+            Method a = CommonReflection.getMethod(clazz, "a", new Class<?>[] {int.class, Object.class});
+            a.setAccessible(true);
+
+            a.invoke(watcher, 0, visible ? (byte) 0 : (byte) 0x20);
+            a.invoke(watcher, 6, (Float) health);
+            a.invoke(watcher, 7, (Integer) 0);
+            a.invoke(watcher, 8, (Byte) (byte) 0);
+            a.invoke(watcher, 10, name);
+            a.invoke(watcher, 11, (Byte) (byte) 1);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return watcher;
     }
 
 }
