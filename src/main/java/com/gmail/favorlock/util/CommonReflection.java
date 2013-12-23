@@ -18,6 +18,16 @@ public class CommonReflection {
         return null;
     }
 
+    public static void setField(Class<?> clazz, Object object, String fieldName, Object value) {
+        try {
+            Field field = CommonReflection.getField(clazz, fieldName);
+            field.setAccessible(true);
+            field.set(object, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Method getMethod(Class<?> clazz, String method, Class<?>[] args) {
         for (Method m : clazz.getMethods()) {
             if (m.getName().equals(method) && classListEqual(args, m.getParameterTypes())) {
