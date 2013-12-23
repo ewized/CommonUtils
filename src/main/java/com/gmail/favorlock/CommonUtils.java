@@ -10,4 +10,8 @@ public class CommonUtils extends JavaPlugin {
         plugin = this;
     }
 
+    public static CommonUtils getPlugin() {
+        return plugin;
+    }
+
 }
