@@ -1,0 +1,7 @@
+name: CommonUtils
+version: 0.0.1
+description: Common utilities for Bukkit.
+author: Favorlock
+
+main: com.gmail.favorlock.CommonUtils
+database: false
