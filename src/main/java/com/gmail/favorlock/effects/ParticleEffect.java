@@ -1,6 +1,6 @@
 package com.gmail.favorlock.effects;
 
-import com.gmail.favorlock.PacketHandler;
+import com.gmail.favorlock.PacketFactory;
 import com.gmail.favorlock.entity.EntityHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -53,7 +53,7 @@ public enum ParticleEffect {
     }
 
     public static void sendPacket(Player player, Location location, ParticleEffect effect) {
-        Object packet = PacketHandler.getWorldParticlesPacket(effect.getName(), location);
+        Object packet = PacketFactory.getWorldParticlesPacket(effect.getName(), location);
         EntityHandler.sendPacket(player, packet);
     }
 }

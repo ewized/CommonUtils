@@ -6,7 +6,7 @@ import org.bukkit.Location;
 
 import java.lang.reflect.Field;
 
-public class PacketHandler {
+public class PacketFactory {
 
     public static Object getWorldParticlesPacket(String effect, Location location) {
         Class<?> clazz = ServerHandler.getCraftClass("PacketPlayOutWorldParticles");
@@ -15,9 +15,9 @@ public class PacketHandler {
         try {
             packet = clazz.newInstance();
             CommonReflection.setField(clazz, packet, "a", effect);
-            CommonReflection.setField(clazz, packet, "b", location.getX());
-            CommonReflection.setField(clazz, packet, "c", location.getY());
-            CommonReflection.setField(clazz, packet, "d", location.getZ());
+            CommonReflection.setField(clazz, packet, "b", (float) location.getX());
+            CommonReflection.setField(clazz, packet, "c", (float) location.getY());
+            CommonReflection.setField(clazz, packet, "d", (float) location.getZ());
             CommonReflection.setField(clazz, packet, "e", 0);
             CommonReflection.setField(clazz, packet, "f", 0);
             CommonReflection.setField(clazz, packet, "g", 0);
