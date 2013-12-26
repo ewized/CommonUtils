@@ -2,7 +2,7 @@ package com.gmail.favorlock;
 
 import org.bukkit.Bukkit;
 
-public class ServerHandler {
+public class VersionHandler {
 
     public static Class<?> getCraftClass(String className) {
         String name = Bukkit.getServer().getClass().getPackage().getName();

@@ -6,7 +6,7 @@ import org.bukkit.Location;
 public class PacketFactory {
 
     public static Object getWorldParticlesPacket(String effect, Location location) {
-        Class<?> clazz = ServerHandler.getCraftClass("PacketPlayOutWorldParticles");
+        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutWorldParticles");
         Object packet = null;
 
         try {
@@ -30,7 +30,7 @@ public class PacketFactory {
     }
 
     public static Object getSpawnEntityLivingPacket(int entityId, int mobId, Location location, Object watcher) {
-        Class<?> clazz = ServerHandler.getCraftClass("PacketPlayOutSpawnEntityLiving");
+        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutSpawnEntityLiving");
         Object packet = null;
 
         try {

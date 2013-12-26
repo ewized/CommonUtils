@@ -1,6 +1,6 @@
 package com.gmail.favorlock.entity;
 
-import com.gmail.favorlock.ServerHandler;
+import com.gmail.favorlock.VersionHandler;
 import com.gmail.favorlock.util.CommonReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 public class EntityHandler {
 
@@ -57,7 +56,7 @@ public class EntityHandler {
     }
 
     public static Object getWatcher(Entity entity, boolean visible, float health, String name) {
-        Class<?> clazz = ServerHandler.getCraftClass("DataWatcher");
+        Class<?> clazz = VersionHandler.getCraftClass("DataWatcher");
         Object watcher = null;
 
         try {
