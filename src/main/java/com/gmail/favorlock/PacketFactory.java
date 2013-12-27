@@ -29,7 +29,7 @@ public class PacketFactory {
             packet = clazz.newInstance();
             CommonReflection.setField(clazz, packet, "a", entityId);
             CommonReflection.setField(clazz, packet, "b",
-                    CommonReflection.invokeMethod(watcher.getClass(), "c", watcher));
+                    CommonReflection.invokeMethodAndReturn(watcher.getClass(), "c", watcher));
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

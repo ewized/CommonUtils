@@ -1,5 +1,7 @@
 package com.gmail.favorlock.util;
 
+import com.gmail.favorlock.CommonUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,11 +61,36 @@ public class CommonReflection {
         return null;
     }
 
-    public static Object invokeMethod(Class clazz, String method, Object object) {
+    public static Object invokeMethodAndReturn(Class clazz, String method, Object object) {
         Object value = null;
 
         try {
-            value = getMethod(clazz, method).invoke(object);
+            Method methodToInvoke = getMethod(clazz, method);
+            methodToInvoke.setAccessible(true);
+
+            value = methodToInvoke.invoke(object);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+    public static Object invokeMethodAndReturn(Class clazz, String method, Object object, Object... params) {
+        Object value = null;
+
+        Class<?>[] args = new Class<?>[params.length];
+        for (int x = 0; x < params.length; x++) {
+            args[x] = params[x].getClass();
+        }
+
+        try {
+            Method methodToInvoke = getMethod(clazz, method, args);
+            methodToInvoke.setAccessible(true);
+
+            value = methodToInvoke.invoke(object, params);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -79,7 +106,7 @@ public class CommonReflection {
         }
 
         for (int i = 0; i < listOne.length; i++) {
-            if (listOne[i] != listTwo[i]) {
+            if (listOne[i] != listTwo[i] && (listTwo[i].isAssignableFrom(listOne[i]) == false)) {
                 return false;
             }
         }
