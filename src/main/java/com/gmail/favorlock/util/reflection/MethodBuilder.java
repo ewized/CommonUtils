@@ -1,5 +1,7 @@
 package com.gmail.favorlock.util.reflection;
 
+import com.gmail.favorlock.CommonUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -16,6 +18,8 @@ public class MethodBuilder {
 
     public MethodBuilder(Class<?> clazz, String method, Object object, Class<?>[] params) {
         this.method = CommonReflection.getMethod(clazz, method, params);
+        this.method.setAccessible(true);
+        this.object = object;
     }
 
     public MethodBuilder invoke(Object... params) {

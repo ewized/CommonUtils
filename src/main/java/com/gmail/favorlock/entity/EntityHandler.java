@@ -64,7 +64,7 @@ public class EntityHandler {
             Object nmsEntity = getHandle(entity);
             watcher = clazz.getConstructors()[0].newInstance(nmsEntity);
 
-            new MethodBuilder(clazz, "a", new Class<?>[] {int.class, Object.class})
+            new MethodBuilder(clazz, "a", watcher, new Class<?>[] {int.class, Object.class})
                     .invoke(0, visible ? (byte) 0 : (byte) 0x20)
                     .invoke(6, (Float) health)
                     .invoke(7, (Integer) 0)
