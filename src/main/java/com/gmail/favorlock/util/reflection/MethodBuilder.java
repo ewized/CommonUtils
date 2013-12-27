@@ -10,6 +10,7 @@ public class MethodBuilder {
 
     public MethodBuilder(Class<?> clazz, String method, Object object) {
         this.method = CommonReflection.getMethod(clazz, method);
+        this.method.setAccessible(true);
         this.object = object;
     }
 

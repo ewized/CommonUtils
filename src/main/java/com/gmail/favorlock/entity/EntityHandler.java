@@ -2,6 +2,7 @@ package com.gmail.favorlock.entity;
 
 import com.gmail.favorlock.VersionHandler;
 import com.gmail.favorlock.util.reflection.CommonReflection;
+import com.gmail.favorlock.util.reflection.MethodBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -63,15 +64,13 @@ public class EntityHandler {
             Object nmsEntity = getHandle(entity);
             watcher = clazz.getConstructors()[0].newInstance(nmsEntity);
 
-            Method a = CommonReflection.getMethod(clazz, "a", new Class<?>[] {int.class, Object.class});
-            a.setAccessible(true);
-
-            a.invoke(watcher, 0, visible ? (byte) 0 : (byte) 0x20);
-            a.invoke(watcher, 6, (Float) health);
-            a.invoke(watcher, 7, (Integer) 0);
-            a.invoke(watcher, 8, (Byte) (byte) 0);
-            a.invoke(watcher, 10, name);
-            a.invoke(watcher, 11, (Byte) (byte) 1);
+            new MethodBuilder(clazz, "a", new Class<?>[] {int.class, Object.class})
+                    .invoke(0, visible ? (byte) 0 : (byte) 0x20)
+                    .invoke(6, (Float) health)
+                    .invoke(7, (Integer) 0)
+                    .invoke(8, (Byte) (byte) 0)
+                    .invoke(10, name)
+                    .invoke(11, (Byte) (byte) 1);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
