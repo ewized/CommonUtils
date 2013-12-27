@@ -59,7 +59,7 @@ public class CommonReflection {
         return null;
     }
 
-    public static Object invokeMethodAndReturn(Class clazz, String method, Object object) {
+    public static Object invokeMethodAndReturn(Class<?> clazz, String method, Object object) {
         Object value = null;
 
         try {
@@ -76,7 +76,7 @@ public class CommonReflection {
         return value;
     }
 
-    public static Object invokeMethodAndReturn(Class clazz, String method, Object object, Object... params) {
+    public static Object invokeMethodAndReturn(Class<?> clazz, String method, Object object, Object... params) {
         Object value = null;
 
         Class<?>[] args = new Class<?>[params.length];
