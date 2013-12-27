@@ -1,7 +1,7 @@
 package com.gmail.favorlock.entity;
 
 import com.gmail.favorlock.VersionHandler;
-import com.gmail.favorlock.util.CommonReflection;
+import com.gmail.favorlock.util.reflection.CommonReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

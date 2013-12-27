@@ -1,6 +1,4 @@
-package com.gmail.favorlock.util;
-
-import com.gmail.favorlock.CommonUtils;
+package com.gmail.favorlock.util.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
