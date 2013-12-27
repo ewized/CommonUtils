@@ -21,6 +21,24 @@ public class PacketFactory {
         return packet;
     }
 
+    public static Object getEntityMetadataPacket(int entityId, Object watcher) {
+        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutEntityMetadata");
+        Object packet = null;
+
+        try {
+            packet = clazz.newInstance();
+            CommonReflection.setField(clazz, packet, "a", entityId);
+            CommonReflection.setField(clazz, packet, "b",
+                    CommonReflection.invokeMethod(watcher.getClass(), "c", watcher));
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return packet;
+    }
+
     public static Object getSpawnEntityLivingPacket(int entityId, int mobId, Location location, Object watcher) {
         Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutSpawnEntityLiving");
         Object packet = null;
