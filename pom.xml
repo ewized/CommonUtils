@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>LATEST</version>
+            <version>1.7.2-R0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
