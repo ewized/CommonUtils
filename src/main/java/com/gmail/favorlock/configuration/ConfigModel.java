@@ -63,8 +63,14 @@ public abstract class ConfigModel extends ConfigObject {
                 CONFIG_FILE.createNewFile();
                 if (CONFIG_HEADER != null) {
                     Writer newConfig = new BufferedWriter(new FileWriter(CONFIG_FILE));
+                    boolean firstLine = true;
                     for (String line : CONFIG_HEADER.split("\n")) {
-                        newConfig.write("# " + line + "\n");
+                        if (!firstLine) {
+                            newConfig.write("\n");
+                        } else {
+                            firstLine = false;
+                        }
+                        newConfig.write("# " + line);
                     }
                     newConfig.close();
                 }
