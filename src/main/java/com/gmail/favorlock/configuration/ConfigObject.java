@@ -438,6 +438,8 @@ public abstract class ConfigObject {
       */
 
     protected boolean doSkip(Field field) {
-        return Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers()) || Modifier.isPrivate(field.getModifiers());
+        return Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())
+                || Modifier.isFinal(field.getModifiers()) || Modifier.isProtected(field.getModifiers())
+                || Modifier.isPrivate(field.getModifiers());
     }
 }
