@@ -61,13 +61,13 @@ public abstract class MenuItem {
         descriptions = lines;
     }
 
-    protected ItemStack getItemStack() {
-        ItemStack slot = new ItemStack(getIcon().getItemType(), getNumber());
+    public ItemStack getItemStack() {
+        ItemStack slot = new ItemStack(getIcon().getItemType());
         ItemMeta meta = slot.getItemMeta();
-        meta.setLore(descriptions);
         meta.setDisplayName(getText());
-
+        meta.setLore(descriptions);
         slot.setItemMeta(meta);
+
         return slot;
     }
 
