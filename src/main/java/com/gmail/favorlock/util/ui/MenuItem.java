@@ -61,8 +61,28 @@ public abstract class MenuItem {
         descriptions = lines;
     }
 
-    public ItemStack getItemStack() {
+    public ItemStack getSingleItemStack() {
         ItemStack slot = new ItemStack(getIcon().getItemType());
+        ItemMeta meta = slot.getItemMeta();
+        meta.setDisplayName(getText());
+        meta.setLore(descriptions);
+        slot.setItemMeta(meta);
+
+        return slot;
+    }
+
+    public ItemStack getItemStack() {
+        ItemStack slot = new ItemStack(getIcon().getItemType(), getNumber());
+        ItemMeta meta = slot.getItemMeta();
+        meta.setDisplayName(getText());
+        meta.setLore(descriptions);
+        slot.setItemMeta(meta);
+
+        return slot;
+    }
+
+    public ItemStack getItemStack(short durability) {
+        ItemStack slot = new ItemStack(getIcon().getItemType(), getNumber(), durability);
         ItemMeta meta = slot.getItemMeta();
         meta.setDisplayName(getText());
         meta.setLore(descriptions);

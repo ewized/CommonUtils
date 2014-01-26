@@ -40,6 +40,10 @@ public class Menu implements InventoryHolder {
         return addMenuItem(item, y * 9 + x);
     }
 
+    public boolean addMenuItem(MenuItem item, int x, int y, short durability) {
+        return addMenuItem(item, y * 9 + x, durability);
+    }
+
     public boolean addMenuItem(MenuItem item, int index) {
         ItemStack slot = getInventory().getItem(index);
 
@@ -48,6 +52,20 @@ public class Menu implements InventoryHolder {
         }
 
         getInventory().setItem(index, item.getItemStack());
+        items.put(index, item);
+        item.addToMenu(this);
+
+        return true;
+    }
+
+    public boolean addMenuItem(MenuItem item, int index, short durability) {
+        ItemStack slot = getInventory().getItem(index);
+
+        if (slot != null && slot.getType() != Material.AIR) {
+            return false;
+        }
+
+        getInventory().setItem(index, item.getItemStack(durability));
         items.put(index, item);
         item.addToMenu(this);
 
