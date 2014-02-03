@@ -25,6 +25,20 @@ public class MenuAPI implements Listener {
         return new Menu(title, rows);
     }
 
+    public static Menu createMenu(String title, boolean center, int rows) {
+        int spaces = (32 - title.length()) / 2;
+        String name = "";
+        for (int i = 0; i < spaces; i++) {
+            name += " ";
+        }
+        name += title;
+        if (center) {
+            return new Menu(name, rows);
+        } else {
+            return new Menu(title, rows);
+        }
+    }
+
     public static Menu cloneMenu(Menu menu) {
         return menu.clone();
     }
