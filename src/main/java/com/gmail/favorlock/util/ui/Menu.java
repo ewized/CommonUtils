@@ -58,20 +58,6 @@ public class Menu implements InventoryHolder {
         return true;
     }
 
-    public boolean addMenuItem(MenuItem item, int index, short durability) {
-        ItemStack slot = getInventory().getItem(index);
-
-        if (slot != null && slot.getType() != Material.AIR) {
-            return false;
-        }
-
-        getInventory().setItem(index, item.getItemStack(durability));
-        items.put(index, item);
-        item.addToMenu(this);
-
-        return true;
-    }
-
     public boolean removeMenuItem(int index) {
         ItemStack slot = getInventory().getItem(index);
 
