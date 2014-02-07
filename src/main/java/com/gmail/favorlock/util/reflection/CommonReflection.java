@@ -1,10 +1,47 @@
 package com.gmail.favorlock.util.reflection;
 
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class CommonReflection {
+
+    public static Object getHandle(Entity entity) {
+        Object nmsEntity = null;
+        Method getHandle = CommonReflection.getMethod(entity.getClass(), "getHandle");
+
+        try {
+            nmsEntity = getHandle.invoke(entity);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return nmsEntity;
+    }
+
+    public static Object getHandle(World world) {
+        Object nmsEntity = null;
+
+        Method getHandle = getMethod(world.getClass(), "getHandle");
+        try {
+            nmsEntity = getHandle.invoke(world);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return nmsEntity;
+    }
 
     public static Field getField(Class<?> clazz, String fieldName) {
         try {

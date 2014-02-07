@@ -21,7 +21,7 @@ public class EntityHandler {
 
     public static void sendPacket(Player player, Object packet) {
         try {
-            Object nmsPlayer = getHandle(player);
+            Object nmsPlayer = CommonReflection.getHandle(player);
             Field playerConnection = nmsPlayer.getClass().getField("playerConnection");
             Object connection = playerConnection.get(nmsPlayer);
             Method sendPacket = CommonReflection.getMethod(connection.getClass(), "sendPacket");
@@ -39,29 +39,12 @@ public class EntityHandler {
         }
     }
 
-    public static Object getHandle(Entity entity) {
-        Object nmsEntity = null;
-        Method getHandle = CommonReflection.getMethod(entity.getClass(), "getHandle");
-
-        try {
-            nmsEntity = getHandle.invoke(entity);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return nmsEntity;
-    }
-
     public static Object getWatcher(Entity entity, boolean visible, float health, String name) {
         Class<?> clazz = VersionHandler.getCraftClass("DataWatcher");
         Object watcher = null;
 
         try {
-            Object nmsEntity = getHandle(entity);
+            Object nmsEntity = CommonReflection.getHandle(entity);
             watcher = clazz.getConstructors()[0].newInstance(nmsEntity);
 
             new MethodBuilder(clazz, "a", watcher, new Class<?>[]{int.class, Object.class})
