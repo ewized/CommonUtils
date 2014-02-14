@@ -66,6 +66,10 @@ public class MenuAPI implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onMenuItemClicked(InventoryClickEvent event) {
+        if (event.isRightClick()) {
+            return;
+        }
+
         Inventory inventory = event.getInventory();
         if (inventory.getHolder() instanceof Menu) {
             Menu menu = (Menu) inventory.getHolder();
