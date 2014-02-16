@@ -52,8 +52,8 @@ public enum ParticleEffect {
         return particleName;
     }
 
-    public static void sendPacket(Player player, Location location, ParticleEffect effect) {
-        Object packet = PacketFactory.getWorldParticlesPacket(effect.getName(), location);
+    public static void sendPacket(Player player, Location location, ParticleEffect effect, float xDev, float yDev, float zDev, float speed, int amount) {
+        Object packet = PacketFactory.getWorldParticlesPacket(effect.getName(), location, xDev, yDev, zDev, speed, amount);
         EntityHandler.sendPacket(player, packet);
     }
 }

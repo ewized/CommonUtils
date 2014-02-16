@@ -66,7 +66,7 @@ public class PacketFactory {
         return packet;
     }
 
-    public static Object getWorldParticlesPacket(String effect, Location location) {
+    public static Object getWorldParticlesPacket(String effect, Location location, float xDeviation, float yDeviation, float zDeviation, float speed, int amount) {
         Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutWorldParticles");
         Object packet = null;
 
@@ -76,11 +76,11 @@ public class PacketFactory {
             CommonReflection.setField(clazz, packet, "b", (float) location.getX());
             CommonReflection.setField(clazz, packet, "c", (float) location.getY());
             CommonReflection.setField(clazz, packet, "d", (float) location.getZ());
-            CommonReflection.setField(clazz, packet, "e", 0);
-            CommonReflection.setField(clazz, packet, "f", 0);
-            CommonReflection.setField(clazz, packet, "g", 0);
-            CommonReflection.setField(clazz, packet, "h", 0);
-            CommonReflection.setField(clazz, packet, "i", 10);
+            CommonReflection.setField(clazz, packet, "e", xDeviation);
+            CommonReflection.setField(clazz, packet, "f", yDeviation);
+            CommonReflection.setField(clazz, packet, "g", zDeviation);
+            CommonReflection.setField(clazz, packet, "h", speed);
+            CommonReflection.setField(clazz, packet, "i", amount);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
