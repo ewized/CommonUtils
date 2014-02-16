@@ -240,9 +240,10 @@ public class BossBar {
 			Bukkit.getScheduler().cancelTask(timerID);
 	}
 	
+	// This is no longer a limitation, apparently
 	private static String trim(String message){
-		if(message.length() > 64) // Prevents client crash from sending strings longer than 64
-			message = message.substring(0, 63);
+		// if(message.length() > 64) // Prevents client crash from sending strings longer than 64
+			// message = message.substring(0, 63);
 		return message;
 	}
 	/** This method should be called from methods that respond to events like PlayerTeleportEvent or PlayerRespawnEvent.
