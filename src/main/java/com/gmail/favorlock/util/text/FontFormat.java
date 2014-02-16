@@ -1,41 +1,47 @@
 package com.gmail.favorlock.util.text;
 
+import org.bukkit.ChatColor;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public enum FontFormat {
 
-    BLACK("0"),
-    DARK_BLUE("1"),
-    DARK_GREEN("2"),
-    DARK_AQUA("3"),
-    DARK_RED("4"),
-    PURPLE("5"),
-    ORANGE("6"),
-    GREY("7"),
-    DARK_GREY("8"),
-    BLUE("9"),
-    GREEN("a"),
-    AQUA("b"),
-    RED("c"),
-    PINK("d"),
-    YELLOW("e"),
-    WHITE("f"),
-    RANDOM("k"),
-    BOLD("l"),
-    STRIKE("m"),
-    UNDERLINED("n"),
-    ITALICS("o"),
-    RESET("r");
+    BLACK("0", 1),
+    DARK_BLUE("1", 2),
+    DARK_GREEN("2", 2),
+    DARK_AQUA("3", 2),
+    DARK_RED("4", 2),
+    PURPLE("5", 2),
+    ORANGE("6", 0),
+    GREY("7", 1),
+    DARK_GREY("8", 1),
+    BLUE("9", 2),
+    GREEN("a", 0),
+    AQUA("b", 0),
+    RED("c", 0),
+    PINK("d", 0),
+    YELLOW("e", 0),
+    WHITE("f", 1),
+    RANDOM("k", 3),
+    BOLD("l", 3),
+    STRIKE("m", 3),
+    UNDERLINED("n", 3),
+    ITALICS("o", 3),
+    RESET("r", 3);
 
     private final String value;
+    private final int type;
     private static final Map<String, String> translate;
     private static final String COLOR_PREFIX_CHARACTER = "\u00a7";
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf("&") + "[0-9A-FK-OR]");
 
-    private FontFormat(String value) {
+    private FontFormat(String value, int type) {
         this.value = COLOR_PREFIX_CHARACTER + value;
+        this.type = type;
     }
 
     public String toString() {
@@ -86,6 +92,47 @@ public enum FontFormat {
         }
 
         return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
+    }
+
+    public static String rainbow(String text, boolean includeShades, boolean includeDarks) {
+        StringBuilder builder = new StringBuilder();
+        int readcount = 0;
+
+        List<FontFormat> colors = new ArrayList<FontFormat>();
+        for (FontFormat format : FontFormat.values()) {
+            if (format.type == 0) {
+                colors.add(format);
+            }
+
+            if (includeShades && format.type == 1) {
+                colors.add(format);
+            }
+
+            if (includeDarks && format.type == 2) {
+                colors.add(format);
+            }
+        }
+
+        while (readcount < text.length()) {
+            for (int i = 0; i <= colors.size(); i++) {
+                if (i == colors.size()) {
+                    i = 0;
+                }
+
+                while (text.charAt(readcount) == ' ') {
+                    builder.append(text.charAt(readcount));
+                    readcount += 1;
+                }
+
+                builder.append(colors.get(i)).append(text.charAt(readcount));
+                readcount += 1;
+
+                if (readcount == text.length()) {
+                    break;
+                }
+            }
+        }
+        return builder.toString();
     }
 
 }
