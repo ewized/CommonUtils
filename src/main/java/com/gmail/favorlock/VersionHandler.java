@@ -20,7 +20,7 @@ public class VersionHandler {
     }
 
     public static Class<?> getCraftBukkitClass(String className) {
-        String name = Bukkit.getServerName().getClass().getPackage().getName();
+        String name = Bukkit.getServer().getClass().getPackage().getName();
         String version = name.substring(name.lastIndexOf('.') + 1);
         String clazzName = "org.bukkit.craftbukkit." + version + "." + className;
         Class<?> clazz = null;
