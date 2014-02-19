@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class MenuItem {
 
-    private Menu menu;
+    private MenuHolder menu;
     private int quantity;
     private MaterialData icon;
     private String text;
@@ -49,17 +49,17 @@ public abstract class MenuItem {
         this.data = data;
     }
 
-    protected void addToMenu(Menu menu) {
+    protected void addToMenu(MenuHolder menu) {
         this.menu = menu;
     }
 
-    protected void removeFromMenu(Menu menu) {
+    protected void removeFromMenu(MenuHolder menu) {
         if (this.menu == null) {
             this.menu = null;
         }
     }
 
-    public Menu getMenu() {
+    public MenuHolder getMenu() {
         return menu;
     }
 
