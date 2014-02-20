@@ -1,7 +1,5 @@
 package com.gmail.favorlock.util.ui;
 
-import java.util.HashMap;
-
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -9,40 +7,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import com.gmail.favorlock.util.ui.MenuAPI;
-import com.gmail.favorlock.util.ui.MenuCloseBehavior;
 import com.gmail.favorlock.util.ui.MenuItem;
 
-public abstract class MenuHolder implements InventoryHolder {
-
-	HashMap<Integer, MenuItem> items = new HashMap<>();
-	boolean exitOnClickOutside = true;
-	MenuCloseBehavior menuCloseBehavior;
-
-	public void setMenuCloseBehavior(MenuCloseBehavior menuCloseBehavior) {
-		this.menuCloseBehavior = menuCloseBehavior;
-	}
-
-	public MenuCloseBehavior getMenuCloseBehavior() {
-		return menuCloseBehavior;
-	}
-
-	public void setExitOnClickOutside(boolean exit) {
-		this.exitOnClickOutside = exit;
-	}
-
-	public boolean exitOnClickOutside() {
-		return exitOnClickOutside;
-	}
-
-	@SuppressWarnings("deprecation")
-	protected void selectMenuItem(Player player, int index) {
-		if (items.containsKey(index)) {
-			MenuItem item = items.get(index);
-			item.onClick(player);
-		}
-		player.updateInventory();
-	}
+public abstract class MenuHolder extends MenuBase implements InventoryHolder {
 
 	public void openMenu(Player player) {
 		if (getInventory().getViewers().contains(player)) {
@@ -58,9 +25,14 @@ public abstract class MenuHolder implements InventoryHolder {
 			player.closeInventory();
 		}
 	}
-
-	public void switchMenu(Player player, MenuHolder menu) {
-		MenuAPI.switchMenu(player, this, menu);
+	
+	@SuppressWarnings("deprecation")
+	protected void selectMenuItem(Player player, int index) {
+		if (items.containsKey(index)) {
+			MenuItem item = items.get(index);
+			item.onClick(player);
+		}
+		player.updateInventory();
 	}
 
 	public boolean addMenuItem(MenuItem item, int index) {

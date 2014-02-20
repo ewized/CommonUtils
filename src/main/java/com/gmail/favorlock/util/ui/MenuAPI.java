@@ -1,8 +1,7 @@
 package com.gmail.favorlock.util.ui;
 
-import java.util.HashSet;
+import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +19,7 @@ public class MenuAPI implements Listener {
 
 	protected static CommonUtils instance;
 	
-	protected HashSet<String> playersAnvils = new HashSet<>();
+	protected HashMap<String, MenuAnvil> playersAnvils = new HashMap<>();
 
 	public MenuAPI(CommonUtils plugin) {
 		instance = plugin;
@@ -66,7 +65,7 @@ public class MenuAPI implements Listener {
 		}
 	}
 
-	public static void switchMenu(final Player player, MenuHolder fromMenu, final MenuHolder toMenu) {
+	public static void switchMenu(final Player player, MenuBase fromMenu, final MenuBase toMenu) {
 		fromMenu.closeMenu(player);
 
 		new BukkitRunnable() {
@@ -79,8 +78,8 @@ public class MenuAPI implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onMenuItemClicked(InventoryClickEvent event) {
-		Bukkit.getServer().broadcastMessage("Invclick: " + event.toString());// TODO DEBUG
 		Inventory inventory = event.getInventory();
+		Player player = (Player) event.getWhoClicked();
 		if (inventory.getHolder() instanceof MenuHolder) {
 			MenuHolder menu = (MenuHolder) inventory.getHolder();
 			if (event.isRightClick()) {
@@ -88,7 +87,29 @@ public class MenuAPI implements Listener {
 				return;
 			}
 			if (event.getWhoClicked() instanceof Player) {
-				Player player = (Player) event.getWhoClicked();
+				if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
+					if (menu.exitOnClickOutside()) {
+						menu.closeMenu(player);
+					}
+				} else {
+					int index = event.getRawSlot();
+					if (index < inventory.getSize()) {
+						menu.selectMenuItem(player, index);
+					} else {
+						if (menu.exitOnClickOutside()) {
+							menu.closeMenu(player);
+						}
+					}
+				}
+			}
+			event.setCancelled(true);
+		} else if (playersAnvils.containsKey(player.getName())) {
+			MenuAnvil menu = playersAnvils.get(player.getName());
+			if (event.isRightClick()) {
+				event.setCancelled(true);
+				return;
+			}
+			if (event.getWhoClicked() instanceof Player) {
 				if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
 					if (menu.exitOnClickOutside()) {
 						menu.closeMenu(player);
@@ -112,12 +133,21 @@ public class MenuAPI implements Listener {
 	public void onMenuClosed(InventoryCloseEvent event) {
 		if (event.getPlayer() instanceof Player) {
 			Inventory inventory = event.getInventory();
+			Player player = (Player) event.getPlayer();
 			if (inventory.getHolder() instanceof MenuHolder) {
 				MenuHolder menu = (MenuHolder) inventory.getHolder();
 				MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
 
 				if (menuCloseBehavior != null) {
-					menuCloseBehavior.onClose((Player) event.getPlayer());
+					menuCloseBehavior.onClose(player);
+				}
+			} else if (playersAnvils.containsKey(player.getName())) {
+				MenuAnvil menu = playersAnvils.remove(player.getName());
+				menu.onClose(player);
+				MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
+				
+				if (menuCloseBehavior != null) {
+					menuCloseBehavior.onClose(player);
 				}
 			}
 		}

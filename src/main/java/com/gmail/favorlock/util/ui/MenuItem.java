@@ -9,9 +9,9 @@ import org.bukkit.material.MaterialData;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MenuItem {
+public abstract class MenuItem extends MenuClickBehavior {
 
-    private MenuHolder menu;
+    private MenuBase menu;
     private int quantity;
     private MaterialData icon;
     private String text;
@@ -49,17 +49,17 @@ public abstract class MenuItem {
         this.data = data;
     }
 
-    protected void addToMenu(MenuHolder menu) {
+    protected void addToMenu(MenuBase menu) {
         this.menu = menu;
     }
 
-    protected void removeFromMenu(MenuHolder menu) {
+    protected void removeFromMenu(MenuBase menu) {
         if (this.menu == null) {
             this.menu = null;
         }
     }
 
-    public MenuHolder getMenu() {
+    public MenuBase getMenu() {
         return menu;
     }
 
@@ -118,6 +118,7 @@ public abstract class MenuItem {
     public int getSlot() {
         return slot;
     }
-
+    
+    @Override
     public abstract void onClick(Player player);
 }
