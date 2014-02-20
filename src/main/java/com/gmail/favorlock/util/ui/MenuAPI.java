@@ -79,7 +79,6 @@ public class MenuAPI implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onMenuItemClicked(InventoryClickEvent event) {
-		Bukkit.getServer().broadcastMessage("Invclick: " + event.toString());// TODO DEBUG
 		Inventory inventory = event.getInventory();
 		if (inventory.getHolder() instanceof MenuHolder) {
 			MenuHolder menu = (MenuHolder) inventory.getHolder();
