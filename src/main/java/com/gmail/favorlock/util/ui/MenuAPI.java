@@ -42,6 +42,10 @@ public class MenuAPI implements Listener {
 		name += title;
 		return new Menu(name, rows);
 	}
+
+    public static MenuAnvil createMenuAnvil() {
+        return new MenuAnvil();
+    }
 	
 	public static MenuDispenser createMenuDispenser(String title) {
 		return new MenuDispenser(title);

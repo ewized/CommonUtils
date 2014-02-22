@@ -51,9 +51,10 @@
                         </goals>
                         <configuration>
                             <artifactSet>
-                                <includes>
-                                    <include>org.reflections:reflections</include>
-                                </includes>
+                                <excludes>
+                                    <exclude>org.bukkit:bukkit</exclude>
+                                    <exclude>org.spigotmc:spigot</exclude>
+                                </excludes>
                             </artifactSet>
                         </configuration>
                     </execution>
