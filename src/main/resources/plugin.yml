@@ -5,3 +5,5 @@ author: Favorlock
 
 main: com.gmail.favorlock.CommonUtils
 database: false
+
+softdepend: [ProtocolLib]

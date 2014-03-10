@@ -8,27 +8,49 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import com.gmail.favorlock.CommonUtils;
 import com.gmail.favorlock.VersionHandler;
 import com.gmail.favorlock.util.reflection.CommonReflection;
 
 public class MenuAnvil extends MenuBase {
 
+	private static HashMap<String, MenuAnvil> playersAnvils = new HashMap<>();
+	
 	private HashMap<String, Inventory> anvils = new HashMap<>();
 	private HashMap<String, Object> containerAnvils = new HashMap<>();
 	private MenuClickBehavior resultClickBehavior;
 	
 	public MenuAnvil() {}
 	
+	public static boolean hasOpenAnvil(Player player) {
+		if (playersAnvils.containsKey(player.getName())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static MenuAnvil getOpenAnvil(Player player) {
+		if (!hasOpenAnvil(player)) {
+			return null;
+		}
+		return playersAnvils.get(player.getName());
+	}
+	
+	public static MenuAnvil removeOpenAnvil(Player player) {
+		if(!hasOpenAnvil(player)) {
+			return null;
+		}
+		return playersAnvils.remove(player.getName());
+	}
+	
 	public void onClose(Player player) {
 		Inventory closed = anvils.remove(player.getName());
 		if (closed == null) {
 			Bukkit.getConsoleSender().sendMessage("Player " + player.getName() +
 					" closed an anvil inventory that was not registered!");
-			return;
+		} else {
+			closed.clear(0);
+			closed.clear(1);
 		}
-		closed.clear(0);
-		closed.clear(1);
 		containerAnvils.remove(player.getName());
 	}
 	
@@ -99,7 +121,7 @@ public class MenuAnvil extends MenuBase {
 			for (Entry<Integer, MenuItem> inMenu : items.entrySet()) {
 				inventory.setItem(inMenu.getKey(), inMenu.getValue().getItemStack());
 			}
-			CommonUtils.getMenuAPI().playersAnvils.put(player.getName(), this);
+			playersAnvils.put(player.getName(), this);
 			anvils.put(player.getName(), inventory);
 
 			Method nextContainerCounter = CommonReflection.getMethod(entityPlayerClass, "nextContainerCounter", 0);
@@ -129,7 +151,7 @@ public class MenuAnvil extends MenuBase {
 	
 	@SuppressWarnings("deprecation")
 	public void closeMenu(Player player) {
-		if (CommonUtils.getMenuAPI().playersAnvils.containsKey(player.getName())) {
+		if (playersAnvils.containsKey(player.getName())) {
 			player.closeInventory();
 			player.updateInventory();
 		}

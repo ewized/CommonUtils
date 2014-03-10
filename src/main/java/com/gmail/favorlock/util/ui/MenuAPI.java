@@ -1,7 +1,6 @@
 package com.gmail.favorlock.util.ui;
 
-import java.util.HashMap;
-
+import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,8 +18,6 @@ import com.gmail.favorlock.CommonUtils;
 public class MenuAPI implements Listener {
 
 	protected static CommonUtils instance;
-	
-	protected HashMap<String, MenuAnvil> playersAnvils = new HashMap<>();
 
 	public MenuAPI(CommonUtils plugin) {
 		instance = plugin;
@@ -31,7 +29,7 @@ public class MenuAPI implements Listener {
 	}
 
 	public static Menu createMenu(String title, boolean center, int rows) {
-		if(!center) {
+		if (!center) {
 			return new Menu(title, rows);
 		}
 		int spaces = (32 - title.length()) / 2;
@@ -43,14 +41,22 @@ public class MenuAPI implements Listener {
 		return new Menu(name, rows);
 	}
 
-    public static MenuAnvil createMenuAnvil() {
-        return new MenuAnvil();
-    }
+	public static MenuAnvil createMenuAnvil() {
+		return new MenuAnvil();
+	}
 	
+	public static MenuCommandBlock createMenuCommandBlock(String defaultText) {
+		if (CommonUtils.isPacketListenerActive()) {
+			return new MenuCommandBlock(defaultText);
+		} else {
+			return null;
+		}
+	}
+
 	public static MenuDispenser createMenuDispenser(String title) {
 		return new MenuDispenser(title);
 	}
-	
+
 	public static MenuHopper createMenuHopper(String title) {
 		return new MenuHopper(title);
 	}
@@ -79,7 +85,7 @@ public class MenuAPI implements Listener {
 			}
 		}.runTask(instance);
 	}
-
+	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onMenuItemClicked(InventoryClickEvent event) {
 		Inventory inventory = event.getInventory();
@@ -107,8 +113,8 @@ public class MenuAPI implements Listener {
 				}
 			}
 			event.setCancelled(true);
-		} else if (playersAnvils.containsKey(player.getName())) {
-			MenuAnvil menu = playersAnvils.get(player.getName());
+		} else if (MenuAnvil.hasOpenAnvil(player)) {
+			MenuAnvil menu = MenuAnvil.getOpenAnvil(player);
 			if (event.isRightClick()) {
 				event.setCancelled(true);
 				return;
@@ -145,15 +151,29 @@ public class MenuAPI implements Listener {
 				if (menuCloseBehavior != null) {
 					menuCloseBehavior.onClose(player);
 				}
-			} else if (playersAnvils.containsKey(player.getName())) {
-				MenuAnvil menu = playersAnvils.remove(player.getName());
+			} else if (MenuAnvil.hasOpenAnvil(player)) {
+				MenuAnvil menu = MenuAnvil.removeOpenAnvil(player);
 				menu.onClose(player);
 				MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
-				
+
 				if (menuCloseBehavior != null) {
 					menuCloseBehavior.onClose(player);
 				}
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerMove(PlayerMoveEvent event) {
+		if (MenuCommandBlock.hasMenuOpen(event.getPlayer())) {
+			Location from = event.getFrom();
+			Location to = event.getTo();
+			
+			if ((to.getPitch() == from.getPitch()) && (to.getYaw() == from.getYaw())) {
+				return;
+			}
+			
+			MenuCommandBlock.cancelFor(event.getPlayer());
 		}
 	}
 }
