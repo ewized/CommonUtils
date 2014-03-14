@@ -82,10 +82,15 @@ public abstract class StrictModel extends ConfigModel {
 				field.set(this, field.getType().cast(loadObject(field, cs, path)));
 			} else {
 				Object value = field.get(this);
-				if (value == null) {
-					failedToDefine.add(
-							String.format("'%s' of type %s", field.getName().replaceAll("_", "."), field.getType().getSimpleName()));
-					continue;
+				if (field.isAnnotationPresent(StrictField.class)) {
+					StrictField annotation = field.getAnnotation(StrictField.class);
+					boolean strict = annotation.isStrict();
+					
+					if (strict) {
+						failedToDefine.add(
+								String.format("'%s' of type %s", field.getName().replaceAll("_", "."), field.getType().getSimpleName()));
+						continue;
+					}
 				}
 				cs.set(path, saveObject(value, field, cs, path));
 			}
@@ -112,10 +117,15 @@ public abstract class StrictModel extends ConfigModel {
 				// Do nothing
 			} else {
 				Object value = field.get(this);
-				if (value == null) {
-					needsToDefine.add(
-							String.format("'%s' of type %s", field.getName().replaceAll("_", "."), field.getType().getSimpleName()));
-					continue;
+				if (field.isAnnotationPresent(StrictField.class)) {
+					StrictField annotation = field.getAnnotation(StrictField.class);
+					boolean strict = annotation.isStrict();
+					
+					if (strict) {
+						needsToDefine.add(
+								String.format("'%s' of type %s", field.getName().replaceAll("_", "."), field.getType().getSimpleName()));
+						continue;
+					}
 				}
 				cs.set(path, saveObject(value, field, cs, path));
 			}
