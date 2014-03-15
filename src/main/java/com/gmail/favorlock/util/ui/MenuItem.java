@@ -29,10 +29,12 @@ public abstract class MenuItem extends MenuClickBehavior {
         this(text, icon, 1);
     }
 
+    @SuppressWarnings("deprecation")
     public MenuItem(String text, MaterialData icon, int quantity) {
         this.text = text;
         this.icon = icon;
         this.quantity = quantity;
+        this.data = icon.getData();
     }
 
     public MenuItem(String text, MaterialData icon, short data) {
