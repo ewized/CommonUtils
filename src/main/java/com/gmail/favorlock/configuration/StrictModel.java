@@ -12,6 +12,25 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+/** An extension of ConfigModel that fails
+ *  to load if any field annotated with
+ * 
+ * <code>@StrictField</code>
+ * 
+ * is not present in the loaded yml file.
+ * 
+ * <p>
+ * 
+ * This is most useful for objects that a plugin
+ *  would not operate sufficiently in absence of.
+ * 
+ * <p>
+ * 
+ * Defaults can still be defined, any field without
+ *  the StrictField annotation will be allowed to
+ *  act as a default, with the same behavior as
+ *  ConfigModel provides.
+ */
 public abstract class StrictModel extends ConfigModel {
 
 	@Override

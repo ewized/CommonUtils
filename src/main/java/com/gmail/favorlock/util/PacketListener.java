@@ -22,6 +22,19 @@ import com.gmail.favorlock.CommonUtils;
 import com.gmail.favorlock.util.ui.MenuCommandBlock;
 import com.google.common.base.Charsets;
 
+/** A packet listener for use in cases where
+ *  packet listening is unavoidable. An
+ *  instance of this class will only be
+ *  active if ProtocolLib is present.
+ *  Functionality using this class
+ *  <b>may be unusable</b>
+ *  in the case that the
+ *  PacketListener is not active.
+ *  <p><br>
+ *  <code>CommonUtils.isPacketListenerActive();</code>
+ *  <p> can be used to determine if the
+ *   packet listener is active.
+ */
 public class PacketListener implements com.comphenix.protocol.events.PacketListener {
 
 	private CommonUtils instance;
