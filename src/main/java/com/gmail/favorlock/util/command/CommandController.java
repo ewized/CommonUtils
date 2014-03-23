@@ -69,38 +69,10 @@ public class CommandController implements CommandExecutor {
     }
 
     /**
-     * @author AmoebaMan
-     * An annotation interface that may be attached to a method to designate it as a command handler.
-     * When registering a handler with this class, only methods marked with this annotation will be considered for command registration.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    public static @interface CommandHandler {
-        String name();
-        String[] aliases() default { "" };
-        String description() default "";
-        String usage() default "";
-        String permission() default "";
-        String permissionMessage() default "You do not have permission to use that command";
-    }
-
-    /**
      * Tests if a method is a command handler
      */
     private static boolean isCommandHandler(Method method){
         return method.getAnnotation(CommandHandler.class) != null;
-    }
-
-    /**
-     * @author AmoebaMan
-     * An annotation interface that may be attached to a method to designate it as a subcommand handler.
-     * When registering a handler with this class, only methods marked with this annotation will be considered for subcommand registration.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    public static @interface SubCommandHandler {
-        String parent();
-        String name();
-        String permission() default "";
-        String permissionMessage() default "You do not have permission to use that command";
     }
 
     /**
