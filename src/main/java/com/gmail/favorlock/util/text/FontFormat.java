@@ -1,7 +1,5 @@
 package com.gmail.favorlock.util.text;
 
-import org.bukkit.ChatColor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

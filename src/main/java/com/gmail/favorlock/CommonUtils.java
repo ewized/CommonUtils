@@ -1,7 +1,5 @@
 package com.gmail.favorlock;
 
-import java.util.logging.Logger;
-
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.favorlock.util.PacketListener;
@@ -17,13 +15,12 @@ public class CommonUtils extends JavaPlugin {
         plugin = this;
         menuAPI = new MenuAPI(this);
         
-        Logger log = Logger.getLogger("Minecraft");
         if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
         	packetListener = new PacketListener(this);
-        	log.info("ProtocolLib found; PacketListener active.");
+        	getLogger().info("ProtocolLib found; PacketListener active.");
         } else {
         	packetListener = null;
-        	log.warning("ProtocolLib not found; PacketListener inactive.");
+        	getLogger().warning("ProtocolLib not found; PacketListener inactive.");
         }
     }
 

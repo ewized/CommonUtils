@@ -1,11 +1,10 @@
 package com.gmail.favorlock.effects;
 
-import com.gmail.favorlock.PacketFactory;
-import com.gmail.favorlock.entity.EntityHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.Random;
+import com.gmail.favorlock.PacketFactory;
+import com.gmail.favorlock.entity.EntityHandler;
 
 public enum ParticleEffect {
     HUGE_EXPLOSION("hugeexplosion"),
@@ -42,7 +41,6 @@ public enum ParticleEffect {
     HAPPY_VILLAGER("happyVillager");
 
     private String particleName;
-    private static Random random = new Random();
 
     ParticleEffect(String particleName) {
         this.particleName = particleName;
