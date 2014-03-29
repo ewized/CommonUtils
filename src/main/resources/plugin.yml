@@ -1,5 +1,5 @@
 name: CommonUtils
-version: 0.0.1
+version: ${version}
 description: Common utilities for Bukkit.
 author: Favorlock
 
