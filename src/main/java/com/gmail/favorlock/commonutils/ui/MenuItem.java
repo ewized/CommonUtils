@@ -120,7 +120,7 @@ public abstract class MenuItem extends MenuClickBehavior {
     public int getSlot() {
         return slot;
     }
-    
+
     @Override
     public abstract void onClick(Player player);
 }

@@ -18,7 +18,7 @@ public class EntityHandler {
             sendPacket(player, packet);
         }
     }
-    
+
     public static void sendPacket(Player[] players, Object packet) {
         for (Player player : players)
             sendPacket(player, packet);

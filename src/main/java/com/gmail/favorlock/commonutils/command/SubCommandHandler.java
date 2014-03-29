@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
  * When registering a handler with this class, only
  * methods marked with this annotation will be
  * considered for subcommand registration.
+ *
  * @originalauthor AmoebaMan
  */
 @Inherited
@@ -21,9 +22,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SubCommandHandler {
     String parent();
+
     String name();
+
     String permission() default "";
+
     String permissionMessage() default "You do not have permission to use that command";
-    
+
     CommandHandling handling() default CommandHandling.COMMAND_EXECUTION;
 }

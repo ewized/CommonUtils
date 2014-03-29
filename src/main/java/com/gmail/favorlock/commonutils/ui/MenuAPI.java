@@ -17,163 +17,163 @@ import com.gmail.favorlock.commonutils.CommonUtils;
 
 public class MenuAPI implements Listener {
 
-	protected static CommonUtils instance;
+    protected static CommonUtils instance;
 
-	public MenuAPI(CommonUtils plugin) {
-		instance = plugin;
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-	}
+    public MenuAPI(CommonUtils plugin) {
+        instance = plugin;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
 
-	public static Menu createMenu(String title, int rows) {
-		return new Menu(title, rows);
-	}
+    public static Menu createMenu(String title, int rows) {
+        return new Menu(title, rows);
+    }
 
-	public static Menu createMenu(String title, boolean center, int rows) {
-		if (!center) {
-			return new Menu(title, rows);
-		}
-		int spaces = (32 - title.length()) / 2;
-		String name = "";
-		for (int i = 0; i < spaces; i++) {
-			name += " ";
-		}
-		name += title;
-		return new Menu(name, rows);
-	}
+    public static Menu createMenu(String title, boolean center, int rows) {
+        if (!center) {
+            return new Menu(title, rows);
+        }
+        int spaces = (32 - title.length()) / 2;
+        String name = "";
+        for (int i = 0; i < spaces; i++) {
+            name += " ";
+        }
+        name += title;
+        return new Menu(name, rows);
+    }
 
-	public static MenuAnvil createMenuAnvil() {
-		return new MenuAnvil();
-	}
-	
-	public static MenuCommandBlock createMenuCommandBlock(String defaultText) {
-		if (CommonUtils.isPacketListenerActive()) {
-			return new MenuCommandBlock(defaultText);
-		} else {
-			return null;
-		}
-	}
+    public static MenuAnvil createMenuAnvil() {
+        return new MenuAnvil();
+    }
 
-	public static MenuDispenser createMenuDispenser(String title) {
-		return new MenuDispenser(title);
-	}
+    public static MenuCommandBlock createMenuCommandBlock(String defaultText) {
+        if (CommonUtils.isPacketListenerActive()) {
+            return new MenuCommandBlock(defaultText);
+        } else {
+            return null;
+        }
+    }
 
-	public static MenuHopper createMenuHopper(String title) {
-		return new MenuHopper(title);
-	}
+    public static MenuDispenser createMenuDispenser(String title) {
+        return new MenuDispenser(title);
+    }
 
-	public static MenuHolder cloneMenu(MenuHolder menu) {
-		return menu.clone();
-	}
+    public static MenuHopper createMenuHopper(String title) {
+        return new MenuHopper(title);
+    }
 
-	public static void removeMenu(MenuHolder menu) {
-		for (HumanEntity viewer : menu.getInventory().getViewers()) {
-			if (viewer instanceof Player) {
-				menu.closeMenu((Player) viewer);
-			} else {
-				viewer.closeInventory();
-			}
-		}
-	}
+    public static MenuHolder cloneMenu(MenuHolder menu) {
+        return menu.clone();
+    }
 
-	public static void switchMenu(final Player player, MenuBase fromMenu, final MenuBase toMenu) {
-		fromMenu.closeMenu(player);
+    public static void removeMenu(MenuHolder menu) {
+        for (HumanEntity viewer : menu.getInventory().getViewers()) {
+            if (viewer instanceof Player) {
+                menu.closeMenu((Player) viewer);
+            } else {
+                viewer.closeInventory();
+            }
+        }
+    }
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				toMenu.openMenu(player);
-			}
-		}.runTask(instance);
-	}
-	
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onMenuItemClicked(InventoryClickEvent event) {
-		Inventory inventory = event.getInventory();
-		Player player = (Player) event.getWhoClicked();
-		if (inventory.getHolder() instanceof MenuHolder) {
-			MenuHolder menu = (MenuHolder) inventory.getHolder();
-			if (event.isRightClick()) {
-				event.setCancelled(true);
-				return;
-			}
-			if (event.getWhoClicked() instanceof Player) {
-				if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
-					if (menu.exitOnClickOutside()) {
-						menu.closeMenu(player);
-					}
-				} else {
-					int index = event.getRawSlot();
-					if (index < inventory.getSize()) {
-						menu.selectMenuItem(player, index);
-					} else {
-						if (menu.exitOnClickOutside()) {
-							menu.closeMenu(player);
-						}
-					}
-				}
-			}
-			event.setCancelled(true);
-		} else if (MenuAnvil.hasOpenAnvil(player)) {
-			MenuAnvil menu = MenuAnvil.getOpenAnvil(player);
-			if (event.isRightClick()) {
-				event.setCancelled(true);
-				return;
-			}
-			if (event.getWhoClicked() instanceof Player) {
-				if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
-					if (menu.exitOnClickOutside()) {
-						menu.closeMenu(player);
-					}
-				} else {
-					int index = event.getRawSlot();
-					if (index < inventory.getSize()) {
-						menu.selectMenuItem(player, index);
-					} else {
-						if (menu.exitOnClickOutside()) {
-							menu.closeMenu(player);
-						}
-					}
-				}
-			}
-			event.setCancelled(true);
-		}
-	}
+    public static void switchMenu(final Player player, MenuBase fromMenu, final MenuBase toMenu) {
+        fromMenu.closeMenu(player);
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onMenuClosed(InventoryCloseEvent event) {
-		if (event.getPlayer() instanceof Player) {
-			Inventory inventory = event.getInventory();
-			Player player = (Player) event.getPlayer();
-			if (inventory.getHolder() instanceof MenuHolder) {
-				MenuHolder menu = (MenuHolder) inventory.getHolder();
-				MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                toMenu.openMenu(player);
+            }
+        }.runTask(instance);
+    }
 
-				if (menuCloseBehavior != null) {
-					menuCloseBehavior.onClose(player);
-				}
-			} else if (MenuAnvil.hasOpenAnvil(player)) {
-				MenuAnvil menu = MenuAnvil.removeOpenAnvil(player);
-				menu.onClose(player);
-				MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onMenuItemClicked(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+        Player player = (Player) event.getWhoClicked();
+        if (inventory.getHolder() instanceof MenuHolder) {
+            MenuHolder menu = (MenuHolder) inventory.getHolder();
+            if (event.isRightClick()) {
+                event.setCancelled(true);
+                return;
+            }
+            if (event.getWhoClicked() instanceof Player) {
+                if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
+                    if (menu.exitOnClickOutside()) {
+                        menu.closeMenu(player);
+                    }
+                } else {
+                    int index = event.getRawSlot();
+                    if (index < inventory.getSize()) {
+                        menu.selectMenuItem(player, index);
+                    } else {
+                        if (menu.exitOnClickOutside()) {
+                            menu.closeMenu(player);
+                        }
+                    }
+                }
+            }
+            event.setCancelled(true);
+        } else if (MenuAnvil.hasOpenAnvil(player)) {
+            MenuAnvil menu = MenuAnvil.getOpenAnvil(player);
+            if (event.isRightClick()) {
+                event.setCancelled(true);
+                return;
+            }
+            if (event.getWhoClicked() instanceof Player) {
+                if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
+                    if (menu.exitOnClickOutside()) {
+                        menu.closeMenu(player);
+                    }
+                } else {
+                    int index = event.getRawSlot();
+                    if (index < inventory.getSize()) {
+                        menu.selectMenuItem(player, index);
+                    } else {
+                        if (menu.exitOnClickOutside()) {
+                            menu.closeMenu(player);
+                        }
+                    }
+                }
+            }
+            event.setCancelled(true);
+        }
+    }
 
-				if (menuCloseBehavior != null) {
-					menuCloseBehavior.onClose(player);
-				}
-			}
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerMove(PlayerMoveEvent event) {
-		if (MenuCommandBlock.hasMenuOpen(event.getPlayer())) {
-			Location from = event.getFrom();
-			Location to = event.getTo();
-			
-			if ((to.getPitch() == from.getPitch()) && (to.getYaw() == from.getYaw())) {
-				return;
-			}
-			
-			MenuCommandBlock.cancelFor(event.getPlayer());
-		}
-	}
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMenuClosed(InventoryCloseEvent event) {
+        if (event.getPlayer() instanceof Player) {
+            Inventory inventory = event.getInventory();
+            Player player = (Player) event.getPlayer();
+            if (inventory.getHolder() instanceof MenuHolder) {
+                MenuHolder menu = (MenuHolder) inventory.getHolder();
+                MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
+
+                if (menuCloseBehavior != null) {
+                    menuCloseBehavior.onClose(player);
+                }
+            } else if (MenuAnvil.hasOpenAnvil(player)) {
+                MenuAnvil menu = MenuAnvil.removeOpenAnvil(player);
+                menu.onClose(player);
+                MenuCloseBehavior menuCloseBehavior = menu.getMenuCloseBehavior();
+
+                if (menuCloseBehavior != null) {
+                    menuCloseBehavior.onClose(player);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (MenuCommandBlock.hasMenuOpen(event.getPlayer())) {
+            Location from = event.getFrom();
+            Location to = event.getTo();
+
+            if ((to.getPitch() == from.getPitch()) && (to.getYaw() == from.getYaw())) {
+                return;
+            }
+
+            MenuCommandBlock.cancelFor(event.getPlayer());
+        }
+    }
 }

@@ -14,13 +14,13 @@ public class CommonUtils extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         menuAPI = new MenuAPI(this);
-        
+
         if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
-        	packetListener = new PacketListener(this);
-        	getLogger().info("ProtocolLib found; PacketListener active.");
+            packetListener = new PacketListener(this);
+            getLogger().info("ProtocolLib found; PacketListener active.");
         } else {
-        	packetListener = null;
-        	getLogger().warning("ProtocolLib not found; PacketListener inactive.");
+            packetListener = null;
+            getLogger().warning("ProtocolLib not found; PacketListener inactive.");
         }
     }
 
@@ -33,10 +33,10 @@ public class CommonUtils extends JavaPlugin {
     }
 
     public static PacketListener getPacketListener() {
-    	return packetListener;
+        return packetListener;
     }
-    
+
     public static boolean isPacketListenerActive() {
-    	return (packetListener != null);
+        return (packetListener != null);
     }
 }

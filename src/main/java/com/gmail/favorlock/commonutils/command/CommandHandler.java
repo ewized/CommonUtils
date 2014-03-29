@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * When registering a handler with this class, only
  * methods marked with this annotation will be
  * considered for command registration.
- * <p>
+ * <p/>
  * When the handling field has the default value of
  * <code>CommandHandling.COMMAND_EXECUTION</code>,
  * the command will receive the settings that are
@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
  * <code>CommandHandling.TAB_COMPLETION</code> instead,
  * only the name will be retrieved from this annotation,
  * all other fields will be ignored.
+ *
  * @originalauthor AmoebaMan
  */
 @Inherited
@@ -31,11 +32,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface CommandHandler {
     String name();
-    String[] aliases() default { "" };
+
+    String[] aliases() default {""};
+
     String description() default "";
+
     String usage() default "";
+
     String permission() default "";
+
     String permissionMessage() default "You do not have permission to use that command";
-    
+
     CommandHandling handling() default CommandHandling.COMMAND_EXECUTION;
 }

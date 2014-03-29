@@ -9,69 +9,69 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class MenuHolder extends MenuBase implements InventoryHolder {
 
-	public void openMenu(Player player) {
-		if (getInventory().getViewers().contains(player)) {
-			throw new IllegalArgumentException(player.getName() + " is already viewing " + getInventory().getTitle());
-		}
+    public void openMenu(Player player) {
+        if (getInventory().getViewers().contains(player)) {
+            throw new IllegalArgumentException(player.getName() + " is already viewing " + getInventory().getTitle());
+        }
 
-		player.openInventory(getInventory());
-	}
+        player.openInventory(getInventory());
+    }
 
-	public void closeMenu(Player player) {
-		if (getInventory().getViewers().contains(player)) {
-			getInventory().getViewers().remove(player);
-			player.closeInventory();
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	protected void selectMenuItem(Player player, int index) {
-		if (items.containsKey(index)) {
-			MenuItem item = items.get(index);
-			item.onClick(player);
-		}
-		player.updateInventory();
-	}
+    public void closeMenu(Player player) {
+        if (getInventory().getViewers().contains(player)) {
+            getInventory().getViewers().remove(player);
+            player.closeInventory();
+        }
+    }
 
-	public boolean addMenuItem(MenuItem item, int index) {
-		ItemStack slot = getInventory().getItem(index);
+    @SuppressWarnings("deprecation")
+    protected void selectMenuItem(Player player, int index) {
+        if (items.containsKey(index)) {
+            MenuItem item = items.get(index);
+            item.onClick(player);
+        }
+        player.updateInventory();
+    }
 
-		if (slot != null && slot.getType() != Material.AIR) {
-			return false;
-		}
+    public boolean addMenuItem(MenuItem item, int index) {
+        ItemStack slot = getInventory().getItem(index);
 
-		getInventory().setItem(index, item.getItemStack());
-		items.put(index, item);
-		item.addToMenu(this);
+        if (slot != null && slot.getType() != Material.AIR) {
+            return false;
+        }
 
-		return true;
-	}
+        getInventory().setItem(index, item.getItemStack());
+        items.put(index, item);
+        item.addToMenu(this);
 
-	public boolean removeMenuItem(int index) {
-		ItemStack slot = getInventory().getItem(index);
+        return true;
+    }
 
-		if (slot == null || slot.getType() == Material.AIR) {
-			return false;
-		}
+    public boolean removeMenuItem(int index) {
+        ItemStack slot = getInventory().getItem(index);
 
-		getInventory().clear(index);
-		items.remove(index).removeFromMenu(this);
+        if (slot == null || slot.getType() == Material.AIR) {
+            return false;
+        }
 
-		return true;
-	}
+        getInventory().clear(index);
+        items.remove(index).removeFromMenu(this);
 
-	@SuppressWarnings("deprecation")
-	public void updateMenu() {
-		for (HumanEntity entity : getInventory().getViewers()) {
-			if (entity instanceof Player) {
-				Player player = (Player) entity;
-				player.updateInventory();
-			}
-		}
-	}
+        return true;
+    }
 
-	@Override
-	public abstract Inventory getInventory();
+    @SuppressWarnings("deprecation")
+    public void updateMenu() {
+        for (HumanEntity entity : getInventory().getViewers()) {
+            if (entity instanceof Player) {
+                Player player = (Player) entity;
+                player.updateInventory();
+            }
+        }
+    }
 
-	protected abstract MenuHolder clone();
+    @Override
+    public abstract Inventory getInventory();
+
+    protected abstract MenuHolder clone();
 }
