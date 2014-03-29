@@ -32,4 +32,16 @@ public class MethodBuilder {
         return this;
     }
 
+    public Object invokeReturn(Object... params) {
+        try {
+            return method.invoke(object, params);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

@@ -3,6 +3,7 @@ package com.gmail.favorlock.commonutils.bossbar;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gmail.favorlock.commonutils.bossbar.version.v1_7.Dragon;
 import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,11 +13,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.gmail.favorlock.commonutils.CommonUtils;
 
 public class BossBar {
-    // Maps player name to their current BossBarDragon
-    private static final Map<String, BossBarDragon> playerBars = new HashMap<String, BossBarDragon>();
+    // Maps player name to their current FakeDragon
+    private static final Map<String, FakeDragon> playerBars = new HashMap<String, FakeDragon>();
     // Maps player name to the task ID of their ticking bar, if applicable
     private static final Map<String, Integer> tickingBars = new HashMap<String, Integer>();
-
     /**
      * Get whether or not a player has a bar currently displayed.
      *
@@ -46,7 +46,7 @@ public class BossBar {
     public static boolean removeBar(Player player) {
         if (!hasBar(player))
             return false;
-        EntityHandler.sendPacket(player, getBarDragon(player, "").getDragonDestroyPacket());
+        EntityHandler.sendPacket(player, getBarDragon(player, "").getDestroyPacket());
         playerBars.remove(player.getName());
         stopTickingBar(player);
         return true;
@@ -77,9 +77,9 @@ public class BossBar {
      * @param message String message to be displayed on the bar.
      */
     public static void setMessageBar(Player player, String message) {
-        BossBarDragon dragon = getBarDragon(player, message);
-        dragon.setDisplayedName(trim(message));
-        dragon.setHealthDirectly(BossBarDragon.FULL_HEALTH);
+        FakeDragon dragon = getBarDragon(player, message);
+        dragon.setName(trim(message));
+        dragon.setHealth(FakeDragon.MAX_HEALTH);
         stopTickingBar(player);
         sendBarDragon(dragon, player);
     }
@@ -107,9 +107,9 @@ public class BossBar {
     public static void setPercentBar(Player player, String message, int percent) {
         if ((percent < 0f) || (percent > 100f))
             return;
-        BossBarDragon dragon = getBarDragon(player, message);
-        dragon.setDisplayedName(trim(message));
-        dragon.setHealthPercent(percent);
+        FakeDragon dragon = getBarDragon(player, message);
+        dragon.setName(trim(message));
+        dragon.setHealth(percent);
         stopTickingBar(player);
         sendBarDragon(dragon, player);
     }
@@ -224,22 +224,22 @@ public class BossBar {
             return;
         if (interval.length < 2)
             interval = new int[]{interval[0], 20};
-        BossBarDragon dragon = getBarDragon(player, message);
-        dragon.setDisplayedName(trim(message));
-        dragon.setHealthDirectly(decrement ? BossBarDragon.FULL_HEALTH : 0);
-        final float healthChange = BossBarDragon.FULL_HEALTH / interval[0];
+        FakeDragon dragon = getBarDragon(player, message);
+        dragon.setName(trim(message));
+        dragon.setHealth(decrement ? FakeDragon.MAX_HEALTH : 0);
+        final float healthChange = FakeDragon.MAX_HEALTH / interval[0];
         stopTickingBar(player);
         tickingBars.put(player.getName(), Bukkit.getScheduler().runTaskTimer(CommonUtils.getPlugin(), new BukkitRunnable() {
             public void run() {
-                BossBarDragon dragon = getBarDragon(player, "");
-                dragon.setHealthDirectly(dragon.getHealth() + (decrement ? -healthChange : healthChange));
-                if (decrement ? dragon.getHealth() < 0 : dragon.getHealth() > BossBarDragon.FULL_HEALTH) {
+                FakeDragon dragon = getBarDragon(player, "");
+                dragon.setHealth(dragon.getHealth() + (decrement ? -healthChange : healthChange));
+                if (decrement ? dragon.getHealth() < 0 : dragon.getHealth() > FakeDragon.MAX_HEALTH) {
                     removeBar(player);
                     stopTickingBar(player);
-                } else if (dragon.getHealth() == (decrement ? 0 : BossBarDragon.FULL_HEALTH)) {
+                } else if (dragon.getHealth() == (decrement ? 0 : FakeDragon.MAX_HEALTH)) {
                     if (completeMessage != null) {
-                        dragon.setHealthDirectly(decrement ? 0 : BossBarDragon.FULL_HEALTH);
-                        dragon.setDisplayedName(trim(completeMessage));
+                        dragon.setHealth(decrement ? 0 : FakeDragon.MAX_HEALTH);
+                        dragon.setName(trim(completeMessage));
                         sendBarDragon(dragon, player);
                     }
                     sendBarDragon(dragon, player);
@@ -251,33 +251,33 @@ public class BossBar {
         sendBarDragon(dragon, player);
     }
 
-    private static BossBarDragon addBarDragon(Player player, String message) {
-        BossBarDragon dragon = newBarDragon(message, player.getLocation().add(0, -384, 0));
-        EntityHandler.sendPacket(player, dragon.getDragonSpawnPacket());
+    private static FakeDragon addBarDragon(Player player, String message) {
+        FakeDragon dragon = newBarDragon(message, player.getLocation().add(0, -384, 0));
+        EntityHandler.sendPacket(player, dragon.getSpawnPacket());
         playerBars.put(player.getName(), dragon);
         return dragon;
     }
 
-    private static BossBarDragon addBarDragon(Player player, Location loc, String message) {
-        BossBarDragon dragon = newBarDragon(message, loc.add(0, -384, 0));
-        EntityHandler.sendPacket(player, dragon.getDragonSpawnPacket());
+    private static FakeDragon addBarDragon(Player player, Location loc, String message) {
+        FakeDragon dragon = newBarDragon(message, loc.add(0, -384, 0));
+        EntityHandler.sendPacket(player, dragon.getSpawnPacket());
         playerBars.put(player.getName(), dragon);
         return dragon;
     }
 
-    private static BossBarDragon getBarDragon(Player player, String message) {
+    private static FakeDragon getBarDragon(Player player, String message) {
         if (hasBar(player))
             return playerBars.get(player.getName());
         else
             return addBarDragon(player, trim(message));
     }
 
-    private static BossBarDragon newBarDragon(String message, Location loc) {
-        BossBarDragon barDragon = new BossBarDragon(message, loc);
+    private static FakeDragon newBarDragon(String message, Location loc) {
+        FakeDragon barDragon = new Dragon(message, loc);
         return barDragon;
     }
 
-    private static void sendBarDragon(BossBarDragon barDragon, Player player) {
+    private static void sendBarDragon(FakeDragon barDragon, Player player) {
         EntityHandler.sendPacket(player, barDragon.getMetaPacket(barDragon.getWatcher()));
         EntityHandler.sendPacket(player, barDragon.getTeleportPacket(player.getLocation().add(0, -384, 0)));
     }
@@ -309,14 +309,14 @@ public class BossBar {
             public void run() {
                 if (!hasBar(player))
                     return;
-                BossBarDragon oldBarDragon = getBarDragon(player, "");
+                FakeDragon oldBarDragon = getBarDragon(player, "");
                 float oldHealth = oldBarDragon.getHealth();
-                String message = oldBarDragon.getDisplayedName();
-                EntityHandler.sendPacket(player, getBarDragon(player, "").getDragonDestroyPacket());
+                String message = oldBarDragon.getName();
+                EntityHandler.sendPacket(player, getBarDragon(player, "").getDestroyPacket());
                 playerBars.remove(player.getName());
 
-                BossBarDragon newBarDragon = addBarDragon(player, loc, message);
-                newBarDragon.setHealthDirectly(oldHealth);
+                FakeDragon newBarDragon = addBarDragon(player, loc, message);
+                newBarDragon.setHealth(oldHealth);
                 sendBarDragon(newBarDragon, player);
             }
         });

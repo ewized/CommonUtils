@@ -72,4 +72,31 @@ public class EntityHandler {
         return watcher;
     }
 
+    public static Object getWatcher(Object entity, boolean visible, float health, String name) {
+        Class<?> clazz = VersionHandler.getCraftClass("DataWatcher");
+        Object watcher = null;
+
+        try {
+            watcher = clazz.getConstructors()[0].newInstance(entity);
+
+            new MethodBuilder(clazz, "a", watcher, new Class<?>[]{int.class, Object.class})
+                    .invoke(0, visible ? (byte) 0 : (byte) 0x20)
+                    .invoke(6, (Float) health)
+                    .invoke(7, (Integer) 0)
+                    .invoke(8, (Byte) (byte) 0)
+                    .invoke(10, name)
+                    .invoke(11, (Byte) (byte) 1);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return watcher;
+    }
+
 }
