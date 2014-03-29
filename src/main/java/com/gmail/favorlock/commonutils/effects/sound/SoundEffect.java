@@ -3,6 +3,7 @@ package com.gmail.favorlock.commonutils.effects.sound;
 import java.io.Serializable;
 
 import org.bukkit.Location;
+import org.bukkit.Note;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -18,6 +19,13 @@ public class SoundEffect implements Serializable {
         this.sound = sound;
         this.volume = volume;
         this.pitch = pitch;
+    }
+    
+    @SuppressWarnings("deprecation")
+    public SoundEffect(Sound sound, float volume, Note pitch) {
+        this.sound = sound;
+        this.volume = volume;
+        this.pitch = SoundUtil.getPitchFor(pitch.getId());
     }
     
     /**

@@ -24,11 +24,8 @@ public class SoundSequence implements Serializable {
 
     private static final long serialVersionUID = -5803173434004574724L;
     
-    private final Map<Integer, List<SoundDisplay>> sequence;
-    
-    public SoundSequence() {
-        sequence = new HashMap<>();
-    }
+    private final Map<Integer, List<SoundDisplay>> sequence = new HashMap<>();
+    private transient List<TaskPlaySound> tasks = new ArrayList<>();
     
     /**
      * Play this SoundSequence at the specified location.
@@ -37,29 +34,8 @@ public class SoundSequence implements Serializable {
      * @param location  The location to play sounds at.
      */
     public void play(final Location location) {
-        new BukkitRunnable() {
-            private int tick = 0;
-            private int found = 0;
-            private final Map<Integer, List<SoundDisplay>> seq = sequence;
-            
-            public void run() {
-                List<SoundDisplay> sounds = seq.get(new Integer(tick++));
-                
-                if (sounds != null) {
-                    for (SoundDisplay display : sounds) {
-                        Location loc = location.clone().add(display.vector.toVector());
-                        display.sound.play(loc);
-                        found++;
-                    }
-                }
-                
-                if (found > seq.size()) {
-                    try {
-                        this.cancel();
-                    } catch (IllegalStateException e) {}
-                }
-            }
-        }.runTaskTimer(CommonUtils.getPlugin(), 0L, 1L);
+        initTransient();
+        tasks.add(new TaskPlaySound(sequence, location, null, SoundPlayType.LOCATION, tasks).start());
     }
     
     /**
@@ -70,29 +46,8 @@ public class SoundSequence implements Serializable {
      * @param players   The players to play sounds to.
      */
     public void play(final Location location, final Player... players) {
-        new BukkitRunnable() {
-            private int tick = 0;
-            private int found = 0;
-            private final Map<Integer, List<SoundDisplay>> seq = sequence;
-            
-            public void run() {
-                List<SoundDisplay> sounds = seq.get(new Integer(tick++));
-                
-                if (sounds != null) {
-                    for (SoundDisplay display : sounds) {
-                        Location loc = location.clone().add(display.vector.toVector());
-                        display.sound.play(loc, players);
-                        found++;
-                    }
-                }
-                
-                if (found > seq.size()) {
-                    try {
-                        this.cancel();
-                    } catch (IllegalStateException e) {}
-                }
-            }
-        }.runTaskTimer(CommonUtils.getPlugin(), 0L, 1L);
+        initTransient();
+        tasks.add(new TaskPlaySound(sequence, location, players, SoundPlayType.LOCATION_PLAYERS, tasks).start());
     }
     
     /**
@@ -102,31 +57,39 @@ public class SoundSequence implements Serializable {
      * @param players   The players to play sounds to.
      */
     public void play(final Player... players) {
-        new BukkitRunnable () {
-            private int tick = 0;
-            private int found = 0;
-            private final Map<Integer, List<SoundDisplay>> seq = sequence;
-            
-            public void run() {
-                List<SoundDisplay> sounds = seq.get(new Integer(tick++));
-                
-                if (sounds != null) {
-                    for (SoundDisplay display : sounds) {
-                        for (Player player : players) {
-                            Location loc = player.getEyeLocation().clone().add(display.vector.toVector());
-                            display.sound.play(loc, player);
-                            found++;
-                        }
-                    }
-                }
-                
-                if (found > seq.size()) {
-                    try {
-                        this.cancel();
-                    } catch (IllegalStateException e) {}
-                }
-            }
-        }.runTaskTimer(CommonUtils.getPlugin(), 0L, 1L);
+        initTransient();
+        tasks.add(new TaskPlaySound(sequence, null, players, SoundPlayType.PLAYERS, tasks).start());
+    }
+    
+    /**
+     * Stops all currently running tasks for this sequence.
+     */
+    public void stopAll() {
+        initTransient();
+        
+        for (TaskPlaySound task : tasks) {
+            try {
+                task.cancel();
+            } catch (Exception e) {}
+        }
+        
+        tasks.clear();
+    }
+    
+    /**
+     * Stops all currently running tasks for this sequence,
+     * for the specified player only. This will have no effect
+     * on a sequence that was played at a specific location.
+     * 
+     * @param player The player for whom this sequence
+     * should stop.
+     */
+    public void stopFor(Player player) {
+        initTransient();
+        
+        for (TaskPlaySound task : tasks) {
+            task.stopFor(player);
+        }
     }
     
     /**
@@ -228,6 +191,11 @@ public class SoundSequence implements Serializable {
         }
     }
     
+    private void initTransient() {
+        if (tasks == null)
+            tasks = new ArrayList<>();
+    }
+    
     private static class SoundDisplay implements Serializable {
         
         private static final long serialVersionUID = -5992270977058731326L;
@@ -238,6 +206,84 @@ public class SoundSequence implements Serializable {
         private SoundDisplay(SoundEffect sound, Vector offset) {
             this.sound = sound;
             this.vector = new SerializableVector(offset);
+        }
+    }
+    
+    private static enum SoundPlayType { LOCATION, LOCATION_PLAYERS, PLAYERS }
+    
+    private static class TaskPlaySound extends BukkitRunnable {
+        private final Map<Integer, List<SoundDisplay>> seq;
+        private final Location location;
+        private Player[] players;
+        private final SoundPlayType type;
+        private final List<TaskPlaySound> running_tasks;
+        private int tick = 0;
+        private int found = 0;
+        
+        private TaskPlaySound(Map<Integer, List<SoundDisplay>> sequence, Location initial, Player[] players, SoundPlayType type, List<TaskPlaySound> tasks) {
+            this.seq = new HashMap<>(sequence);
+            this.location = initial;
+            this.players = players;
+            this.type = type;
+            this.running_tasks = tasks;
+        }
+        
+        public TaskPlaySound start() {
+            this.runTaskTimer(CommonUtils.getPlugin(), 0L, 1L);
+            return this;
+        }
+        
+        public void stopFor(Player cancel) {
+            if (type.equals(SoundPlayType.LOCATION) || (players == null))
+                return;
+            
+            Player[] replacement = new Player[players.length - 1];
+            int newindex = 0;
+            
+            for (Player player : players) {
+                if (player.equals(cancel))
+                    continue;
+                
+                replacement[newindex++] = player;
+            }
+            
+            players = replacement;
+        }
+        
+        public void run() {
+            List<SoundDisplay> sounds = seq.get(new Integer(tick++));
+            
+            if (sounds != null) {
+                if (type.equals(SoundPlayType.LOCATION))
+                    for (SoundDisplay display : sounds) {
+                        Location loc = location.clone().add(display.vector.toVector());
+                        display.sound.play(loc);
+                    }
+                
+                if (type.equals(SoundPlayType.LOCATION_PLAYERS))
+                    for (SoundDisplay display : sounds) {
+                        Location loc = location.clone().add(display.vector.toVector());
+                        display.sound.play(loc, players);
+                    }
+                
+                if (type.equals(SoundPlayType.PLAYERS))
+                    for (SoundDisplay display : sounds) {
+                        for (Player player : players) {
+                            Location loc = player.getEyeLocation().clone().add(display.vector.toVector());
+                            display.sound.play(loc, player);
+                        }
+                    }
+                
+                found++;
+            }
+            
+            if (found > seq.size()) {
+                try {
+                    this.cancel();
+                } catch (IllegalStateException e) {}
+                
+                running_tasks.remove(this);
+            }
         }
     }
     
