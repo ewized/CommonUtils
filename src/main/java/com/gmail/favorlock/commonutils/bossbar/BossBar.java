@@ -17,6 +17,7 @@ public class BossBar {
     private static final Map<String, FakeDragon> playerBars = new HashMap<String, FakeDragon>();
     // Maps player name to the task ID of their ticking bar, if applicable
     private static final Map<String, Integer> tickingBars = new HashMap<String, Integer>();
+    
     /**
      * Get whether or not a player has a bar currently displayed.
      *
@@ -46,6 +47,7 @@ public class BossBar {
     public static boolean removeBar(Player player) {
         if (!hasBar(player))
             return false;
+        
         EntityHandler.sendPacket(player, getBarDragon(player, "").getDestroyPacket());
         playerBars.remove(player.getName());
         stopTickingBar(player);
@@ -77,6 +79,8 @@ public class BossBar {
      * @param message String message to be displayed on the bar.
      */
     public static void setMessageBar(Player player, String message) {
+        removeBar(player);
+        
         FakeDragon dragon = getBarDragon(player, message);
         dragon.setName(trim(message));
         dragon.setHealth(FakeDragon.MAX_HEALTH);
@@ -93,6 +97,7 @@ public class BossBar {
     public static void setAllPercentBar(String message, int percent) {
         if ((percent < 0f) || (percent > 100f))
             return;
+        
         for (Player player : Bukkit.getServer().getOnlinePlayers())
             setPercentBar(player, message, percent);
     }
@@ -107,6 +112,9 @@ public class BossBar {
     public static void setPercentBar(Player player, String message, int percent) {
         if ((percent < 0f) || (percent > 100f))
             return;
+        
+        removeBar(player);
+        
         FakeDragon dragon = getBarDragon(player, message);
         dragon.setName(trim(message));
         dragon.setHealth(percent);
@@ -222,13 +230,18 @@ public class BossBar {
     private static void setTimerBar(final Player player, String message, int[] interval, final String completeMessage, final boolean decrement) {
         if (interval[0] < 0)
             return;
+        
         if (interval.length < 2)
             interval = new int[]{interval[0], 20};
+        
+        removeBar(player);
+        
         FakeDragon dragon = getBarDragon(player, message);
         dragon.setName(trim(message));
         dragon.setHealth(decrement ? FakeDragon.MAX_HEALTH : 0);
         final float healthChange = FakeDragon.MAX_HEALTH / interval[0];
         stopTickingBar(player);
+        
         tickingBars.put(player.getName(), Bukkit.getScheduler().runTaskTimer(CommonUtils.getPlugin(), new BukkitRunnable() {
             public void run() {
                 FakeDragon dragon = getBarDragon(player, "");
@@ -284,6 +297,7 @@ public class BossBar {
 
     private static void stopTickingBar(Player player) {
         Integer timerID = tickingBars.remove(player.getName());
+        
         if (timerID != null)
             Bukkit.getScheduler().cancelTask(timerID);
     }
@@ -305,6 +319,7 @@ public class BossBar {
     public static void adjustBossBarTeleport(final Player player, final Location loc) {
         if (!hasBar(player))
             return;
+        
         Bukkit.getScheduler().runTask(CommonUtils.getPlugin(), new Runnable() {
             public void run() {
                 if (!hasBar(player))
