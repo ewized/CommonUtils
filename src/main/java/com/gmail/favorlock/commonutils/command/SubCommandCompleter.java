@@ -9,23 +9,18 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation interface that may be attached to
- * a method to designate it as a subcommand handler.
+ * a method to designate it as a subcommand tab completer.
  * When registering a handler with this class, only
  * methods marked with this annotation will be
- * considered for subcommand registration.
- *
- * @originalauthor AmoebaMan
+ * considered for subcommand completion registration.
  */
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface SubCommandHandler {
+public @interface SubCommandCompleter {
+
     String parent();
-
+    
     String name();
-
-    String permission() default "";
-
-    String permissionMessage() default "You do not have permission to use that command";
 }

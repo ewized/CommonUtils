@@ -76,31 +76,42 @@ public class CommandController {
                     CommandHandler annotation = method.getAnnotation(CommandHandler.class);
 
                     if (plugin.getCommand(annotation.name()) != null) {
-                        CommandHandling handling = annotation.handling();
+                        CommandHandling handling = CommandHandling.COMMAND_EXECUTION;
                         PluginCommand command = plugin.getCommand(annotation.name());
                         handling.handleCommand(command, method, instance);
 
-                        if (handling.equals(CommandHandling.COMMAND_EXECUTION)) {
-                            if (!(annotation.aliases().equals(new String[]{""})))
-                                command.setAliases(Lists.newArrayList(annotation.aliases()));
+                        if (!(annotation.aliases().equals(new String[]{""})))
+                            command.setAliases(Lists.newArrayList(annotation.aliases()));
 
-                            if (!annotation.description().equals(""))
-                                command.setDescription(annotation.description());
+                        if (!annotation.description().equals(""))
+                            command.setDescription(annotation.description());
 
-                            if (!annotation.usage().equals(""))
-                                command.setUsage(annotation.usage());
+                        if (!annotation.usage().equals(""))
+                            command.setUsage(annotation.usage());
 
-                            if (!annotation.permission().equals(""))
-                                command.setPermission(annotation.permission());
+                        if (!annotation.permission().equals(""))
+                            command.setPermission(annotation.permission());
 
-                            if (!annotation.permissionMessage().equals(""))
-                                command.setPermissionMessage(ChatColor.RED + annotation.permissionMessage());
-                        }
+                        if (!annotation.permissionMessage().equals(""))
+                            command.setPermissionMessage(ChatColor.RED + annotation.permissionMessage());
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register command of" +
-                                        " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
-                                annotation.name(), instance.getClass().getCanonicalName()
-                        ));
+                                " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
+                                annotation.name(), instance.getClass().getCanonicalName()));
+                    }
+                }
+                
+                if (method.isAnnotationPresent(CommandCompleter.class)) {
+                    CommandCompleter annotation = method.getAnnotation(CommandCompleter.class);
+                    
+                    if (plugin.getCommand(annotation.name()) != null) {
+                        CommandHandling handling = CommandHandling.TAB_COMPLETION;
+                        PluginCommand command = plugin.getCommand(annotation.name());
+                        handling.handleCommand(command, method, instance);
+                    } else {
+                        plugin.getLogger().warning(String.format("[CommandController]\nCould not register command of" +
+                                " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
+                                annotation.name(), instance.getClass().getCanonicalName()));
                     }
                 }
 
@@ -110,19 +121,39 @@ public class CommandController {
                     if (plugin.getCommand(annotation.parent()) != null) {
                         PluginCommand command = plugin.getCommand(annotation.parent());
                         SubCommand subcommand = new SubCommand(
-                                plugin.getCommand(annotation.parent()),
+                                command,
                                 annotation.name(),
                                 annotation.permission(),
                                 annotation.permissionMessage(),
                                 method,
                                 instance);
-                        annotation.handling().handleSubCommand(command, subcommand);
+                        CommandHandling.COMMAND_EXECUTION.handleSubCommand(command, subcommand);
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register subcommand of" +
-                                        " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
-                                        " plugin.yml file.",
-                                annotation.name(), annotation.parent(), instance.getClass().getCanonicalName()
-                        ));
+                                " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
+                                " plugin.yml file.",
+                                annotation.name(), annotation.parent(), instance.getClass().getCanonicalName()));
+                    }
+                }
+                
+                if (method.isAnnotationPresent(SubCommandCompleter.class)) {
+                    SubCommandCompleter annotation = method.getAnnotation(SubCommandCompleter.class);
+                    
+                    if (plugin.getCommand(annotation.parent()) != null) {
+                        PluginCommand command = plugin.getCommand(annotation.parent());
+                        SubCommand subcommand = new SubCommand(
+                                command,
+                                annotation.name(),
+                                "",
+                                "",
+                                method,
+                                instance);
+                        CommandHandling.TAB_COMPLETION.handleSubCommand(command, subcommand);
+                    } else {
+                        plugin.getLogger().warning(String.format("[CommandController]\nCould not register subcommand of" +
+                                " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
+                                " plugin.yml file.",
+                                annotation.name(), annotation.parent(), instance.getClass().getCanonicalName()));
                     }
                 }
             }
