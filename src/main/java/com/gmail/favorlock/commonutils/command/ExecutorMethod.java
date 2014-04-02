@@ -58,6 +58,16 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
                                     }
                                 }
                             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
+                        } else if (boolean.class.isAssignableFrom(returns)) {
+                            try {
+                                boolean cmdsuccess = (boolean) sub_method.invoke(sub_instance, sender, sub_args);
+                                
+                                if (!cmdsuccess) {
+                                    if (!subcommand.usage.equals("")) {
+                                        sender.sendMessage(subcommand.usage);
+                                    }
+                                }
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                         } else {
                             try {
                                 sub_method.invoke(sub_instance, sender, sub_args);
@@ -87,6 +97,10 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
                     if (Boolean.class.isAssignableFrom(returns)) {
                         try {
                             return (Boolean) main_method.invoke(main_instance, sender, args);
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
+                    } else if (boolean.class.isAssignableFrom(returns)) {
+                        try {
+                            return (boolean) main_method.invoke(main_instance, sender, args);
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                     } else {
                         try {
