@@ -46,9 +46,22 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
                     }
 
                     if (subcommand.permission.equals("") || sender.hasPermission(subcommand.permission)) {
-                        try {
-                            sub_method.invoke(sub_instance, sender, sub_args);
-                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        Class<?> returns = sub_method.getReturnType();
+                        
+                        if (Boolean.class.isAssignableFrom(returns)) {
+                            try {
+                                boolean cmdsuccess = (Boolean) sub_method.invoke(sub_instance, sender, sub_args);
+                                
+                                if (!cmdsuccess) {
+                                    if (!subcommand.usage.equals("")) {
+                                        sender.sendMessage(subcommand.usage);
+                                    }
+                                }
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
+                        } else {
+                            try {
+                                sub_method.invoke(sub_instance, sender, sub_args);
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                         }
 
                         return true;
@@ -69,9 +82,16 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
         if (hasMainCommand()) {
             if (compatibleParameterTypes(main_method, sender)) {
                 if ((command.getPermission() == null) || command.getPermission().equals("") || sender.hasPermission(command.getPermission())) {
-                    try {
-                        main_method.invoke(main_instance, sender, args);
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    Class<?> returns = main_method.getReturnType();
+                    
+                    if (Boolean.class.isAssignableFrom(returns)) {
+                        try {
+                            return (Boolean) main_method.invoke(main_instance, sender, args);
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
+                    } else {
+                        try {
+                            main_method.invoke(main_instance, sender, args);
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                     }
 
                     return true;

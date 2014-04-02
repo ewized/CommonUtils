@@ -25,6 +25,8 @@ public @interface SubCommandHandler {
 
     String name();
 
+    String usage() default "";
+
     String permission() default "";
 
     String permissionMessage() default "You do not have permission to use that command";

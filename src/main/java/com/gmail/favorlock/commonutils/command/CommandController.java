@@ -15,15 +15,17 @@ public class CommandController {
     protected static class SubCommand {
         public final Command parent;
         public final String child;
+        public final String usage;
         public final String permission;
         public final String permissionMessage;
 
         public final Method method;
         public final Object instance;
 
-        public SubCommand(Command parent, String child, String permission, String permissionMessage, Method method, Object instance) {
+        public SubCommand(Command parent, String child, String usage, String permission, String permissionMessage, Method method, Object instance) {
             this.parent = parent;
             this.child = child.toLowerCase();
+            this.usage = usage;
             this.permission = permission;
             this.permissionMessage = permissionMessage;
 
@@ -123,6 +125,7 @@ public class CommandController {
                         SubCommand subcommand = new SubCommand(
                                 command,
                                 annotation.name(),
+                                annotation.usage(),
                                 annotation.permission(),
                                 annotation.permissionMessage(),
                                 method,
@@ -144,6 +147,7 @@ public class CommandController {
                         SubCommand subcommand = new SubCommand(
                                 command,
                                 annotation.name(),
+                                "",
                                 "",
                                 "",
                                 method,
