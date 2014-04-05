@@ -30,62 +30,60 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Sub Commands
-        if (args.length > 0) {
-            if (hasSubCommands()) {
-                String subcommand_string = CommandController.SubCommand.toStringFor(command, args[0]);
-                CommandController.SubCommand subcommand = subcommands.get(subcommand_string);
+        if ((args.length > 0) && hasSubCommands()) {
+            String subcommand_string = CommandController.SubCommand.toStringFor(command, args[0]);
+            CommandController.SubCommand subcommand = subcommands.get(subcommand_string);
 
-                if (subcommand != null) {
-                    Method sub_method = subcommand.method;
-                    Object sub_instance = subcommand.instance;
+            if (subcommand != null) {
+                Method sub_method = subcommand.method;
+                Object sub_instance = subcommand.instance;
 
-                    if (compatibleParameterTypes(sub_method, sender)) {
-                        String[] sub_args = new String[args.length - 1];
+                if (compatibleParameterTypes(sub_method, sender)) {
+                    String[] sub_args = new String[args.length - 1];
 
-                        for (int i = 1; i < args.length; i++) {
-                            sub_args[i - 1] = args[i];
-                        }
+                    for (int i = 1; i < args.length; i++) {
+                        sub_args[i - 1] = args[i];
+                    }
 
-                        if (subcommand.permission.equals("") || sender.hasPermission(subcommand.permission)) {
-                            Class<?> returns = sub_method.getReturnType();
+                    if (subcommand.permission.equals("") || sender.hasPermission(subcommand.permission)) {
+                        Class<?> returns = sub_method.getReturnType();
 
-                            if (Boolean.class.isAssignableFrom(returns)) {
-                                try {
-                                    boolean cmdsuccess = (Boolean) sub_method.invoke(sub_instance, sender, sub_args);
+                        if (Boolean.class.isAssignableFrom(returns)) {
+                            try {
+                                boolean cmdsuccess = (Boolean) sub_method.invoke(sub_instance, sender, sub_args);
 
-                                    if (!cmdsuccess) {
-                                        if (!subcommand.usage.equals("")) {
-                                            sender.sendMessage(subcommand.usage);
-                                        }
+                                if (!cmdsuccess) {
+                                    if (!subcommand.usage.equals("")) {
+                                        sender.sendMessage(subcommand.usage);
                                     }
-                                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
-                            } else if (boolean.class.isAssignableFrom(returns)) {
-                                try {
-                                    boolean cmdsuccess = (boolean) sub_method.invoke(sub_instance, sender, sub_args);
+                                }
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
+                        } else if (boolean.class.isAssignableFrom(returns)) {
+                            try {
+                                boolean cmdsuccess = (boolean) sub_method.invoke(sub_instance, sender, sub_args);
 
-                                    if (!cmdsuccess) {
-                                        if (!subcommand.usage.equals("")) {
-                                            sender.sendMessage(subcommand.usage);
-                                        }
+                                if (!cmdsuccess) {
+                                    if (!subcommand.usage.equals("")) {
+                                        sender.sendMessage(subcommand.usage);
                                     }
-                                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
-                            } else {
-                                try {
-                                    sub_method.invoke(sub_instance, sender, sub_args);
-                                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
-                            }
-
-                            return true;
+                                }
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                         } else {
-                            if (!subcommand.permissionMessage.equals(""))
-                                sender.sendMessage(ChatColor.RED + subcommand.permissionMessage);
-                            return true;
+                            try {
+                                sub_method.invoke(sub_instance, sender, sub_args);
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                         }
+
+                        return true;
                     } else {
-                        sender.sendMessage(String.format("%sThis command must be run by a a %s.",
-                                ChatColor.RED, sub_method.getParameterTypes()[0].getSimpleName()));
+                        if (!subcommand.permissionMessage.equals(""))
+                            sender.sendMessage(ChatColor.RED + subcommand.permissionMessage);
                         return true;
                     }
+                } else {
+                    sender.sendMessage(String.format("%sThis command must be run by a a %s.",
+                            ChatColor.RED, sub_method.getParameterTypes()[0].getSimpleName()));
+                    return true;
                 }
             }
         }
