@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 import org.bukkit.util.Vector;
 
+/**
+ * A Bukkit Vector that can be easily
+ * serialized and deserialized.
+ */
 public class SerializableVector implements Serializable {
 
     private static final long serialVersionUID = 2502224833193065220L;
