@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.gmail.favorlock.commonutils.CommonUtils;
-import com.gmail.favorlock.commonutils.math.SerializableVector;
+import com.gmail.favorlock.commonutils.serialization.SerializableVector;
 
 public class ParticleSequence implements Serializable {
 
