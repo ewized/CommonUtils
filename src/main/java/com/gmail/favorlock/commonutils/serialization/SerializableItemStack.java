@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class SerializableItemStack implements Serializable {
         this.data = item.getData().getData();
         
         this.meta_display = item.getItemMeta().getDisplayName();
-        this.meta_lore = item.getItemMeta().getLore();
+        this.meta_lore = new ArrayList<>(item.getItemMeta().getLore());
         
         this.enchantments = packEnchantments(item.getEnchantments());
         
