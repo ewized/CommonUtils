@@ -28,7 +28,7 @@ public class SerializableItemStack implements Serializable {
     private String meta_display;
     private List<String> meta_lore;
     
-    private transient ItemStack item;
+    private transient ItemStack item = null;
     
     /**
      * Create a new {@link SerializableItemStack}.
@@ -48,17 +48,23 @@ public class SerializableItemStack implements Serializable {
      * @return The ItemStack
      */
     public ItemStack getItemStack() {
+        if (item == null)
+            unpackItem();
+        
         return item;
     }
     
     @SuppressWarnings("deprecation")
     private void packItem() {
-        this.amount = item.getAmount();
         this.material = item.getData().getItemType().toString();
         this.data = item.getData().getData();
-        this.enchantments = packEnchantments(item.getEnchantments());
+        
         this.meta_display = item.getItemMeta().getDisplayName();
         this.meta_lore = item.getItemMeta().getLore();
+        
+        this.enchantments = packEnchantments(item.getEnchantments());
+        
+        this.amount = item.getAmount();
     }
     
     private Map<String, Integer> packEnchantments(Map<Enchantment, Integer> enchants) {
