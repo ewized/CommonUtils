@@ -18,7 +18,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.gmail.favorlock.commonutils.CommonUtils;
-import com.gmail.favorlock.commonutils.serialization.SerializableVector;
 
 public class ParticleSequence implements Serializable {
 
@@ -190,17 +189,15 @@ public class ParticleSequence implements Serializable {
         private static final long serialVersionUID = -923651335456182534L;
 
         private final Particle particle;
-        private final SerializableVector vector;
+        private final Map<String, Object> vector;
 
         private ParticleDisplay(Particle particle, Vector offset) {
             this.particle = particle;
-            this.vector = new SerializableVector(offset);
+            this.vector = offset.serialize();
         }
     }
 
     private static enum ParticleDisplayType {LOCATION, LOCATION_PLAYERS}
-
-    ;
 
     private static class TaskDisplayParticles extends BukkitRunnable {
         private final Map<Integer, List<ParticleDisplay>> seq;
@@ -247,13 +244,13 @@ public class ParticleSequence implements Serializable {
             if (particles != null) {
                 if (type.equals(ParticleDisplayType.LOCATION))
                     for (ParticleDisplay display : particles) {
-                        Location loc = location.clone().add(display.vector.toVector());
+                        Location loc = location.clone().add(Vector.deserialize(display.vector));
                         display.particle.play(loc);
                     }
 
                 if (type.equals(ParticleDisplayType.LOCATION_PLAYERS))
                     for (ParticleDisplay display : particles) {
-                        Location loc = location.clone().add(display.vector.toVector());
+                        Location loc = location.clone().add(Vector.deserialize(display.vector));
                         display.particle.play(loc, players);
                     }
 

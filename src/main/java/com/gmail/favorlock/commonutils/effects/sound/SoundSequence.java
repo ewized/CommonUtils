@@ -18,7 +18,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.gmail.favorlock.commonutils.CommonUtils;
-import com.gmail.favorlock.commonutils.serialization.SerializableVector;
 
 public class SoundSequence implements Serializable {
 
@@ -201,11 +200,11 @@ public class SoundSequence implements Serializable {
         private static final long serialVersionUID = -5992270977058731326L;
 
         private final SoundEffect sound;
-        private final SerializableVector vector;
+        private final Map<String, Object> vector;
 
         private SoundDisplay(SoundEffect sound, Vector offset) {
             this.sound = sound;
-            this.vector = new SerializableVector(offset);
+            this.vector = offset.serialize();
         }
     }
 
@@ -256,20 +255,20 @@ public class SoundSequence implements Serializable {
             if (sounds != null) {
                 if (type.equals(SoundPlayType.LOCATION))
                     for (SoundDisplay display : sounds) {
-                        Location loc = location.clone().add(display.vector.toVector());
+                        Location loc = location.clone().add(Vector.deserialize(display.vector));
                         display.sound.play(loc);
                     }
 
                 if (type.equals(SoundPlayType.LOCATION_PLAYERS))
                     for (SoundDisplay display : sounds) {
-                        Location loc = location.clone().add(display.vector.toVector());
+                        Location loc = location.clone().add(Vector.deserialize(display.vector));
                         display.sound.play(loc, players);
                     }
 
                 if (type.equals(SoundPlayType.PLAYERS))
                     for (SoundDisplay display : sounds) {
                         for (Player player : players) {
-                            Location loc = player.getEyeLocation().clone().add(display.vector.toVector());
+                            Location loc = player.getEyeLocation().clone().add(Vector.deserialize(display.vector));
                             display.sound.play(loc, player);
                         }
                     }
