@@ -69,7 +69,9 @@ public class CommandController {
      * @param instance An instance of the class whose methods should be considered for registration
      */
     public static void registerCommands(JavaPlugin plugin, Object instance) {
-
+        plugin.getLogger().info(String.format("[CommandController]\nReceived registration from plugin (main %s)"
+                + " to register an instance of %s", plugin.getDescription().getMain(), instance.getClass().getCanonicalName()));
+        
         for (Method method : instance.getClass().getMethods()) {
             Class<?>[] params = method.getParameterTypes();
 
@@ -96,7 +98,7 @@ public class CommandController {
 
                         if (!annotation.permissionMessage().equals(""))
                             command.setPermissionMessage(ChatColor.RED + annotation.permissionMessage());
-                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered command execution of command" +
+                        plugin.getLogger().info(String.format("[CommandController]\nRegistered command execution of command" +
                                 " name %s to an instance of %s.",
                                 annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
@@ -113,7 +115,7 @@ public class CommandController {
                         CommandHandling handling = CommandHandling.TAB_COMPLETION;
                         PluginCommand command = plugin.getCommand(annotation.name());
                         handling.handleCommand(command, method, instance);
-                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered tab completion of command" +
+                        plugin.getLogger().info(String.format("[CommandController]\nRegistered tab completion of command" +
                                 " name %s to an instance of %s.",
                                 annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
@@ -137,7 +139,7 @@ public class CommandController {
                                 method,
                                 instance);
                         CommandHandling.COMMAND_EXECUTION.handleSubCommand(command, subcommand);
-                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered command execution of subcommand" +
+                        plugin.getLogger().info(String.format("[CommandController]\nRegistered command execution of subcommand" +
                                 " name %s to an instance of %s.",
                                 annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
@@ -162,7 +164,7 @@ public class CommandController {
                                 method,
                                 instance);
                         CommandHandling.TAB_COMPLETION.handleSubCommand(command, subcommand);
-                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered tab completion of subcommand" +
+                        plugin.getLogger().info(String.format("[CommandController]\nRegistered tab completion of subcommand" +
                                 " name %s to an instance of %s.",
                                 annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
