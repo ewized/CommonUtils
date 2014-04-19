@@ -1,13 +1,26 @@
 package com.gmail.favorlock.commonutils.effects.sound;
 
+import java.io.File;
+
+import javax.sound.midi.ShortMessage;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Note;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
+import com.gmail.favorlock.commonutils.effects.sound.midi.MidiTransceiver;
+import com.gmail.favorlock.commonutils.effects.sound.midi.MidiWrapper;
+
 public class SoundUtil {
 
+    private static final int[] midi_instruments = {
+        0, 0, 0, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+        6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 2, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 1, 1, 1, 5, 1, 1, 1, 1, 1, 2, 4, 3};
+    
     /**
      * Play a sound for a player.
      */
@@ -53,6 +66,65 @@ public class SoundUtil {
     }
 
     /**
+     * Attempt to play a MIDI file, with the given parameters, to the given
+     * players.
+     * <p/>
+     * A MidiWrapper object will be returned, which can be used to affect the
+     * sequence while its playing.
+     * <p/>
+     * If an exception is encountered during loading the file, it will be
+     * caught, and null will be returned.
+     * 
+     * @param file      The File to read MIDI from.
+     * @param tempo     The tempo to play at.
+     * @param volume    The volume to play at.
+     * @param players   The Players to play to.
+     * @return  A MidiWrapper object.
+     */
+    public static MidiWrapper playMidi(File file, float tempo, float volume, Player... players) {
+        try {
+            return MidiWrapper.playMidi(file, tempo, volume, players);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Attempt to play a MIDI file, with the given tempo, to the given players.
+     * <p/>
+     * A MidiWrapper object will be returned, which can be used to affect the
+     * sequence while its playing.
+     * <p/>
+     * If an exception is encountered during loading the file, it will be
+     * caught, and null will be returned.
+     * 
+     * @param file      The File to read MIDI from.
+     * @param tempo     The tempo to play at.
+     * @param players   The Players to play to.
+     * @return  A MidiWrapper object.
+     */
+    public static MidiWrapper playMidi(File file, float tempo, Player... players) {
+        return playMidi(file, tempo, MidiTransceiver.getDefaultVolume(), players);
+    }
+    
+    /**
+     * Attempt to play a MIDI file to the given players.
+     * <p/>
+     * A MidiWrapper object will be returned, which can be used to affect the
+     * sequence while its playing.
+     * <p/>
+     * If an exception is encountered during loading the file, it will be
+     * caught, and null will be returned.
+     * 
+     * @param file      The File to read MIDI from.
+     * @param players   The Players to play to.
+     * @return  A MidiWrapper object.
+     */
+    public static MidiWrapper playMidi(File file, Player... players) {
+        return playMidi(file, MidiTransceiver.getDefaultTempo(), MidiTransceiver.getDefaultVolume(), players);
+    }
+    
+    /**
      * Get the float pitch value for a given note.
      *
      * @param note_id The note.
@@ -70,59 +142,47 @@ public class SoundUtil {
      * @return <b>float</b> representing the pitch of this note.
      */
     public static float getPitchFor(byte note_id) {
-        switch (note_id) {
-            case 0:// F#
-                return 0.5f;
-            case 1:// G
-                return 0.53f;
-            case 2:// G#
-                return 0.56f;
-            case 3:// A
-                return 0.6f;
-            case 4:// A#
-                return 0.63f;
-            case 5:// B
-                return 0.67f;
-            case 6:// C
-                return 0.7f;
-            case 7:// C#
-                return 0.76f;
-            case 8:// D
-                return 0.8f;
-            case 9:// D#
-                return 0.84f;
-            case 10:// E
-                return 0.9f;
-            case 11:// F
-                return 0.94f;
-            case 12:// F#
-                return 1.0f;
-            case 13:// G
-                return 1.06f;
-            case 14:// G#
-                return 1.12f;
-            case 15:// A
-                return 1.18f;
-            case 16:// A#
-                return 1.26f;
-            case 17:// B
-                return 1.34f;
-            case 18:// C
-                return 1.42f;
-            case 19:// C#
-                return 1.5f;
-            case 20:// D
-                return 1.6f;
-            case 21:// D#
-                return 1.68f;
-            case 22:// E
-                return 1.78f;
-            case 23:// F
-                return 1.88f;
-            case 24:// F#
-                return 2.0f;
-            default:
-                return 0f;
+        if (note_id < 0)
+            return .0f;
+        
+        if (note_id > 24)
+            return 2.0f;
+        
+        final byte middle_note_id = 12;
+        
+        return (float)  Math.pow(2.0, (note_id - middle_note_id) / 12.0);
+    }
+    
+    public static float getPitchFor(ShortMessage sm) {
+        return getPitchFor(getNoteFor(sm));
+    }
+    
+    public static Note getNoteFor(ShortMessage sm) {
+        if (sm.getCommand() == ShortMessage.NOTE_ON) {
+            final byte midi_middle_note_id = 54;
+            
+            return new Note((sm.getData1() - midi_middle_note_id % 12) % 24);
+        } else {
+            return null;
+        }
+    }
+    
+    public static Sound getSoundFor(int midi_patch) {
+        switch (midi_instruments[midi_patch]) {
+        case 1:
+            return Sound.NOTE_BASS_GUITAR;
+        case 2:
+            return Sound.NOTE_SNARE_DRUM;
+        case 3:
+            return Sound.NOTE_STICKS;
+        case 4:
+            return Sound.NOTE_BASS_DRUM;
+        case 5:
+            return Sound.NOTE_PLING;
+        case 6:
+            return Sound.NOTE_BASS;
+        default:
+            return Sound.NOTE_PIANO;
         }
     }
 }
