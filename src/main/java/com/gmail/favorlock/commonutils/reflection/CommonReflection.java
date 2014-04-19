@@ -3,6 +3,7 @@ package com.gmail.favorlock.commonutils.reflection;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -65,6 +66,25 @@ public class CommonReflection {
             e.printStackTrace();
         }
     }
+    
+    public static Constructor<?> getConstructor(Class<?> cls, Class<?>[] param_classes) {
+        try {
+            Constructor<?> constructor = cls.getConstructor(param_classes);
+            return constructor;
+        } catch (NoSuchMethodException | SecurityException e) {
+            return null;
+        }
+    }
+    
+    public static Object constructNewInstance(Constructor<?> constructor, Object[] parameters) {
+        constructor.setAccessible(true);
+        
+        try {
+            return constructor.newInstance(parameters);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            return null;
+        }
+    }
 
     public static Method getMethod(Class<?> clazz, String method, Class<?>[] args) {
         for (Method m : clazz.getMethods()) {
@@ -94,6 +114,32 @@ public class CommonReflection {
         }
 
         return null;
+    }
+    
+    public static Object invokeMethodAndReturn(Method method, Object instance) {
+        Object ret;
+        
+        try {
+            method.setAccessible(true);
+            ret = method.invoke(instance);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            ret = null;
+        }
+        
+        return ret;
+    }
+    
+    public static Object invokeMethodAndReturn(Method method, Object instance, Object[] params) {
+        Object ret;
+        
+        try {
+            method.setAccessible(true);
+            ret = method.invoke(instance, params);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            ret = null;
+        }
+        
+        return ret;
     }
 
     public static Object invokeMethodAndReturn(Class<?> clazz, String method, Object object) {
