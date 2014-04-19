@@ -57,6 +57,8 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
                                         sender.sendMessage(subcommand.usage);
                                     }
                                 }
+                                
+                                return cmdsuccess;
                             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                         } else if (boolean.class.isAssignableFrom(returns)) {
                             try {
@@ -67,6 +69,8 @@ public class ExecutorMethod extends CommandMethod implements CommandExecutor {
                                         sender.sendMessage(subcommand.usage);
                                     }
                                 }
+                                
+                                return cmdsuccess;
                             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {}
                         } else {
                             try {
