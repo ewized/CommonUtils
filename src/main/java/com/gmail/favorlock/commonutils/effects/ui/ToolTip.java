@@ -27,7 +27,7 @@ import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 
-public class ToolTip implements Listener {
+public class ToolTip {
 
     @SuppressWarnings("deprecation")
     /** The MaterialData that should be used when a player has no held item to modify. */
@@ -41,6 +41,7 @@ public class ToolTip implements Listener {
     
     private final JavaPlugin plugin;
     private final Map<String, ToolTipQueue> main_queue;
+    private final ToolTipListener listener;
     private QueueHandler task;
     
     /**
@@ -63,9 +64,10 @@ public class ToolTip implements Listener {
     public ToolTip(JavaPlugin plugin, boolean process) {
         this.plugin = plugin;
         this.main_queue = new HashMap<>();
+        this.listener = new ToolTipListener();
         this.task = null;
         
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
         
         if (process)
             startQueue();
@@ -197,62 +199,64 @@ public class ToolTip implements Listener {
     }
     
     protected void finalize() throws Throwable {
-        HandlerList.unregisterAll(this);
+        HandlerList.unregisterAll(listener);
         super.finalize();
     }
     
-    @EventHandler
-    public void onInventoryOpen(InventoryOpenEvent e) {
-        if (e.getPlayer() instanceof Player) {
-            Player player = (Player) e.getPlayer();
-            
-            if (hasQueue(player)) {
-                plugin.getLogger().info("InvOpen w/ queue");
-                ToolTipQueue q = main_queue.get(player.getName());
+    private class ToolTipListener implements Listener {
+        @EventHandler
+        public void onInventoryOpen(InventoryOpenEvent e) {
+            if (e.getPlayer() instanceof Player) {
+                Player player = (Player) e.getPlayer();
                 
-                for (int i = 0; i < 9; i++) {
-                    sendReset(player, i);
-                }
-                
-                if (q != null) {
-                    q.operate = false;
-                }
-            }
-        }
-    }
-    
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent e) {
-        if (e.getPlayer() instanceof Player) {
-            Player player = (Player) e.getPlayer();
-            
-            if (hasQueue(player)) {
-                plugin.getLogger().info("InvClose w/ queue");
-                ToolTipQueue q = main_queue.get(player.getName());
-                
-                if (q != null) {
-                    q.operate = true;
-                    q.update();
-                }
-            }
-        }
-    }
-    
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e) {
-        final Player player = e.getPlayer();
-        
-        if (hasQueue(player)) {
-            ToolTipQueue q = main_queue.get(player.getName());
-            
-            if (q != null) {
-                final ToolTipMessage message = q.peek();
-                final int slot = player.getInventory().getHeldItemSlot();
-                new BukkitRunnable() {
-                    public void run() {
-                        sendMessage(player, message.message, slot);
+                if (hasQueue(player)) {
+                    plugin.getLogger().info("InvOpen w/ queue");
+                    ToolTipQueue q = main_queue.get(player.getName());
+                    
+                    for (int i = 0; i < 9; i++) {
+                        sendReset(player, i);
                     }
-                }.runTask(plugin);
+                    
+                    if (q != null) {
+                        q.operate = false;
+                    }
+                }
+            }
+        }
+        
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent e) {
+            if (e.getPlayer() instanceof Player) {
+                Player player = (Player) e.getPlayer();
+                
+                if (hasQueue(player)) {
+                    plugin.getLogger().info("InvClose w/ queue");
+                    ToolTipQueue q = main_queue.get(player.getName());
+                    
+                    if (q != null) {
+                        q.operate = true;
+                        q.update();
+                    }
+                }
+            }
+        }
+        
+        @EventHandler
+        public void onPlayerInteract(PlayerInteractEvent e) {
+            final Player player = e.getPlayer();
+            
+            if (hasQueue(player)) {
+                ToolTipQueue q = main_queue.get(player.getName());
+                
+                if (q != null) {
+                    final ToolTipMessage message = q.peek();
+                    final int slot = player.getInventory().getHeldItemSlot();
+                    new BukkitRunnable() {
+                        public void run() {
+                            sendMessage(player, message.message, slot);
+                        }
+                    }.runTask(plugin);
+                }
             }
         }
     }
