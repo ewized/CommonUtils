@@ -45,11 +45,12 @@ public class CommandController {
             return (parent.getName() + " " + child).trim();
         }
     }
-
+    
     /**
      * Registers all command handlers and subcommand handlers
      * in the given classes, matching them with their corresponding
      * commands and subcommands registered to the specified plugin.
+     * Output will only be sent to the console in cases of error.
      *
      * @param plugin    The plugin whose commands should be considered for registration
      * @param instances Instances of the classes whose methods should be considered for registration
@@ -59,18 +60,49 @@ public class CommandController {
             registerCommands(plugin, instance);
         }
     }
-
+    
+    /**
+     * Registers all command handlers and subcommand handlers
+     * in the given classes, matching them with their corresponding
+     * commands and subcommands registered to the specified plugin.
+     *
+     * @param plugin    The plugin whose commands should be considered for registration
+     * @param verbose  If true, very verbose output will be sent to the console even for success
+     * @param instances Instances of the classes whose methods should be considered for registration
+     */
+    public static void registerCommands(JavaPlugin plugin, boolean verbose, Object... instances) {
+        for (Object instance : instances) {
+            registerCommands(plugin, verbose, instance);
+        }
+    }
+    
+    /**
+     * Registers all command handlers and subcommand handlers
+     * in the given class, matching them with their corresponding
+     * commands and subcommands registered to the specified plugin.
+     * Output will only be sent to the console in cases of error.
+     *
+     * @param plugin   The plugin whose commands should be considered for registration
+     * @param instance An instance of the class whose methods should be considered for registration
+     */
+    public static void registerCommands(JavaPlugin plugin, Object instance) {
+        registerCommands(plugin, false, instance);
+    }
+    
     /**
      * Registers all command handlers and subcommand handlers
      * in the given class, matching them with their corresponding
      * commands and subcommands registered to the specified plugin.
      *
      * @param plugin   The plugin whose commands should be considered for registration
+     * @param verbose  If true, very verbose output will be sent to the console even for success
      * @param instance An instance of the class whose methods should be considered for registration
      */
-    public static void registerCommands(JavaPlugin plugin, Object instance) {
-        plugin.getLogger().info(String.format("[CommandController]\nReceived registration from plugin (main %s)"
-                + " to register an instance of %s", plugin.getDescription().getMain(), instance.getClass().getCanonicalName()));
+    public static void registerCommands(JavaPlugin plugin, boolean verbose, Object instance) {
+        if (verbose) {
+            plugin.getLogger().info(String.format("[CommandController]\nReceived registration from plugin (main %s)"
+                    + " to register an instance of %s", plugin.getDescription().getMain(), instance.getClass().getCanonicalName()));
+        }
         
         for (Method method : instance.getClass().getMethods()) {
             Class<?>[] params = method.getParameterTypes();
@@ -98,9 +130,12 @@ public class CommandController {
 
                         if (!annotation.permissionMessage().equals(""))
                             command.setPermissionMessage(ChatColor.RED + annotation.permissionMessage());
-                        plugin.getLogger().info(String.format("[CommandController]\nRegistered command execution of command" +
-                                " name %s to an instance of %s.",
-                                annotation.name(), instance.getClass().getCanonicalName()));
+                        
+                        if (verbose) {
+                            plugin.getLogger().info(String.format("[CommandController]\nRegistered command execution of command" +
+                                    " name %s to an instance of %s.",
+                                    annotation.name(), instance.getClass().getCanonicalName()));
+                        }
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register command of" +
                                 " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
@@ -115,9 +150,12 @@ public class CommandController {
                         CommandHandling handling = CommandHandling.TAB_COMPLETION;
                         PluginCommand command = plugin.getCommand(annotation.name());
                         handling.handleCommand(command, method, instance);
-                        plugin.getLogger().info(String.format("[CommandController]\nRegistered tab completion of command" +
-                                " name %s to an instance of %s.",
-                                annotation.name(), instance.getClass().getCanonicalName()));
+                        
+                        if (verbose) {
+                            plugin.getLogger().info(String.format("[CommandController]\nRegistered tab completion of command" +
+                                    " name %s to an instance of %s.",
+                                    annotation.name(), instance.getClass().getCanonicalName()));
+                        }
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register command of" +
                                 " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
@@ -139,9 +177,12 @@ public class CommandController {
                                 method,
                                 instance);
                         CommandHandling.COMMAND_EXECUTION.handleSubCommand(command, subcommand);
-                        plugin.getLogger().info(String.format("[CommandController]\nRegistered command execution of subcommand" +
-                                " name %s to an instance of %s.",
-                                annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
+                        
+                        if (verbose) {
+                            plugin.getLogger().info(String.format("[CommandController]\nRegistered command execution of subcommand" +
+                                    " name %s to an instance of %s.",
+                                    annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
+                        }
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register subcommand of" +
                                 " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
@@ -164,9 +205,12 @@ public class CommandController {
                                 method,
                                 instance);
                         CommandHandling.TAB_COMPLETION.handleSubCommand(command, subcommand);
-                        plugin.getLogger().info(String.format("[CommandController]\nRegistered tab completion of subcommand" +
-                                " name %s to an instance of %s.",
-                                annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
+                        
+                        if (verbose) {
+                            plugin.getLogger().info(String.format("[CommandController]\nRegistered tab completion of subcommand" +
+                                    " name %s to an instance of %s.",
+                                    annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
+                        }
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register subcommand of" +
                                 " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
