@@ -96,6 +96,9 @@ public class CommandController {
 
                         if (!annotation.permissionMessage().equals(""))
                             command.setPermissionMessage(ChatColor.RED + annotation.permissionMessage());
+                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered command execution of command" +
+                                " name %s to an instance of %s.",
+                                annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register command of" +
                                 " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
@@ -110,6 +113,9 @@ public class CommandController {
                         CommandHandling handling = CommandHandling.TAB_COMPLETION;
                         PluginCommand command = plugin.getCommand(annotation.name());
                         handling.handleCommand(command, method, instance);
+                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered tab completion of command" +
+                                " name %s to an instance of %s.",
+                                annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register command of" +
                                 " name %s from an instance of %s; this plugin does not define command in its plugin.yml.",
@@ -131,6 +137,9 @@ public class CommandController {
                                 method,
                                 instance);
                         CommandHandling.COMMAND_EXECUTION.handleSubCommand(command, subcommand);
+                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered command execution of subcommand" +
+                                " name %s to an instance of %s.",
+                                annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register subcommand of" +
                                 " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
@@ -153,6 +162,9 @@ public class CommandController {
                                 method,
                                 instance);
                         CommandHandling.TAB_COMPLETION.handleSubCommand(command, subcommand);
+                        plugin.getLogger().warning(String.format("[CommandController]\nRegistered tab completion of subcommand" +
+                                " name %s to an instance of %s.",
+                                annotation.parent() + ":" + annotation.name(), instance.getClass().getCanonicalName()));
                     } else {
                         plugin.getLogger().warning(String.format("[CommandController]\nCould not register subcommand of" +
                                 " name %s (super %s) from an instance of %s; this plugin does not define command in its" +
