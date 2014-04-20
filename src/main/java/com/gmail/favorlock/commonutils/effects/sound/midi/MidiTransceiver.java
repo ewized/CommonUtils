@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
+import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 
 import org.bukkit.Sound;
@@ -19,6 +20,10 @@ import com.gmail.favorlock.commonutils.effects.sound.SoundUtil;
  * Acts as a conduit between a MIDI sequencer and the Bukkit API's Sound enum.
  * Will play the sequencer's sound as accurately as is possible with the note
  * block instruments.
+ * <p/>
+ * The MidiTransceiver will monitor the state of the transmitting Sequencer,
+ * and close the Sequencer when transmitting has stopped. At that time, the
+ * MidiTransceiver will close itself, and should be finalizable.
  */
 public class MidiTransceiver implements Receiver {
 
@@ -27,12 +32,16 @@ public class MidiTransceiver implements Receiver {
     
     private final Map<Integer, Integer> channel_patches;
     private final Set<WeakReference<Player>> players;
+    private final WeakReference<Sequencer> seq;
     private float volume;
+    private boolean playing;
     
-    protected MidiTransceiver(float volume, Player... players) {
+    protected MidiTransceiver(Sequencer seq, float volume, Player... players) {
         this.channel_patches = new HashMap<>();
         this.players = new HashSet<>();
+        this.seq = new WeakReference<>(seq);
         this.volume = volume;
+        this.playing = true;
         
         for (Player player : players)
             this.players.add(new WeakReference<>(player));
@@ -63,6 +72,10 @@ public class MidiTransceiver implements Receiver {
         this.volume = volume;
     }
     
+    public boolean isPlaying() {
+        return playing;
+    }
+    
     public void send(MidiMessage mm, long time) {
         if (mm instanceof ShortMessage) {
             ShortMessage sm = (ShortMessage) mm;
@@ -70,14 +83,22 @@ public class MidiTransceiver implements Receiver {
             switch (sm.getCommand()) {
             case ShortMessage.NOTE_ON:
                 play(sm);
-                break;
+                return;
             case ShortMessage.NOTE_OFF:
-                break;
+                return;
             case ShortMessage.PROGRAM_CHANGE:
                 int channel = sm.getChannel();
                 int patch = sm.getData1();
                 channel_patches.put(channel, patch);
                 break;
+            default:
+                break;
+            }
+            
+            if (playing) {
+                if (seq.get() == null || !seq.get().isRunning()) {
+                    close();
+                }
             }
         }
     }
@@ -106,8 +127,10 @@ public class MidiTransceiver implements Receiver {
     }
     
     public void close() {
+        this.playing = false;
         channel_patches.clear();
         players.clear();
+        seq.clear();
     }
     
     

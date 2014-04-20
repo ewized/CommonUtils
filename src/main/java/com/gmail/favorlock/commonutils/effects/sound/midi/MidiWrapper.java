@@ -12,6 +12,14 @@ import javax.sound.midi.Sequencer;
 
 import org.bukkit.entity.Player;
 
+/**
+ * A class that provides weak access to a MidiTransceiver, while it is receiving
+ * transmission from a running Sequencer. Once the MidiTransceiver has closed,
+ * some methods will throw IllegalStateExceptions when invoked; the isValid()
+ * method can be used to ensure that a MidiWrapper's transceiver isn't closed.
+ * <p>
+ * This class also provides static methods for initializing a MIDI sequence.
+ */
 public class MidiWrapper {
 
     private final WeakReference<MidiTransceiver> midi;
@@ -22,16 +30,20 @@ public class MidiWrapper {
     
     /**
      * Get whether or not this MidiWrapper's MidiTransceiver is still valid.
+     * <p/>
+     * The MidiTransceiver is considered valid when there are still strong
+     * references to it, and it is still receiving transmission from its
+     * Sequencer.
      * 
      * @return <b>true</b> if the transceiver is still valid,
      *         <b>false</b> otherwise.
      */
     public boolean isValid() {
-        return midi.get() != null;
+        return midi.get() != null && midi.get().isPlaying();
     }
     
     /**
-     * Add the given player to the transmitter's player list.
+     * Add the given player to the transceiver's player list.
      * 
      * @throws IllegalStateException
      *     If this MidiWrapper's transceiver is no longer valid.
@@ -49,7 +61,7 @@ public class MidiWrapper {
     }
     
     /**
-     * Remove the given player from the transmitter's player list, if present.
+     * Remove the given player from the transceiver's player list, if present.
      * 
      * @throws IllegalStateException
      *     If this MidiWrapper's transceiver is no longer valid.
@@ -169,7 +181,7 @@ public class MidiWrapper {
             sequencer.open();
             sequencer.setTempoFactor(tempo);
             
-            MidiTransceiver receiver = new MidiTransceiver(volume, players);
+            MidiTransceiver receiver = new MidiTransceiver(sequencer, volume, players);
             sequencer.getTransmitter().setReceiver(receiver);
             sequencer.start();
             return new MidiWrapper(receiver);
