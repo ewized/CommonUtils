@@ -1,4 +1,4 @@
-package com.gmail.favorlock.commonutils.scoreboard.api;
+package com.gmail.favorlock.commonutils.scoreboard.api.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

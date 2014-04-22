@@ -1,5 +1,6 @@
 package com.gmail.favorlock.commonutils.scoreboard.impl;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,9 +31,9 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
     private static final ScoreboardWrapper SERVERMAIN = initServerMainScoreboardWrapper();
     private static final Map<String, ScoreboardWrapper> registry = new HashMap<>();
 
-    private final Scoreboard original;
     private final String label;
     private final boolean main;
+    private Scoreboard original;
     private Scoreboard board;
     
     private CraftScoreboardWrapper(Scoreboard board, String label) {
@@ -83,6 +84,21 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
      */
     public boolean isMain() {
         return main;
+    }
+    
+    /**
+     * Unregister this ScoreboardWrapper.
+     */
+    public void unregisterWrapper() {
+        if (isMain())
+            throw new IllegalStateException("Cannot unregister the server main Scoreboard!");
+        
+        clearEntries();
+        clearObjectives();
+        clearTeams();
+        this.board = null;
+        this.original = null;
+        registry.remove(label);
     }
     
     /**
@@ -184,6 +200,11 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         return board.getEntries();
     }
     
+    /**
+     * Get a set of all the Objectives in the Scoreboard represented by this object.
+     * 
+     * @return A set of ObjectiveWrappers for all Objectives.
+     */
     public Set<ObjectiveWrapper> getObjectiveSet() {
         Set<Objective> objectives = board.getObjectives();
         Set<ObjectiveWrapper> objective_wrappers = new HashSet<>();
@@ -199,6 +220,33 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         return objective_wrappers;
     }
     
+    /**
+     * Get whether or not an Objective by the given name currently exists.
+     * 
+     * @param name  The name of the Objective to look for.
+     * @return <b>true</b> if an Objective by the given name exists,
+     *         <b>false</b> otherwise.
+     */
+    public boolean isObjectiveRegistered(String name) {
+        return getObjective(name) != null;
+    }
+    
+    /**
+     * Get whether or not a Team by the given name currently exists.
+     * 
+     * @param name  The name of the Team to look for.
+     * @return <b>true</b> if a Team by the given name exists, <b>false</b>
+     *         otherwise.
+     */
+    public boolean isTeamRegistered(String name) {
+        return getTeam(name) != null;
+    }
+    
+    /**
+     * Get a set of all the Teams in the Scoreboard represented by this object.
+     * 
+     * @return A set of TeamWrappers for all Teams.
+     */
     public Set<TeamWrapper> getTeamSet() {
         Set<Team> teams = board.getTeams();
         Set<TeamWrapper> team_wrappers = new HashSet<>();
@@ -240,9 +288,19 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         
         try { // Newly registered objective should have been intercepted and proxied
             Objective registered = board.registerNewObjective(name, criterion.getCriterionString());
-//            Objective proxy = ObjectiveProxy.newProxy(this, registered);
             
-            return new CraftObjectiveWrapper(this, registered).setProxy(registered);
+            if (Proxy.isProxyClass(registered.getClass())) {
+                InvocationHandler ih = Proxy.getInvocationHandler(registered);
+                
+                if (ih instanceof ObjectiveProxy) {
+                    ObjectiveProxy proxy = (ObjectiveProxy) ih;
+                    
+                    return proxy.getObjectiveWrapper();
+                }
+            }
+
+            Bukkit.getLogger().warning("Scoreboard util- Newly registered Objective returned without being proxied!");
+            return null; // return new CraftObjectiveWrapper(this, registered).setProxy(registered);
         } catch (IllegalArgumentException e) {
             return getObjectiveFor(name);
         }
@@ -266,10 +324,31 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         Objective objective = board.getObjective(name);
         
         if (Proxy.isProxyClass(objective.getClass())) {
-            return new CraftObjectiveWrapper(this, objective).setProxy(objective);
+            InvocationHandler ih = Proxy.getInvocationHandler(objective);
+            
+            if (ih instanceof ObjectiveProxy) {
+                ObjectiveProxy proxy = (ObjectiveProxy) ih;
+                
+                return proxy.getObjectiveWrapper();
+            }
+            
+            Bukkit.getLogger().warning("Scoreboard util- Existing Objective proxy was not a ObjectiveProxy!");
+            return null; // return new CraftObjectiveWrapper(this, objective).setProxy(objective);
         } else {
             Objective proxy = ObjectiveProxy.newProxy(this, objective);
-            return new CraftObjectiveWrapper(this, proxy).setProxy(proxy);
+            
+            if (Proxy.isProxyClass(proxy.getClass())) {
+                InvocationHandler ih = Proxy.getInvocationHandler(proxy);
+                
+                if (ih instanceof ObjectiveProxy) {
+                    ObjectiveProxy proxyHandler = (ObjectiveProxy) ih;
+                    
+                    return proxyHandler.getObjectiveWrapper();
+                }
+            }
+            
+            Bukkit.getLogger().warning("Scoreboard util- Existing Objective could not be proxied!");
+            return null; // return new CraftObjectiveWrapper(this, proxy).setProxy(proxy);
         }
     }
 
@@ -286,9 +365,19 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         
         try { // Newly registered team should have been intercepted and proxied
             Team registered = board.registerNewTeam(name);
-//            Team proxy = TeamProxy.newProxy(this, registered);
             
-            return new CraftTeamWrapper(this, registered).setProxy(registered);
+            if (Proxy.isProxyClass(registered.getClass())) {
+                InvocationHandler ih = Proxy.getInvocationHandler(registered);
+                
+                if (ih instanceof TeamProxy) {
+                    TeamProxy proxy = (TeamProxy) ih;
+                    
+                    return proxy.getTeamWrapper();
+                }
+            }
+            
+            Bukkit.getLogger().warning("Scoreboard util- Newly registered Team returned without being proxied!");
+            return null; // return new CraftTeamWrapper(this, registered).setProxy(registered);
         } catch (IllegalArgumentException e) {
             return getTeamFor(name);
         }
@@ -312,10 +401,31 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         Team team = board.getTeam(name);
         
         if (Proxy.isProxyClass(team.getClass())) {
-            return new CraftTeamWrapper(this, team).setProxy(team);
+            InvocationHandler ih = Proxy.getInvocationHandler(team);
+            
+            if (ih instanceof TeamProxy) {
+                TeamProxy proxy = (TeamProxy) ih;
+                
+                return proxy.getTeamWrapper();
+            }
+
+            Bukkit.getLogger().warning("Scoreboard util- Existing Team proxy was not a TeamProxy!");
+            return null; // return new CraftTeamWrapper(this, team).setProxy(team);
         } else {
             Team proxy = TeamProxy.newProxy(this, team);
-            return new CraftTeamWrapper(this, proxy).setProxy(proxy);
+            
+            if (Proxy.isProxyClass(proxy.getClass())) {
+                InvocationHandler ih = Proxy.getInvocationHandler(proxy);
+                
+                if (ih instanceof TeamProxy) {
+                    TeamProxy proxyHandler = (TeamProxy) ih;
+                    
+                    return proxyHandler.getTeamWrapper();
+                }
+            }
+            
+            Bukkit.getLogger().warning("Scoreboard util- Existing Team could not be proxied!");
+            return null; // return new CraftTeamWrapper(this, proxy).setProxy(proxy);
         }
     }
 
@@ -394,6 +504,63 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
     
     
     /**
+     * Integrate an existing Scoreboard into the ScoreboardAPI.
+     * 
+     * @param scoreboard The Scoreboard to attempt to integrate.
+     * @param label      The label to use if a new wrapper is to be registered.
+     * @return A ScoreboardWrapper for the given Scoreboard, or <b>null</b> if
+     *         an error occurred.
+     */
+    public static ScoreboardWrapper integrateExistingScoreboard(Scoreboard scoreboard, String label) {
+        if (Proxy.isProxyClass(scoreboard.getClass())) {
+            if (scoreboard instanceof ScoreboardWrapper) {
+                return (ScoreboardWrapper) scoreboard;
+            }
+            
+            Bukkit.getLogger().warning("Scoreboard util- Existing Scoreboard was proxy but not ScoreboardWrapper!");
+            return null;
+        }
+        
+        if (SERVERMAIN != null) {
+            if (scoreboard.equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
+                return SERVERMAIN;
+            }
+        }
+        
+        for (Map.Entry<String, ScoreboardWrapper> entry : registry.entrySet()) {
+            ScoreboardWrapper wrapper = entry.getValue();
+            
+            if (wrapper == null)
+                continue;
+            
+            if (Proxy.isProxyClass(wrapper.getClass())) {
+                InvocationHandler ih = Proxy.getInvocationHandler(wrapper);
+                
+                if (ih instanceof ScoreboardProxy) {
+                    ScoreboardProxy proxy = (ScoreboardProxy) ih;
+                    
+                    CraftScoreboardWrapper custom_wrapper = proxy.getProxiedScoreboardWrapper();
+                    
+                    if (scoreboard.equals(custom_wrapper.bypassProxy())) {
+                        return wrapper;
+                    }
+                } else {
+                    Bukkit.getLogger().warning("Scoreboard util- Custom Wrapper was a proxy but not a ScoreboardProxy!");
+                }
+            } else {
+                Bukkit.getLogger().warning("Scoreboard util- Custom Wrapper was not null and not a proxy!");
+            }
+        }
+        
+        if (registry.containsKey(label)) {
+            throw new IllegalArgumentException(String.format(
+                    "The label %s is already in use!", label));
+        }
+        
+        return wrapExistingScoreboard(scoreboard, label);
+    }
+    
+    /**
      * Get the ScoreboardWrapper currently registered under the given label, or
      * create one if none is currently registered.
      * 
@@ -408,7 +575,9 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Scoreboard proxy = ScoreboardProxy.newProxy(wrapper, false);
             
             if (proxy instanceof ScoreboardWrapper) {
-                return (ScoreboardWrapper) proxy;
+                ScoreboardWrapper custom_wrapper = (ScoreboardWrapper) proxy;
+                registry.put(label, custom_wrapper);
+                return custom_wrapper;
             } else {
                 return null;
             }
@@ -432,10 +601,40 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
     /**
      * Get the ScoreboardWrapper for the server main Scoreboard.
      * 
+     * @deprecated There are a lot of things that can go wrong when using the
+     *             scoreboard that the server saves to file; use this with
+     *             caution, as this may have to be taken out in the future.
+     * 
      * @return The ScoreboardWrapper that represents the server main Scoreboard.
      */
     public static ScoreboardWrapper getServerMainScoreboardWrapper() {
         return SERVERMAIN;
+    }
+    
+    private static ScoreboardWrapper wrapExistingScoreboard(Scoreboard scoreboard, String label) {
+        if (registry.containsKey(label)) {
+            throw new IllegalArgumentException(String.format(
+                    "The label %s is already in use!", label));
+        }
+        
+        if (Proxy.isProxyClass(scoreboard.getClass())) {
+            if (scoreboard instanceof ScoreboardWrapper) {
+                return (ScoreboardWrapper) scoreboard;
+            }
+            
+            Bukkit.getLogger().warning("Scoreboard util- Existing Scoreboard was proxy but not ScoreboardWrapper!");
+        }
+        
+        CraftScoreboardWrapper wrapper = new CraftScoreboardWrapper(scoreboard, label);
+        Scoreboard proxy = ScoreboardProxy.newProxy(wrapper, false);
+        
+        if (proxy instanceof ScoreboardWrapper) {
+            ScoreboardWrapper custom_wrapper = (ScoreboardWrapper) proxy;
+            registry.put(label, custom_wrapper);
+            return custom_wrapper;
+        } else {
+            return null;
+        }
     }
     
     private static ScoreboardWrapper initServerMainScoreboardWrapper() {

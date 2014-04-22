@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
@@ -12,7 +13,7 @@ import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper
 import com.gmail.favorlock.commonutils.scoreboard.impl.CraftScoreboardWrapper;
 
 /**
- * An API for dealing with Scoreboards.
+ * A [pretty hacky] API for dealing with Scoreboards.
  * <p/>
  * All Scoreboards and components created through this API will actually be
  * proxies of their representative Bukkit objects. This allows them to have
@@ -47,10 +48,33 @@ public class ScoreboardAPI {
     /**
      * Get a new ScoreboardWrapper for the server main Scoreboard.
      * 
+     * @deprecated There are a lot of things that can go wrong when using the
+     *             scoreboard that the server saves to file; use this with
+     *             caution, as this may have to be taken out in the future.
+     * 
      * @return A ScoreboardWrapper for the server's main Scoreboard.
      */
     public static ScoreboardWrapper getServerScoreboard() {
         return CraftScoreboardWrapper.getServerMainScoreboardWrapper();
+    }
+    
+    /**
+     * Integrate an existing Scoreboard into the ScoreboardAPI. If the given
+     * Scoreboard is already a ScoreboardProxy, nothing will be changed, and its
+     * existing ScoreboardWrapper will be returned. If the given Scoreboard is
+     * not already a proxy, it will be registered under the given label.
+     * 
+     * @throws IllegalArgumentException
+     *             If the given label is already in use, and the given
+     *             Scoreboard isn't already proxied.
+     * 
+     * @param scoreboard The Scoreboard to attempt to integrate.
+     * @param label      The label to use if a new wrapper is to be registered.
+     * @return A ScoreboardWrapper for the given Scoreboard, or <b>null</b> if
+     *         an error occurred.
+     */
+    public static ScoreboardWrapper integrateExistingScoreboard(Scoreboard scoreboard, String label) {
+        return CraftScoreboardWrapper.integrateExistingScoreboard(scoreboard, label);
     }
     
     /**

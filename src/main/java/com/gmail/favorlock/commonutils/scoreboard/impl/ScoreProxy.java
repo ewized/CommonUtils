@@ -8,7 +8,7 @@ import java.lang.reflect.Proxy;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Score;
 
-import com.gmail.favorlock.commonutils.scoreboard.api.ScoreboardScoreChangeEvent;
+import com.gmail.favorlock.commonutils.scoreboard.api.events.ScoreboardScoreChangeEvent;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
 
 public class ScoreProxy implements InvocationHandler {

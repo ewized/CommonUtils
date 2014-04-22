@@ -39,6 +39,21 @@ public interface ScoreboardWrapper {
     public boolean isMain();
     
     /**
+     * Unregister this ScoreboardWrapper from the ScoreboardAPI. This operation
+     * can only be performed if this ScoreboardWrapper is not representative of
+     * the server main Scoreboard.
+     * <p/>
+     * Should this call be successful, the all Objectives, Scores, and Teams
+     * will be cleared, and the ScoreboardWrapper will no longer have any
+     * reference to the Scoreboard.
+     * 
+     * @throws IllegalStateException
+     *             If this ScoreboardWrapper represents the server's main
+     *             Scoreboard, in which case it cannot be unregistered.
+     */
+    public void unregisterWrapper();
+    
+    /**
      * Clear all objective scores for every entry of the Scoreboard represented
      * by this object.
      * 
@@ -92,6 +107,38 @@ public interface ScoreboardWrapper {
      * @return A set of all entries.
      */
     public Set<String> getEntrySet();
+    
+    /**
+     * Get a set of all the Objectives in the Scoreboard represented by this object.
+     * 
+     * @return A set of ObjectiveWrappers for all Objectives.
+     */
+    public Set<ObjectiveWrapper> getObjectiveSet();
+    
+    /**
+     * Get a set of all the Teams in the Scoreboard represented by this object.
+     * 
+     * @return A set of TeamWrappers for all Teams.
+     */
+    public Set<TeamWrapper> getTeamSet();
+    
+    /**
+     * Get whether or not an Objective by the given name currently exists.
+     * 
+     * @param name  The name of the Objective to look for.
+     * @return <b>true</b> if an Objective by the given name exists,
+     *         <b>false</b> otherwise.
+     */
+    public boolean isObjectiveRegistered(String name);
+    
+    /**
+     * Get whether or not a Team by the given name currently exists.
+     * 
+     * @param name  The name of the Team to look for.
+     * @return <b>true</b> if a Team by the given name exists, <b>false</b>
+     *         otherwise.
+     */
+    public boolean isTeamRegistered(String name);
     
     /**
      * Register an Objective under the given name and the 'dummy' criterion. If

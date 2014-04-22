@@ -19,10 +19,20 @@ public class ObjectiveProxy implements InvocationHandler {
 
     private final CraftObjectiveWrapper proxying;
     private final Objective noproxy;
+    private CraftObjectiveWrapper wrapper;
     
     private ObjectiveProxy(CraftObjectiveWrapper proxying, Objective noproxy) {
         this.proxying = proxying;
         this.noproxy = noproxy;
+        this.wrapper = null;
+    }
+    
+    private void setObjectiveWrapper(CraftObjectiveWrapper wrapper) {
+        this.wrapper = wrapper;
+    }
+    
+    protected CraftObjectiveWrapper getObjectiveWrapper() {
+        return wrapper;
     }
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -72,11 +82,13 @@ public class ObjectiveProxy implements InvocationHandler {
         }
         
         CraftObjectiveWrapper objective_wrapper = new CraftObjectiveWrapper(wrapper, objective);
+        ObjectiveProxy invocationHandler = new ObjectiveProxy(objective_wrapper, objective);
         Objective proxy = (Objective) Proxy.newProxyInstance(
                 ObjectiveProxy.class.getClassLoader(),
                 new Class<?>[] { Objective.class, ObjectiveWrapper.class },
-                new ObjectiveProxy(objective_wrapper, objective));
+                invocationHandler);
         objective_wrapper.setProxy(proxy);
+        invocationHandler.setObjectiveWrapper(new CraftObjectiveWrapper(wrapper, proxy).setProxy(proxy));
         
         Class<?> classCraftScoreboard = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboard");
         Field fieldObjectivesMap = CommonReflection.getField(classCraftScoreboard, "objectives");

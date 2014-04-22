@@ -17,10 +17,20 @@ public class TeamProxy implements InvocationHandler {
 
     private final CraftTeamWrapper proxying;
     private final Team noproxy;
+    private CraftTeamWrapper wrapper;
     
     private TeamProxy(CraftTeamWrapper proxying, Team noproxy) {
         this.proxying = proxying;
         this.noproxy = noproxy;
+        this.wrapper = null;
+    }
+    
+    private void setTeamWrapper(CraftTeamWrapper wrapper) {
+        this.wrapper = wrapper;
+    }
+    
+    protected CraftTeamWrapper getTeamWrapper() {
+        return wrapper;
     }
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -51,11 +61,13 @@ public class TeamProxy implements InvocationHandler {
         }
         
         CraftTeamWrapper team_wrapper = new CraftTeamWrapper(wrapper, team);
+        TeamProxy invocationHandler = new TeamProxy(team_wrapper, team);
         Team proxy = (Team) Proxy.newProxyInstance(
                 TeamProxy.class.getClassLoader(),
                 new Class<?>[] { Team.class, TeamWrapper.class },
-                new TeamProxy(team_wrapper, team));
+                invocationHandler);
         team_wrapper.setProxy(proxy);
+        invocationHandler.setTeamWrapper(new CraftTeamWrapper(wrapper, proxy).setProxy(proxy));
         
         Class<?> classCraftScoreboard = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboard");
         Field fieldTeamsMap = CommonReflection.getField(classCraftScoreboard, "teams");

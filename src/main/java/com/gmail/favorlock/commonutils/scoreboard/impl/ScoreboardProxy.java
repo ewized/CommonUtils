@@ -30,6 +30,10 @@ public class ScoreboardProxy implements InvocationHandler {
         this.noproxy = noproxy;
     }
     
+    protected CraftScoreboardWrapper getProxiedScoreboardWrapper() {
+        return proxying;
+    }
+    
     public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
         Class<?>[] params = method.getParameterTypes();
         
@@ -37,6 +41,12 @@ public class ScoreboardProxy implements InvocationHandler {
             switch (method.getName()) {
             case "registerNewObjective": // Intercept and proxy new Objectives
                 if (params.length == 2 && params[0].equals(String.class) && params[1].equals(String.class)) {
+                    for (Objective objective : noproxy.getObjectives()) {
+                        if (objective.getName().equals((String) args[0])) {
+                            return ObjectiveProxy.newProxy(proxying, objective);
+                        }
+                    }
+                    
                     Objective created = (Objective) method.invoke(noproxy, args);
                     
                     if (Proxy.isProxyClass(created.getClass())) {
@@ -49,6 +59,12 @@ public class ScoreboardProxy implements InvocationHandler {
                 break;
             case "registerNewTeam": // Intercept and proxy new Teams
                 if (params.length == 1 && params[0].equals(String.class)) {
+                    for (Team team : noproxy.getTeams()) {
+                        if (team.getName().equals((String) args[0])) {
+                            return TeamProxy.newProxy(proxying, team);
+                        }
+                    }
+                    
                     Team created = (Team) method.invoke(noproxy, args);
                     
                     if (Proxy.isProxyClass(created.getClass())) {
