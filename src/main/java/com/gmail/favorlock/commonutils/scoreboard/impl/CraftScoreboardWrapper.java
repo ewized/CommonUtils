@@ -27,15 +27,13 @@ import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
  */
 public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
 
-    private static final ScoreboardWrapper SERVER_MAIN_WRAPPER = initServerMainScoreboardWrapper();
+    private static final ScoreboardWrapper SERVERMAIN = initServerMainScoreboardWrapper();
     private static final Map<String, ScoreboardWrapper> registry = new HashMap<>();
 
     private final Scoreboard original;
     private final String label;
     private final boolean main;
     private Scoreboard board;
-//    /** @deprecated NEVER call methods on this reference, will cause recursion. */
-//    protected Scoreboard proxy;
     
     private CraftScoreboardWrapper(Scoreboard board, String label) {
         if (board == null)
@@ -45,7 +43,6 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         this.board = board;
         this.label = label;
         this.main = label == null;
-//        this.proxy = null;
     }
     
     /**
@@ -54,7 +51,6 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
      * @return The Bukkit Scoreboard.
      */
     public Scoreboard getScoreboard() {
-//        return proxy;
         return board;
     }
     
@@ -63,7 +59,6 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
     }
     
     protected void setProxy(Scoreboard proxy) {
-//        this.proxy = proxy;
         this.board = proxy;
     }
     
@@ -197,7 +192,6 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             if (objective instanceof ObjectiveWrapper) {
                 objective_wrappers.add((ObjectiveWrapper) objective);
             } else {
-                Bukkit.getConsoleSender().sendMessage("Had to proxy existing Team!");
                 objective_wrappers.add((ObjectiveWrapper) ObjectiveProxy.newProxy(this, objective));
             }
         }
@@ -213,7 +207,6 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             if (team instanceof TeamWrapper) {
                 team_wrappers.add((TeamWrapper) team);
             } else {
-                Bukkit.getConsoleSender().sendMessage("Had to proxy existing Team!");
                 team_wrappers.add((TeamWrapper) TeamProxy.newProxy(this, team));
             }
         }
@@ -415,10 +408,8 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Scoreboard proxy = ScoreboardProxy.newProxy(wrapper, false);
             
             if (proxy instanceof ScoreboardWrapper) {
-                Bukkit.getConsoleSender().sendMessage("New custom proxy was a ScoreboardManager");
                 return (ScoreboardWrapper) proxy;
             } else {
-                Bukkit.getConsoleSender().sendMessage("New custom proxy was not a ScoreboardWrapper");
                 return null;
             }
         } else {
@@ -444,7 +435,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
      * @return The ScoreboardWrapper that represents the server main Scoreboard.
      */
     public static ScoreboardWrapper getServerMainScoreboardWrapper() {
-        return SERVER_MAIN_WRAPPER;
+        return SERVERMAIN;
     }
     
     private static ScoreboardWrapper initServerMainScoreboardWrapper() {
@@ -452,10 +443,8 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         Scoreboard proxy = ScoreboardProxy.newProxy(main, true);
         
         if (proxy instanceof ScoreboardWrapper) {
-            Bukkit.getConsoleSender().sendMessage("Main proxy was a ScoreboardManager");
             return (ScoreboardWrapper) proxy;
         } else {
-            Bukkit.getConsoleSender().sendMessage("Main proxy was not a ScoreboardWrapper");
             return null;
         }
     }

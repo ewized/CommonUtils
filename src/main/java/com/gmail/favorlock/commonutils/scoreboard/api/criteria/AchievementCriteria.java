@@ -1,6 +1,10 @@
 package com.gmail.favorlock.commonutils.scoreboard.api.criteria;
 
 
+/**
+ * Represents Scoreboard criteria that are tracked by the server, and are
+ * controlled by their respective Achievements.
+ */
 public enum AchievementCriteria implements ScoreboardCriterion {
 
     ACQUIRE_HARDWARE("acquireIron"),

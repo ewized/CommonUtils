@@ -25,6 +25,12 @@ public class CraftTeamWrapper implements TeamWrapper, Team {
     private Team proxy;
     
     protected CraftTeamWrapper(ScoreboardWrapper wrapper, Team team) {
+        if (wrapper == null)
+            throw new IllegalArgumentException("Wrapper cannot be null!");
+        
+        if (team == null)
+            throw new IllegalArgumentException("Team cannot be null!");
+        
         this.wrapper = wrapper;
         this.team = team;
         this.proxy = null;
@@ -38,10 +44,6 @@ public class CraftTeamWrapper implements TeamWrapper, Team {
      */
     public Team getTeam() {
         return proxy;
-    }
-    
-    protected Team bypassProxy() {
-        return team;
     }
     
     protected CraftTeamWrapper setProxy(Team proxy) {

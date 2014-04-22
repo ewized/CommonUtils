@@ -2,6 +2,10 @@ package com.gmail.favorlock.commonutils.scoreboard.api.criteria;
 
 import org.bukkit.Material;
 
+/**
+ * Represents Scoreboard criteria that are tracked by the server, and are
+ * controlled by their respective item-related Statistics.
+ */
 public class ItemCriteria {
 
     private static final String base = "stat.";

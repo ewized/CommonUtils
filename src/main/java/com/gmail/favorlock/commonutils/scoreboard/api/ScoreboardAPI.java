@@ -21,11 +21,6 @@ import com.gmail.favorlock.commonutils.scoreboard.impl.CraftScoreboardWrapper;
  */
 public class ScoreboardAPI {
 
-    private static final Class<?> classCraftScoreboardComponent =
-            VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardComponent");
-    private static final Method checkState =
-            CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
-    
     /**
      * Gets the ScoreboardWrapper currently registered under the given label, or
      * creates and registers one if one isn't present.
@@ -59,13 +54,17 @@ public class ScoreboardAPI {
     }
     
     /**
-     * Test if an Objective instance is still valid.
+     * Test if an Objective instance is still valid. ObjectiveWrappers implement
+     * this check with ScoreboardComponentWrapper#isValid.
      * 
      * @param objective The Objective to test.
      * @return <b>true</b> if the given Objective is still valid, <b>false</b>
      *         otherwise.
      */
     public static boolean checkState(Objective objective) {
+        Class<?> classCraftScoreboardComponent = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardComponent");
+        Method checkState = CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
+        
         try {
             checkState.setAccessible(true);
             checkState.invoke(objective);
@@ -75,19 +74,24 @@ public class ScoreboardAPI {
             // checkState() threw an IllegalStateException because the Objective no longer has a valid Scoreboard.
             return false;
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace(); // Something actually went wrong
+            // Something actually went wrong
+            e.printStackTrace();
             return false;
         }
     }
     
     /**
-     * Test if a Team instance is still valid.
+     * Test if a Team instance is still valid. TeamWrappers implement this check
+     * with ScoreboardComponentWrapper#isValid.
      * 
      * @param team  The Team to test.
      * @return <b>true</b> if the given Team is still valid, <b>false</b>
      *         otherwise.
      */
     public static boolean checkState(Team team) {
+        Class<?> classCraftScoreboardComponent = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardComponent");
+        Method checkState = CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
+        
         try {
             checkState.setAccessible(true);
             checkState.invoke(team);
@@ -97,7 +101,8 @@ public class ScoreboardAPI {
             // checkState() threw an IllegalStateException because the Team no longer has a valid Scoreboard.
             return false;
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace(); // Something actually went wrong
+            // Something actually went wrong
+            e.printStackTrace();
             return false;
         }
     }

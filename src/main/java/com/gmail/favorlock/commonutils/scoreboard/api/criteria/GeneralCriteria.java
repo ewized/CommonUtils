@@ -1,5 +1,9 @@
 package com.gmail.favorlock.commonutils.scoreboard.api.criteria;
 
+
+/**
+ * Represents the original Scoreboard criteria.
+ */
 public enum GeneralCriteria implements ScoreboardCriterion {
 
     DEATHS("deathCount"),

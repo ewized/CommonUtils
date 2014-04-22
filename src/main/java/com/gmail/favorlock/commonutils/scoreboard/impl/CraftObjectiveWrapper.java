@@ -26,6 +26,9 @@ public class CraftObjectiveWrapper implements ObjectiveWrapper, Objective {
     private Objective proxy;
     
     protected CraftObjectiveWrapper(ScoreboardWrapper wrapper, Objective objective) {
+        if (wrapper == null)
+            throw new IllegalArgumentException("Wrapper cannot be null!");
+        
         if (objective == null)
             throw new IllegalArgumentException("Objective cannot be null!");
         
@@ -44,12 +47,7 @@ public class CraftObjectiveWrapper implements ObjectiveWrapper, Objective {
         return proxy;
     }
     
-    protected Objective bypassProxy() {
-        return objective;
-    }
-    
     protected CraftObjectiveWrapper setProxy(Objective proxy) {
-//        this.objective = proxy;
         this.proxy = proxy;
         return this;
     }
