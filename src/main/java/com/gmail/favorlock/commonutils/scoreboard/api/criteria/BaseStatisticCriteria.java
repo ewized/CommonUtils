@@ -1,4 +1,4 @@
-package com.gmail.favorlock.commonutils.scoreboard.criteria;
+package com.gmail.favorlock.commonutils.scoreboard.api.criteria;
 
 public enum BaseStatisticCriteria implements ScoreboardCriterion {
 

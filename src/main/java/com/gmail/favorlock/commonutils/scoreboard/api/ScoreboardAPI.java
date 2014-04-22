@@ -8,9 +8,17 @@ import org.bukkit.scoreboard.Team;
 
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
-import com.gmail.favorlock.commonutils.scoreboard.CustomScoreboard;
-import com.gmail.favorlock.commonutils.scoreboard.ServerScoreboard;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.impl.CraftScoreboardWrapper;
 
+/**
+ * An API for dealing with Scoreboards.
+ * <p/>
+ * All Scoreboards and components created through this API will actually be
+ * proxies of their representative Bukkit objects. This allows them to have
+ * enhanced capabilities, such as giving access to new events and the ability to
+ * cast directly from the Bukkit object to the API Wrapper object.
+ */
 public class ScoreboardAPI {
 
     private static final Class<?> classCraftScoreboardComponent =
@@ -19,23 +27,35 @@ public class ScoreboardAPI {
             CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
     
     /**
-     * Get a new CustomScoreboard. If one exists under the given label, it will
-     * be returned.
+     * Gets the ScoreboardWrapper currently registered under the given label, or
+     * creates and registers one if one isn't present.
      * 
-     * @param label The label to register the Scoreboard under.
-     * @return The CustomScoreboard.
+     * @param label The name to lookup / register under.
+     * @return The ScoreboardWrapper that was found or created.
      */
-    public static CustomScoreboard newCustomScoreboard(String label) {
-        return CustomScoreboard.forLabel(label);
+    public static ScoreboardWrapper getCustomScoreboard(String label) {
+        return CraftScoreboardWrapper.getCustomScoreboardWrapper(label);
+    }
+    
+    /**
+     * Gets whether or not there is currently a ScoreboardWrapper registered
+     * under the given label.
+     * 
+     * @param name  The label to lookup.
+     * @return <b>true</b> if there is a ScoreboardWrapper registered under the
+     *         given name, <b>false</b> otherwise.
+     */
+    public static boolean isCustomScoreboardRegistered(String label) {
+        return CraftScoreboardWrapper.isCustomScoreboardRegistered(label);
     }
     
     /**
      * Get a new ScoreboardWrapper for the server main Scoreboard.
      * 
-     * @return  A ServerScoreboard.
+     * @return A ScoreboardWrapper for the server's main Scoreboard.
      */
-    public static ServerScoreboard newServerScoreboard() {
-        return new ServerScoreboard();
+    public static ScoreboardWrapper getServerScoreboard() {
+        return CraftScoreboardWrapper.getServerMainScoreboardWrapper();
     }
     
     /**

@@ -1,22 +1,27 @@
 package com.gmail.favorlock.commonutils.scoreboard.api;
 
-import com.gmail.favorlock.commonutils.scoreboard.ObjectiveWrapper;
-import com.gmail.favorlock.commonutils.scoreboard.ScoreboardWrapper;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-public class ScoreboardScoreChangeEvent {
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
 
+public class ScoreboardScoreChangeEvent extends Event {
+
+    private static HandlerList handlers = new HandlerList();
+    
     private final ScoreboardWrapper scoreboard;
     private final ObjectiveWrapper objective;
     private final String entry_name;
-    private final int previous_score;
+    private final int old_score;
     private final int new_score;
-    
-    public ScoreboardScoreChangeEvent(ScoreboardWrapper scoreboard, ObjectiveWrapper objective, String entry_name, int previous_score, int new_score) {
+
+    public ScoreboardScoreChangeEvent(ScoreboardWrapper scoreboard, ObjectiveWrapper objective, String entry_name, int oldscore, int newscore) {
         this.scoreboard = scoreboard;
         this.objective = objective;
         this.entry_name = entry_name;
-        this.previous_score = previous_score;
-        this.new_score = new_score;
+        this.old_score = oldscore;
+        this.new_score = newscore;
     }
     
     public ScoreboardWrapper getScoreboard() {
@@ -31,11 +36,20 @@ public class ScoreboardScoreChangeEvent {
         return entry_name;
     }
     
-    public int getPreviousScore() {
-        return previous_score;
+    public int getOldScore() {
+        return old_score;
     }
     
     public int getNewScore() {
         return new_score;
+    }
+
+    @Override
+    public HandlerList getHandlers() {
+        return getHandlerList();
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

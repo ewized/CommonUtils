@@ -1,29 +1,37 @@
-package com.gmail.favorlock.commonutils.scoreboard;
+package com.gmail.favorlock.commonutils.scoreboard.impl;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.gmail.favorlock.commonutils.scoreboard.api.ScoreboardAPI;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
 
 /**
  * A wrapper for a Bukkit scoreboard Objective, providing API methods for
  * dealing with Scoreboard Objectives.
  */
-public class ObjectiveWrapper {
+public class CraftObjectiveWrapper implements ObjectiveWrapper, Objective {
 
     private final ScoreboardWrapper wrapper;
-    private final Objective objective;
+    private Objective objective;
+    /** @deprecated NEVER call methods on this reference, will cause recursion. */
+    private Objective proxy;
     
-    protected ObjectiveWrapper(ScoreboardWrapper wrapper, Objective objective) {
+    protected CraftObjectiveWrapper(ScoreboardWrapper wrapper, Objective objective) {
         if (objective == null)
             throw new IllegalArgumentException("Objective cannot be null!");
         
         this.wrapper = wrapper;
         this.objective = objective;
+        this.proxy = null;
     }
     
     // API methods
@@ -32,8 +40,18 @@ public class ObjectiveWrapper {
      * 
      * @return The Bukkit Objective object.
      */
-    protected Objective getObjective() {
+    public Objective getObjective() {
+        return proxy;
+    }
+    
+    protected Objective bypassProxy() {
         return objective;
+    }
+    
+    protected CraftObjectiveWrapper setProxy(Objective proxy) {
+//        this.objective = proxy;
+        this.proxy = proxy;
+        return this;
     }
 
     /**
@@ -68,7 +86,7 @@ public class ObjectiveWrapper {
      * @return The entries with the highest score.
      */
     public Set<String> getHighestScore() {
-        return getHighestScore(wrapper.getEntries());
+        return getHighestScore(wrapper.getEntrySet());
     }
     
     /**
@@ -86,7 +104,7 @@ public class ObjectiveWrapper {
         int highest = Integer.MIN_VALUE;
         
         for (String entry : entries) {
-            int score = getScore(entry);
+            int score = getScoreFor(entry);
             if (score > highest) {
                 highest = score;
                 winning.clear();
@@ -164,10 +182,10 @@ public class ObjectiveWrapper {
      * @return The previous score associated with this entry.
      */
     public int deltaScore(String entry, int amount) {
-        int oldscore = getScore(entry);
+        int oldscore = getScoreFor(entry);
         int newscore = oldscore == Integer.MIN_VALUE ? amount : oldscore + amount;
         
-        return setScore(entry, newscore);
+        return setScoreFor(entry, newscore);
     }
     
     // Wrapper methods
@@ -176,10 +194,16 @@ public class ObjectiveWrapper {
      * 
      * @return  The value of the criterion tracked by the Objective.
      */
-    public String getCriteria() {
+    public String getCriterion() {
         return objective.getCriteria();
     }
     
+    /**
+     * Get the Objective's name, as it was registered with the Scoreboard. This
+     * is not the name that Players see in-game.
+     * 
+     * @return The code name for the Objective.
+     */
     public String getCodeName() {
         return objective.getName();
     }
@@ -189,7 +213,7 @@ public class ObjectiveWrapper {
      * 
      * @return  The current display name of the Objective.
      */
-    public String getDisplayName() {
+    public String getDisplay() {
         return objective.getDisplayName();
     }
     
@@ -198,7 +222,7 @@ public class ObjectiveWrapper {
      * 
      * @param name  The new display name to set.
      */
-    public void setDisplayName(String name) {
+    public void setDisplay(String name) {
         objective.setDisplayName(name);
     }
     
@@ -210,8 +234,8 @@ public class ObjectiveWrapper {
      * @return The score that was found, or <code>Integer.MIN_VALUE</code> if
      *         an error occurred.
      */
-    public int getScore(Player player) {
-        return getScore(player.getName());
+    public int getScoreFor(Player player) {
+        return getScoreFor(player.getName());
     }
     
     /**
@@ -222,7 +246,7 @@ public class ObjectiveWrapper {
      * @return The score that was found, or <code>Integer.MIN_VALUE</code> if
      *         an error occurred.
      */
-    public int getScore(String entry) {
+    public int getScoreFor(String entry) {
         try {
             return objective.getScore(entry).getScore();
         } catch (IllegalStateException e) {
@@ -237,8 +261,8 @@ public class ObjectiveWrapper {
      * @param value     The value that the Player's score should be set to.
      * @return The previous score associated with this Player.
      */
-    public int setScore(Player player, int value) {
-        return setScore(player.getName(), value);
+    public int setScoreFor(Player player, int value) {
+        return setScoreFor(player.getName(), value);
     }
 
     /**
@@ -248,8 +272,8 @@ public class ObjectiveWrapper {
      * @param value     The value that the entry's score should be set to.
      * @return The previous score associated with this entry.
      */
-    public int setScore(String entry, int value) {
-        int prev = getScore(entry);
+    public int setScoreFor(String entry, int value) {
+        int prev = getScoreFor(entry);
         
         objective.getScore(entry).setScore(value);
         return prev;
@@ -280,7 +304,58 @@ public class ObjectiveWrapper {
      * Unregister the Objective from its Scoreboard. This ObjectiveWrapper and
      * it's Objective will no longer be valid after this call returns.
      */
-    public void unregister() {
+    public void unregisterComponent() {
+        objective.unregister();
+    }
+    
+    // Must override equals for compatibility
+    public boolean equals(Object obj) {
+        return objective.equals(obj);
+    }
+    
+    // Bukkit Objective delegate methods
+    public String getCriteria() throws IllegalStateException {
+        return objective.getCriteria();
+    }
+
+    public String getDisplayName() throws IllegalStateException {
+        return objective.getDisplayName();
+    }
+
+    public DisplaySlot getDisplaySlot() throws IllegalStateException {
+        return objective.getDisplaySlot();
+    }
+
+    public String getName() throws IllegalStateException {
+        return objective.getName();
+    }
+
+    @Deprecated
+    public Score getScore(OfflinePlayer player) throws IllegalArgumentException, IllegalStateException {
+        return objective.getScore(player);
+    }
+
+    public Score getScore(String entry) throws IllegalArgumentException, IllegalStateException {
+        return objective.getScore(entry);
+    }
+
+    public Scoreboard getScoreboard() {
+        return objective.getScoreboard();
+    }
+
+    public boolean isModifiable() throws IllegalStateException {
+        return objective.isModifiable();
+    }
+
+    public void setDisplayName(String name) throws IllegalStateException, IllegalArgumentException {
+        objective.setDisplayName(name);
+    }
+
+    public void setDisplaySlot(DisplaySlot slot) throws IllegalStateException {
+        objective.setDisplaySlot(slot);
+    }
+
+    public void unregister() throws IllegalStateException {
         objective.unregister();
     }
 }

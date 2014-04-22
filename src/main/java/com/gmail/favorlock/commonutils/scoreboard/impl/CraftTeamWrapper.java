@@ -1,25 +1,33 @@
-package com.gmail.favorlock.commonutils.scoreboard;
+package com.gmail.favorlock.commonutils.scoreboard.impl;
 
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.gmail.favorlock.commonutils.scoreboard.api.ScoreboardAPI;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
 
 /**
  * A wrapper for a Bukkit scoreboard Team, providing API methods for dealing
  * with Scoreboard Teams.
  */
-public class TeamWrapper {
+public class CraftTeamWrapper implements TeamWrapper, Team {
 
     private final ScoreboardWrapper wrapper;
     private final Team team;
+    /** @deprecated NEVER call methods on this reference, will cause recursion */
+    private Team proxy;
     
-    protected TeamWrapper(ScoreboardWrapper wrapper, Team team) {
+    protected CraftTeamWrapper(ScoreboardWrapper wrapper, Team team) {
         this.wrapper = wrapper;
         this.team = team;
+        this.proxy = null;
     }
     
     // API methods
@@ -28,8 +36,17 @@ public class TeamWrapper {
      * 
      * @return The Bukkit Team object.
      */
-    protected Team getTeam() {
+    public Team getTeam() {
+        return proxy;
+    }
+    
+    protected Team bypassProxy() {
         return team;
+    }
+    
+    protected CraftTeamWrapper setProxy(Team proxy) {
+        this.proxy = proxy;
+        return this;
     }
 
     /**
@@ -87,7 +104,7 @@ public class TeamWrapper {
      */
     public int getTotalScores(String objective_name) {
         Set<String> entries = getEntries();
-        ObjectiveWrapper objective = wrapper.getObjective(objective_name);
+        ObjectiveWrapper objective = wrapper.getObjectiveFor(objective_name);
         
         if (objective == null)
             return Integer.MIN_VALUE;
@@ -95,7 +112,7 @@ public class TeamWrapper {
         int total = 0;
         
         for (String teammate : entries) {
-            int score = objective.getScore(teammate);
+            int score = objective.getScoreFor(teammate);
             
             if (score == Integer.MIN_VALUE)
                 continue;
@@ -243,7 +260,7 @@ public class TeamWrapper {
      * 
      * @return The size of the Team.
      */
-    public int getSize() {
+    public int getTotalSize() {
         return team.getSize();
     }
 
@@ -252,7 +269,7 @@ public class TeamWrapper {
      * 
      * @param set   The value to set.
      */
-    public void setAllowFriendlyFire(boolean set) {
+    public void setDoFriendlyFire(boolean set) {
         team.setAllowFriendlyFire(set);
     }
 
@@ -298,7 +315,7 @@ public class TeamWrapper {
      * 
      * @return The display name for the Team.
      */
-    public String getDisplayName() {
+    public String getDisplay() {
         return team.getDisplayName();
     }
     
@@ -307,7 +324,7 @@ public class TeamWrapper {
      * 
      * @param name  The display name to set for the Team.
      */
-    public void setDisplayName(String name) {
+    public void setDisplay(String name) {
         team.setDisplayName(name);
     }
     
@@ -315,7 +332,85 @@ public class TeamWrapper {
      * Unregister the Team from its Scoreboard. This TeamWrapper and it's Team
      * will no longer be valid after this call returns.
      */
-    public void unregister() {
+    public void unregisterComponent() {
+        team.unregister();
+    }
+    
+    // Must override equals for compatibility
+    public boolean equals(Object obj) {
+        return team.equals(obj);
+    }
+
+    // Bukkit Team delegate methods
+    public void addPlayer(OfflinePlayer player) throws IllegalStateException, IllegalArgumentException {
+        team.addPlayer(player);
+    }
+
+    public boolean allowFriendlyFire() throws IllegalStateException {
+        return team.allowFriendlyFire();
+    }
+
+    public boolean canSeeFriendlyInvisibles() throws IllegalStateException {
+        return team.canSeeFriendlyInvisibles();
+    }
+
+    public String getDisplayName() throws IllegalStateException {
+        return team.getDisplayName();
+    }
+
+    public String getName() throws IllegalStateException {
+        return team.getName();
+    }
+
+    public Set<OfflinePlayer> getPlayers() throws IllegalStateException {
+        return team.getPlayers();
+    }
+
+    public String getPrefix() throws IllegalStateException {
+        return team.getPrefix();
+    }
+
+    public Scoreboard getScoreboard() {
+        return team.getScoreboard();
+    }
+
+    public int getSize() throws IllegalStateException {
+        return team.getSize();
+    }
+
+    public String getSuffix() throws IllegalStateException {
+        return team.getSuffix();
+    }
+
+    public boolean hasPlayer(OfflinePlayer player) throws IllegalArgumentException, IllegalStateException {
+        return team.hasPlayer(player);
+    }
+
+    public boolean removePlayer(OfflinePlayer player) throws IllegalStateException, IllegalArgumentException {
+        return team.removePlayer(player);
+    }
+
+    public void setAllowFriendlyFire(boolean allow) throws IllegalStateException {
+        team.setAllowFriendlyFire(allow);
+    }
+
+    public void setCanSeeFriendlyInvisibles(boolean can) throws IllegalStateException {
+        team.setCanSeeFriendlyInvisibles(can);
+    }
+
+    public void setDisplayName(String name) throws IllegalStateException, IllegalArgumentException {
+        team.setDisplayName(name);
+    }
+
+    public void setPrefix(String prefix) throws IllegalStateException, IllegalArgumentException {
+        team.setPrefix(prefix);
+    }
+
+    public void setSuffix(String suffix) throws IllegalStateException, IllegalArgumentException {
+        team.setSuffix(suffix);
+    }
+
+    public void unregister() throws IllegalStateException {
         team.unregister();
     }
 }
