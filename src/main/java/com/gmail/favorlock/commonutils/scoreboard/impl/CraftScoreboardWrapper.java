@@ -33,6 +33,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
 
     private final String label;
     private final boolean main;
+    /** The original, unproxied scoreboard. */
     private Scoreboard original;
     private Scoreboard board;
     
@@ -183,10 +184,10 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
      *         result of this call, <b>false</b> otherwise.
      */
     public boolean setFor(Player player) {
-        if (player.getScoreboard().equals(board))
+        if (player.getScoreboard().equals(original))
             return false;
         
-        player.setScoreboard(board);
+        player.setScoreboard(original);
         return true;
     }
     
