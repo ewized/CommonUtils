@@ -24,10 +24,12 @@ public class ScoreboardProxy implements InvocationHandler {
 
     private final CraftScoreboardWrapper proxying;
     private final Scoreboard noproxy;
+    private final boolean main;
     
-    private ScoreboardProxy(CraftScoreboardWrapper proxying, Scoreboard noproxy) {
+    private ScoreboardProxy(CraftScoreboardWrapper proxying, Scoreboard noproxy, boolean main) {
         this.proxying = proxying;
         this.noproxy = noproxy;
+        this.main = main;
     }
     
     protected CraftScoreboardWrapper getProxiedScoreboardWrapper() {
@@ -43,7 +45,7 @@ public class ScoreboardProxy implements InvocationHandler {
                 if (params.length == 2 && params[0].equals(String.class) && params[1].equals(String.class)) {
                     for (Objective objective : noproxy.getObjectives()) {
                         if (objective.getName().equals((String) args[0])) {
-                            return ObjectiveProxy.newProxy(proxying, objective);
+                            return ObjectiveProxy.newProxy(proxying, objective, main);
                         }
                     }
                     
@@ -53,7 +55,7 @@ public class ScoreboardProxy implements InvocationHandler {
                         return created;
                     }
                     
-                    return ObjectiveProxy.newProxy(proxying, created);
+                    return ObjectiveProxy.newProxy(proxying, created, main);
                 }
                 
                 break;
@@ -61,7 +63,7 @@ public class ScoreboardProxy implements InvocationHandler {
                 if (params.length == 1 && params[0].equals(String.class)) {
                     for (Team team : noproxy.getTeams()) {
                         if (team.getName().equals((String) args[0])) {
-                            return TeamProxy.newProxy(proxying, team);
+                            return TeamProxy.newProxy(proxying, team, main);
                         }
                     }
                     
@@ -71,7 +73,7 @@ public class ScoreboardProxy implements InvocationHandler {
                         return created;
                     }
                     
-                    return TeamProxy.newProxy(proxying, created);
+                    return TeamProxy.newProxy(proxying, created, main);
                 }
                 
                 break;
@@ -148,7 +150,7 @@ public class ScoreboardProxy implements InvocationHandler {
         Scoreboard proxy = (Scoreboard) Proxy.newProxyInstance(
                 ScoreboardProxy.class.getClassLoader(),
                 new Class<?>[] { Scoreboard.class, ScoreboardWrapper.class },
-                new ScoreboardProxy(wrapper, scoreboard));
+                new ScoreboardProxy(wrapper, scoreboard, main));
         wrapper.setProxy(proxy);
         
         Class<?> classCraftScoreboardManager = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardManager");
@@ -167,11 +169,11 @@ public class ScoreboardProxy implements InvocationHandler {
                 
                 // Handle any existing Objectives; ideally there won't be any.
                 for (Objective objective : proxy.getObjectives()) {
-                    ObjectiveProxy.newProxy(wrapper, objective);
+                    ObjectiveProxy.newProxy(wrapper, objective, main);
                 }
                 // Handle any existing Teams; ideally there won't be any.
                 for (Team team : proxy.getTeams()) {
-                    TeamProxy.newProxy(wrapper, team);
+                    TeamProxy.newProxy(wrapper, team, main);
                 }
                 
                 return proxy;

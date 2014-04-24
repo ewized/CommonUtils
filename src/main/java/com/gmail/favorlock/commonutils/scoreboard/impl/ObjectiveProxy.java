@@ -76,7 +76,7 @@ public class ObjectiveProxy implements InvocationHandler {
      * @return An Objective instance that proxies the given Objective instance.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected static Objective newProxy(ScoreboardWrapper wrapper, Objective objective) {
+    protected static Objective newProxy(ScoreboardWrapper wrapper, Objective objective, boolean main) {
         if (Proxy.isProxyClass(objective.getClass())) {
             return objective;
         }
@@ -89,6 +89,11 @@ public class ObjectiveProxy implements InvocationHandler {
                 invocationHandler);
         objective_wrapper.setProxy(proxy);
         invocationHandler.setObjectiveWrapper(new CraftObjectiveWrapper(wrapper, proxy).setProxy(proxy));
+        
+        if (main) {
+            // Don't inject the proxies into the server main Scoreboard
+            return proxy;
+        }
         
         Class<?> classCraftScoreboard = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboard");
         Field fieldObjectivesMap = CommonReflection.getField(classCraftScoreboard, "objectives");

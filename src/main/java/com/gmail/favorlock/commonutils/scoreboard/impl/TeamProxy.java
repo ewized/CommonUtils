@@ -55,7 +55,7 @@ public class TeamProxy implements InvocationHandler {
      * @return A Team instance that proxies the given Team instance.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected static Team newProxy(ScoreboardWrapper wrapper, Team team) {
+    protected static Team newProxy(ScoreboardWrapper wrapper, Team team, boolean main) {
         if (Proxy.isProxyClass(team.getClass())) {
             return team;
         }
@@ -68,6 +68,11 @@ public class TeamProxy implements InvocationHandler {
                 invocationHandler);
         team_wrapper.setProxy(proxy);
         invocationHandler.setTeamWrapper(new CraftTeamWrapper(wrapper, proxy).setProxy(proxy));
+        
+        if (main) {
+            // Don't inject the proxies into the server main Scoreboard
+            return proxy;
+        }
         
         Class<?> classCraftScoreboard = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboard");
         Field fieldTeamsMap = CommonReflection.getField(classCraftScoreboard, "teams");

@@ -213,7 +213,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             if (objective instanceof ObjectiveWrapper) {
                 objective_wrappers.add((ObjectiveWrapper) objective);
             } else {
-                objective_wrappers.add((ObjectiveWrapper) ObjectiveProxy.newProxy(this, objective));
+                objective_wrappers.add((ObjectiveWrapper) ObjectiveProxy.newProxy(this, objective, main));
             }
         }
         
@@ -255,7 +255,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             if (team instanceof TeamWrapper) {
                 team_wrappers.add((TeamWrapper) team);
             } else {
-                team_wrappers.add((TeamWrapper) TeamProxy.newProxy(this, team));
+                team_wrappers.add((TeamWrapper) TeamProxy.newProxy(this, team, main));
             }
         }
         
@@ -335,7 +335,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Bukkit.getLogger().warning("Scoreboard util- Existing Objective proxy was not a ObjectiveProxy!");
             return null; // return new CraftObjectiveWrapper(this, objective).setProxy(objective);
         } else {
-            Objective proxy = ObjectiveProxy.newProxy(this, objective);
+            Objective proxy = ObjectiveProxy.newProxy(this, objective, main);
             
             if (Proxy.isProxyClass(proxy.getClass())) {
                 InvocationHandler ih = Proxy.getInvocationHandler(proxy);
@@ -412,7 +412,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Bukkit.getLogger().warning("Scoreboard util- Existing Team proxy was not a TeamProxy!");
             return null; // return new CraftTeamWrapper(this, team).setProxy(team);
         } else {
-            Team proxy = TeamProxy.newProxy(this, team);
+            Team proxy = TeamProxy.newProxy(this, team, main);
             
             if (Proxy.isProxyClass(proxy.getClass())) {
                 InvocationHandler ih = Proxy.getInvocationHandler(proxy);
