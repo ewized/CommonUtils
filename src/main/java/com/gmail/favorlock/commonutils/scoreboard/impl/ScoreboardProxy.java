@@ -1,21 +1,16 @@
 package com.gmail.favorlock.commonutils.scoreboard.impl;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collection;
 import java.util.HashSet;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import com.gmail.favorlock.commonutils.reflection.CommonReflection;
-import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
 import com.google.common.collect.ImmutableSet;
@@ -131,20 +126,16 @@ public class ScoreboardProxy implements InvocationHandler {
      * Create a new proxy for the Scoreboard underlying the given
      * ScoreboardWrapper. If the given Scoreboard is already a proxy, nothing
      * will be changed, and the existing proxy will be returned.
-     * <p/>
-     * In this method, a newly proxied Scoreboard will inject itself into
-     * Bukkit's ScoreboardManager, causing all subsequent references that the
-     * ScoreboardManager gives to be a reference to the proxy.
      * 
      * @return A Scoreboard instance that proxies the given ScoreboardWrapper's
      *         Scoreboard.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected static Scoreboard newProxy(CraftScoreboardWrapper wrapper, boolean main) {
         Scoreboard scoreboard = wrapper.bypassProxy();
         
         if (Proxy.isProxyClass(scoreboard.getClass())) {
-            return scoreboard;
+            if (Proxy.getInvocationHandler(scoreboard) instanceof ScoreboardProxy)
+                return scoreboard;
         }
         
         Scoreboard proxy = (Scoreboard) Proxy.newProxyInstance(
@@ -153,34 +144,20 @@ public class ScoreboardProxy implements InvocationHandler {
                 new ScoreboardProxy(wrapper, scoreboard, main));
         wrapper.setProxy(proxy);
         
-        Class<?> classCraftScoreboardManager = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardManager");
-        Field fieldScoreboardsCollection = CommonReflection.getField(classCraftScoreboardManager, "scoreboards");
-        fieldScoreboardsCollection.setAccessible(true);
-        
         if (main) {
-            // We cannot replace the server main Scoreboard,
-            // only instances retrieved from this API will be proxied.
+            // Don't do any injection for the server main Scoreboard.
             return proxy;
         } else {
-            try { // Replaces the Scoreboard known to the CraftScoreboardManager with the proxied Scoreboard
-                Collection scoreboards = (Collection) fieldScoreboardsCollection.get(Bukkit.getScoreboardManager());
-                scoreboards.remove(scoreboard);
-                scoreboards.add(proxy);
-                
-                // Handle any existing Objectives; ideally there won't be any.
-                for (Objective objective : proxy.getObjectives()) {
-                    ObjectiveProxy.newProxy(wrapper, objective, main);
-                }
-                // Handle any existing Teams; ideally there won't be any.
-                for (Team team : proxy.getTeams()) {
-                    TeamProxy.newProxy(wrapper, team, main);
-                }
-                
-                return proxy;
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-                return null;
+            // Handle any existing Objectives; as if this Scoreboard was integrated there will be some.
+            for (Objective objective : proxy.getObjectives()) {
+                ObjectiveProxy.newProxy(wrapper, objective, main);
             }
+            // Handle any existing Teams; as if this Scoreboard was integrated there will be some.
+            for (Team team : proxy.getTeams()) {
+                TeamProxy.newProxy(wrapper, team, main);
+            }
+            
+            return proxy;
         }
     }
 }
