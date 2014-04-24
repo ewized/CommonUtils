@@ -28,42 +28,65 @@ public abstract class ConfigModel extends ConfigObject {
     public ConfigModel() {
         CONFIG_HEADER = null;
     }
+    
+    protected void onLoad() {} // Called after a load, override to act on loads
+    
+    protected void onSave() {} // Called after a save, override to act on saves
 
     public ConfigModel load(File file) throws InvalidConfigurationException {
-        if (file == null) throw new InvalidConfigurationException(new NullPointerException());
-        if (!file.exists()) throw new InvalidConfigurationException(new IOException("File doesn't exist"));
+        if (file == null)
+            throw new InvalidConfigurationException(new NullPointerException());
+        
+        if (!file.exists())
+            throw new InvalidConfigurationException(new IOException("File doesn't exist"));
+        
         CONFIG_FILE = file;
         return reload();
     }
 
     public ConfigModel reload() throws InvalidConfigurationException {
-        if (CONFIG_FILE == null) throw new InvalidConfigurationException(new NullPointerException());
-        if (!CONFIG_FILE.exists()) throw new InvalidConfigurationException(new IOException("File doesn't exist"));
+        if (CONFIG_FILE == null)
+            throw new InvalidConfigurationException(new NullPointerException());
+        
+        if (!CONFIG_FILE.exists())
+            throw new InvalidConfigurationException(new IOException("File doesn't exist"));
+        
         YamlConfiguration yamlConfig = YamlConfiguration.loadConfiguration(CONFIG_FILE);
+        
         try {
             onLoad(yamlConfig);
             yamlConfig.save(CONFIG_FILE);
         } catch (Exception ex) {
             throw new InvalidConfigurationException(ex);
         }
+        
+        onLoad();
         return this;
     }
 
     public ConfigModel save(File file) throws InvalidConfigurationException {
-        if (file == null) throw new InvalidConfigurationException(new NullPointerException());
+        if (file == null)
+            throw new InvalidConfigurationException(new NullPointerException());
+        
         CONFIG_FILE = file;
         return save();
     }
 
     public ConfigModel save() throws InvalidConfigurationException {
-        if (CONFIG_FILE == null) throw new InvalidConfigurationException(new NullPointerException());
+        if (CONFIG_FILE == null)
+            throw new InvalidConfigurationException(new NullPointerException());
+        
         if (!CONFIG_FILE.exists()) {
             try {
-                if (CONFIG_FILE.getParentFile() != null) CONFIG_FILE.getParentFile().mkdirs();
+                if (CONFIG_FILE.getParentFile() != null)
+                    CONFIG_FILE.getParentFile().mkdirs();
+                
                 CONFIG_FILE.createNewFile();
+                
                 if (CONFIG_HEADER != null) {
                     Writer newConfig = new BufferedWriter(new FileWriter(CONFIG_FILE));
                     boolean firstLine = true;
+                    
                     for (String line : CONFIG_HEADER.split("\n")) {
                         if (!firstLine) {
                             newConfig.write("\n");
@@ -72,31 +95,43 @@ public abstract class ConfigModel extends ConfigObject {
                         }
                         newConfig.write("# " + line);
                     }
+                    
                     newConfig.close();
                 }
             } catch (Exception ex) {
                 throw new InvalidConfigurationException(ex);
             }
         }
+        
         YamlConfiguration yamlConfig = YamlConfiguration.loadConfiguration(CONFIG_FILE);
+        
         try {
             onSave(yamlConfig);
             yamlConfig.save(CONFIG_FILE);
         } catch (Exception ex) {
             throw new InvalidConfigurationException(ex);
         }
+        
+        onSave();
         return this;
     }
 
     public ConfigModel init(File file) throws InvalidConfigurationException {
-        if (file == null) throw new InvalidConfigurationException(new NullPointerException());
+        if (file == null)
+            throw new InvalidConfigurationException(new NullPointerException());
+        
         CONFIG_FILE = file;
         return init();
     }
 
     public ConfigModel init() throws InvalidConfigurationException {
-        if (CONFIG_FILE == null) throw new InvalidConfigurationException(new NullPointerException());
-        if (CONFIG_FILE.exists()) return reload();
-        else return save();
+        if (CONFIG_FILE == null)
+            throw new InvalidConfigurationException(new NullPointerException());
+        
+        if (CONFIG_FILE.exists()) {
+            return reload();
+        } else {
+            return save();
+        }
     }
 }
