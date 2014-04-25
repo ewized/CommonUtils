@@ -104,7 +104,7 @@ public class MenuAPI implements Listener {
                 } else {
                     int index = event.getRawSlot();
                     if (index < inventory.getSize()) {
-                        menu.selectMenuItem(player, index);
+                        menu.selectMenuItem(inventory, player, index);
                     } else {
                         if (menu.exitOnClickOutside()) {
                             menu.closeMenu(player);

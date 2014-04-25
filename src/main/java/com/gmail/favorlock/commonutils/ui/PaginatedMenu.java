@@ -3,6 +3,7 @@ package com.gmail.favorlock.commonutils.ui;
 import net.minecraft.server.v1_7_R3.Material;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +30,30 @@ public class PaginatedMenu extends MenuHolder {
         for (int i = 0; i < initial_pages; i++) {
             inventories[i] = Bukkit.createInventory(this, 9 * rows, title);
         }
+    }
+    
+    @SuppressWarnings("deprecation")
+    protected void selectMenuItem(Inventory inventory, Player player, int index) {
+        if (index > -1 && index < super.max_items) {
+            for (int i = 0; i < inventories.length; i++) {
+                Inventory inv = inventories[i];
+                
+                if (inv == null)
+                    continue;
+                
+                if (inv.hashCode() == inventory.hashCode()) {
+                    // We have a match, and ideally no duplicate Inventories will be in the array
+                    MenuItem item = true_items[i][index];
+                    
+                    if (item != null)
+                        item.onClick(player);
+                    
+                    break;
+                }
+            }
+        }
+        
+        player.updateInventory();
     }
     
     /**
@@ -65,6 +90,39 @@ public class PaginatedMenu extends MenuHolder {
         
         if (open) {
             player.closeInventory();
+        }
+    }
+    
+    /**
+     * Update this PaginatedMenu, for all viewers of all pages.
+     */
+    @SuppressWarnings("deprecation")
+    public void updateMenu() {
+        for (int i = 0; i < inventories.length; i++) {
+            Inventory inv = inventories[i];
+            
+            if (inv == null)
+                continue;
+            
+            for (HumanEntity player : inv.getViewers()) {
+                if (player instanceof Player) {
+                    ((Player) player).updateInventory();
+                }
+            }
+        }
+    }
+    
+    /**
+     * Update this PaginatedMenu for all viewers of the given page.
+     * 
+     * @param page The page to update viewers of.
+     */
+    @SuppressWarnings("deprecation")
+    public void updateMenu(int page) {
+        for (HumanEntity player : getInventory(page).getViewers()) {
+            if (player instanceof Player) {
+                ((Player) player).updateInventory();
+            }
         }
     }
     
@@ -118,7 +176,7 @@ public class PaginatedMenu extends MenuHolder {
      * @return An Inventory for the given page.
      */
     public Inventory getInventory(int page) {
-        if (page >= getPageCount())
+        if (page < 0 || page >= getPageCount())
             return null;
         
         Inventory inv = inventories[page];
@@ -262,7 +320,7 @@ public class PaginatedMenu extends MenuHolder {
      * Add a MenuItem to the given index, on the given page.
      */
     public boolean addMenuItem(int page, MenuItem item, int index) {
-        if (page >= getPageCount())
+        if (page < 0 || page >= getPageCount())
             return false;
         
         ItemStack slot = getInventory(page).getItem(index);
@@ -291,7 +349,7 @@ public class PaginatedMenu extends MenuHolder {
      * Remove the MenuItem at the given index, on the given page.
      */
     public boolean removeMenuItem(int page, int index) {
-        if (page >= getPageCount())
+        if (page < 0 || page >= getPageCount())
             return false;
         
         ItemStack slot = getInventory(page).getItem(index);

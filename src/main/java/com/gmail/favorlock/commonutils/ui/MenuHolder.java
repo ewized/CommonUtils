@@ -29,10 +29,10 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
     }
 
     @SuppressWarnings("deprecation")
-    protected void selectMenuItem(Player player, int index) {
+    protected void selectMenuItem(Inventory inventory, Player player, int index) {
         if (index > -1 && index < super.max_items) {
-//        if (items.containsKey(index)) {
             MenuItem item = items[index];
+            
             if (item != null)
                 item.onClick(player);
         }
@@ -51,7 +51,6 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
         
         getInventory().setItem(index, item.getItemStack());
         items[index] = item;
-//        items.put(index, item);
         item.addToMenu(this);
 
         return true;
