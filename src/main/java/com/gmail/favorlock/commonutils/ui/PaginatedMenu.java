@@ -1,8 +1,7 @@
 package com.gmail.favorlock.commonutils.ui;
 
-import net.minecraft.server.v1_7_R3.Material;
-
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
