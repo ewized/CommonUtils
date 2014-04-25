@@ -9,9 +9,13 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class MenuHolder extends MenuBase implements InventoryHolder {
 
+    protected MenuHolder(int max_items) {
+        super(max_items);
+    }
+
     public void openMenu(Player player) {
         if (getInventory().getViewers().contains(player)) {
-            throw new IllegalArgumentException(player.getName() + " is already viewing " + getInventory().getTitle());
+            throw new IllegalStateException(player.getName() + " is already viewing " + getInventory().getTitle());
         }
 
         player.openInventory(getInventory());
@@ -26,22 +30,28 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
 
     @SuppressWarnings("deprecation")
     protected void selectMenuItem(Player player, int index) {
-        if (items.containsKey(index)) {
-            MenuItem item = items.get(index);
-            item.onClick(player);
+        if (index > -1 && index < super.max_items) {
+//        if (items.containsKey(index)) {
+            MenuItem item = items[index];
+            if (item != null)
+                item.onClick(player);
         }
+        
         player.updateInventory();
     }
 
     public boolean addMenuItem(MenuItem item, int index) {
         ItemStack slot = getInventory().getItem(index);
-
+        
         if (slot != null && slot.getType() != Material.AIR) {
             return false;
+        } else if (index < 0 || index >= super.max_items) {
+            return false;
         }
-
+        
         getInventory().setItem(index, item.getItemStack());
-        items.put(index, item);
+        items[index] = item;
+//        items.put(index, item);
         item.addToMenu(this);
 
         return true;
@@ -52,10 +62,14 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
 
         if (slot == null || slot.getType() == Material.AIR) {
             return false;
+        } else if (index < 0 || index >= super.max_items) {
+            return false;
         }
 
         getInventory().clear(index);
-        items.remove(index).removeFromMenu(this);
+        MenuItem remove = items[index];
+        items[index] = null;
+        remove.removeFromMenu(this);
 
         return true;
     }

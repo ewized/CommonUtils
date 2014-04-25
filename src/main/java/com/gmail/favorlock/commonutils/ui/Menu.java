@@ -10,6 +10,7 @@ public class Menu extends MenuHolder {
     private int rows;
 
     public Menu(String title, int rows) {
+        super(9 * rows);
         this.title = title;
         this.rows = rows;
     }
@@ -36,10 +37,10 @@ public class Menu extends MenuHolder {
         MenuHolder clone = new Menu(title, rows);
         clone.setExitOnClickOutside(exitOnClickOutside);
         clone.setMenuCloseBehavior(menuCloseBehavior);
-
-        for (int index : items.keySet()) {
-            addMenuItem(items.get(index), index);
-        }
+        clone.items = items.clone();
+//        for (int index : items.keySet()) {
+//            addMenuItem(items.get(index), index);
+//        }
 
         return clone;
     }

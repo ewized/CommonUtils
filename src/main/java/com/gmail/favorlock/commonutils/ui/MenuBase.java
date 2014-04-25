@@ -1,14 +1,19 @@
 package com.gmail.favorlock.commonutils.ui;
 
-import java.util.HashMap;
-
 import org.bukkit.entity.Player;
 
 public abstract class MenuBase {
 
-    HashMap<Integer, MenuItem> items = new HashMap<>();
+//    HashMap<Integer, MenuItem> items = new HashMap<>();
+    final int max_items;
+    MenuItem[] items;
     boolean exitOnClickOutside = true;
     MenuCloseBehavior menuCloseBehavior;
+    
+    protected MenuBase(int max_items) {
+        this.max_items = max_items;
+        this.items = new MenuItem[max_items];
+    }
 
     public void setMenuCloseBehavior(MenuCloseBehavior menuCloseBehavior) {
         this.menuCloseBehavior = menuCloseBehavior;

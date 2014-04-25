@@ -3,12 +3,12 @@ package com.gmail.favorlock.commonutils.ui;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
-import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+
+import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 
 public class MenuAnvil extends MenuBase {
@@ -20,6 +20,7 @@ public class MenuAnvil extends MenuBase {
     private MenuClickBehavior resultClickBehavior;
 
     public MenuAnvil() {
+        super(3);
     }
 
     public static boolean hasOpenAnvil(Player player) {
@@ -78,9 +79,11 @@ public class MenuAnvil extends MenuBase {
                 e.printStackTrace();
                 Bukkit.getConsoleSender().sendMessage("Well, oops..");
             }
-        } else if (items.containsKey(index)) {
-            MenuItem item = items.get(index);
-            item.onClick(player);
+        } else if (index == 0 || index == 1) {
+            MenuItem item = items[index];
+            
+            if (item != null)
+                item.onClick(player);
         }
         player.updateInventory();
     }
@@ -119,9 +122,14 @@ public class MenuAnvil extends MenuBase {
 
             containerAnvils.put(player.getName(), containerAnvil);
             Inventory inventory = (Inventory) getTopInventory.invoke(getBukkitView.invoke(containerAnvil));
-            for (Entry<Integer, MenuItem> inMenu : items.entrySet()) {
-                inventory.setItem(inMenu.getKey(), inMenu.getValue().getItemStack());
+            
+            for (int i = 0; i < items.length; i++) {
+                inventory.setItem(i, items[i].getItemStack());
             }
+//            for (Entry<Integer, MenuItem> inMenu : items.entrySet()) {
+//                inventory.setItem(inMenu.getKey(), inMenu.getValue().getItemStack());
+//            }
+            
             playersAnvils.put(player.getName(), this);
             anvils.put(player.getName(), inventory);
 
@@ -162,14 +170,21 @@ public class MenuAnvil extends MenuBase {
         if ((index > 1) || (index < 0)) {
             throw new IllegalArgumentException("Given index " + index + " is not in the range [0, 1]!");
         }
-        items.put(index, item);
+        
+        items[index] = item;
+//        items.put(index, item);
         item.addToMenu(this);
 
         return true;
     }
 
     public boolean removeMenuItem(int index) {
-        items.remove(index).removeFromMenu(this);
+        if (index < 0 || index >= super.max_items)
+            return false;
+        
+        MenuItem remove = items[index];
+        items[index] = null;
+        remove.removeFromMenu(this);
 
         return true;
     }

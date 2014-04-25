@@ -16,6 +16,7 @@ public class MenuDispenser extends MenuHolder {
     private String title;
 
     public MenuDispenser(String title) {
+        super(9);
         inventory = Bukkit.createInventory(this, TYPE);
         this.title = title;
         Class<?> craftInventoryClass = VersionHandler.getCraftBukkitClass("inventory.CraftInventory");
@@ -63,10 +64,11 @@ public class MenuDispenser extends MenuHolder {
         MenuHolder clone = new MenuDispenser(title);
         clone.setExitOnClickOutside(exitOnClickOutside);
         clone.setMenuCloseBehavior(menuCloseBehavior);
-
-        for (int index : items.keySet()) {
-            addMenuItem(items.get(index), index);
-        }
+        clone.items = items.clone();
+        
+//        for (int index : items.keySet()) {
+//            addMenuItem(items.get(index), index);
+//        }
 
         return clone;
     }

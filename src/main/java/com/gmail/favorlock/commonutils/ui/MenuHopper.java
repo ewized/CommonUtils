@@ -19,6 +19,7 @@ public class MenuHopper extends MenuHolder {
     private String title;
 
     public MenuHopper(String title) {
+        super(5);
         inventory = Bukkit.createInventory(this, TYPE);
         this.title = title;
         Class<?> craftInventoryClass = VersionHandler.getCraftBukkitClass("inventory.CraftInventory");
@@ -67,10 +68,13 @@ public class MenuHopper extends MenuHolder {
 
         if (slot != null && slot.getType() != Material.AIR) {
             return false;
+        } else if (index < 0 || index >= super.max_items) {
+            return false;
         }
 
         getInventory().setItem(index, item.getItemStack());
-        items.put(index, item);
+        items[index] = item;
+//        items.put(index, item);
         item.addToMenu(this);
 
         return true;
@@ -82,10 +86,14 @@ public class MenuHopper extends MenuHolder {
 
         if (slot == null || slot.getType() == Material.AIR) {
             return false;
+        } else if (index < 0 || index >= super.max_items) {
+            return false;
         }
 
         getInventory().clear(index);
-        items.remove(index).removeFromMenu(this);
+        MenuItem remove = items[index];
+        items[index] = null;
+        remove.removeFromMenu(this);
 
         return true;
     }
@@ -95,10 +103,11 @@ public class MenuHopper extends MenuHolder {
         MenuHolder clone = new MenuDispenser(title);
         clone.setExitOnClickOutside(exitOnClickOutside);
         clone.setMenuCloseBehavior(menuCloseBehavior);
-
-        for (int index : items.keySet()) {
-            addMenuItem(items.get(index), index);
-        }
+        clone.items = items.clone();
+        
+//        for (int index : items.keySet()) {
+//            addMenuItem(items.get(index), index);
+//        }
 
         return clone;
     }
