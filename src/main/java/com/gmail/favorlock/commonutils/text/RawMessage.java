@@ -398,13 +398,13 @@ public class RawMessage {
                 lore_string = lore_string.substring(0, lore_string.length() - 1);
                 
                 builder.hoverevent = String.format(
-                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\",Lore:[%s]%s}}}\"}",
+                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\",Lore:[%s]}%s}}\"}",
                         item.getType().getId(), item.getData().getData(),
                         name != null ? name : item.getType().name().toLowerCase(),
                         lore_string, enchants);
             } else {
                 builder.hoverevent = String.format(
-                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\"%s}}}\"}",
+                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\"}%s}}\"}",
                         item.getType().getId(), item.getData().getData(),
                         name != null ? name : item.getType().name().toLowerCase(), enchants);
             }
