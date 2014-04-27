@@ -1,9 +1,12 @@
 package com.gmail.favorlock.commonutils.text;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -344,27 +347,68 @@ public class RawMessage {
                 lore_string += String.format("\\\"%s\\\",", l);
             }
             
-            lore_string = lore_string.substring(0, lore_string.length() - 1);
+            if (!lore_string.equals("")) {
+                lore_string = lore_string.substring(0, lore_string.length() - 1);
+                
+                builder.hoverevent = String.format(
+                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\",Lore:[%s]}}}\"}",
+                        id, data, name, lore_string);
+            } else {
+                builder.hoverevent = String.format(
+                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\"}}}\"}",
+                        id, data, name);
+            }
             
-            builder.hoverevent = String.format(
-                    "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\",Lore:[%s]}}}\"}",
-                    id, data, name, lore_string);
             return builder;
         }
         
         @SuppressWarnings("deprecation")
         public Builder withActionItem(ItemStack item) {
             String lore_string = "";
+            String enchants = "";
+            String name;
+            List<String> lorelist;
             
-            for (String lore : item.getItemMeta().getLore()) {
-                lore_string += String.format("\\\"%s\\\",", lore);
+            if (item.getItemMeta() != null) {
+                name = item.getItemMeta().getDisplayName();
+                lorelist = item.getItemMeta().getLore();
+            } else {
+                name = null;
+                lorelist = null;
             }
             
-            lore_string = lore_string.substring(0, lore_string.length() - 1);
+            if (lorelist != null) {
+                for (String lore : lorelist) {
+                    lore_string += String.format("\\\"%s\\\",", lore);
+                }
+            }
             
-            builder.hoverevent = String.format(
-                    "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\",Lore:[%s]}}}\"}",
-                    item.getType().getId(), item.getData().getData(), item.getItemMeta().getDisplayName(), lore_string);
+            if (item.getEnchantments().size() > 0) {
+                enchants = ",ench:[";
+                
+                for (Map.Entry<Enchantment, Integer> enchant : item.getEnchantments().entrySet()) {
+                    enchants += String.format("{id:%s,lvl:%s},", enchant.getKey().getId(), enchant.getValue().intValue());
+                }
+                
+                enchants = enchants.substring(0, enchants.length() - 1);
+                enchants += "]";
+            }
+            
+            if (!lore_string.equals("")) {
+                lore_string = lore_string.substring(0, lore_string.length() - 1);
+                
+                builder.hoverevent = String.format(
+                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\",Lore:[%s]%s}}}\"}",
+                        item.getType().getId(), item.getData().getData(),
+                        name != null ? name : item.getType().name().toLowerCase(),
+                        lore_string, enchants);
+            } else {
+                builder.hoverevent = String.format(
+                        "{action:show_item,value:\"{id:%s,Damage:%s,tag:{display:{Name:\\\"%s\\\"%s}}}\"}",
+                        item.getType().getId(), item.getData().getData(),
+                        name != null ? name : item.getType().name().toLowerCase(), enchants);
+            }
+            
             return builder;
         }
         
