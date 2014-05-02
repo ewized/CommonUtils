@@ -1,6 +1,7 @@
 package com.gmail.favorlock.commonutils.bossbar;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -145,7 +146,7 @@ public class BossBar {
      * @see {@link BossBar#removeOnlineBars()}, {@link BossBar#removeAllBars()}
      */
     public static void removeOfflineBars() {
-        for (Map.Entry<String, FakeDragon> entry : playerBars.entrySet()) {
+        for (Map.Entry<String, FakeDragon> entry : new HashSet<>(playerBars.entrySet())) {
             if (Bukkit.getPlayer(entry.getKey()) == null) {
                 removeBar(entry.getKey());
             }
