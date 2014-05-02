@@ -1,7 +1,7 @@
 package com.gmail.favorlock.commonutils.bossbar;
 
-import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public abstract class FakeDragon {
 
@@ -18,15 +18,15 @@ public abstract class FakeDragon {
     public float health = 0;
     private boolean visible = false;
     public String name;
-    private Object world;
 
     public FakeDragon(String name, Location location, int percent) {
         this.name = name;
         this.x = location.getBlockX();
         this.y = location.getBlockY();
         this.z = location.getBlockZ();
+        this.yaw = (int) location.getYaw();
+        this.pitch = (int) location.getPitch();
         this.health = percent / 100F * MAX_HEALTH;
-        this.world = CommonReflection.getHandle(location.getWorld());
     }
 
     public FakeDragon(String name, Location location) {
@@ -34,7 +34,6 @@ public abstract class FakeDragon {
         this.x = location.getBlockX();
         this.y = location.getBlockY();
         this.z = location.getBlockZ();
-        this.world = CommonReflection.getHandle(location.getWorld());
     }
 
 
@@ -56,6 +55,14 @@ public abstract class FakeDragon {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setLocation(Location location) {
+        this.x = location.getBlockX();
+        this.y = location.getBlockY();
+        this.z = location.getBlockZ();
+        this.pitch = (int) location.getPitch();
+        this.yaw = (int) location.getY();
     }
 
     public int getX() {
@@ -130,15 +137,7 @@ public abstract class FakeDragon {
         this.visible = visible;
     }
 
-    public Object getWorld() {
-        return world;
-    }
-
-    public void setWorld(Object world) {
-        this.world = world;
-    }
-
-    public abstract Object getSpawnPacket();
+    public abstract Object getSpawnPacket(World world);
 
     public abstract Object getDestroyPacket();
 

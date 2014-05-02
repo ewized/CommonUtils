@@ -60,6 +60,8 @@ public class BossBar {
     public static void removeAllBars() {
         for (Player player : Bukkit.getServer().getOnlinePlayers())
             removeBar(player);
+        
+        playerBars.clear();
     }
 
     /**
@@ -266,14 +268,14 @@ public class BossBar {
 
     private static FakeDragon addBarDragon(Player player, String message) {
         FakeDragon dragon = newBarDragon(message, player.getLocation().add(0, -384, 0));
-        EntityHandler.sendPacket(player, dragon.getSpawnPacket());
+        EntityHandler.sendPacket(player, dragon.getSpawnPacket(player.getWorld()));
         playerBars.put(player.getName(), dragon);
         return dragon;
     }
 
     private static FakeDragon addBarDragon(Player player, Location loc, String message) {
         FakeDragon dragon = newBarDragon(message, loc.add(0, -384, 0));
-        EntityHandler.sendPacket(player, dragon.getSpawnPacket());
+        EntityHandler.sendPacket(player, dragon.getSpawnPacket(player.getWorld()));
         playerBars.put(player.getName(), dragon);
         return dragon;
     }

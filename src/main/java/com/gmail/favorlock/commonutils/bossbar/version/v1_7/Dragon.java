@@ -1,14 +1,16 @@
 package com.gmail.favorlock.commonutils.bossbar.version.v1_7;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+
+import org.bukkit.Location;
+import org.bukkit.World;
+
 import com.gmail.favorlock.commonutils.bossbar.FakeDragon;
 import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import com.gmail.favorlock.commonutils.reflection.MethodBuilder;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
-import org.bukkit.Location;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 public class Dragon extends FakeDragon {
 
@@ -20,14 +22,15 @@ public class Dragon extends FakeDragon {
     }
 
     @Override
-    public Object getSpawnPacket() {
+    public Object getSpawnPacket(World world) {
         Class<?> Entity = VersionHandler.getCraftClass("Entity");
         Class<?> EntityLiving = VersionHandler.getCraftClass("EntityLiving");
         Class<?> EntityEnderDragon = VersionHandler.getCraftClass("EntityEnderDragon");
         Object packet = null;
 
         try {
-            dragon = EntityEnderDragon.getConstructor(VersionHandler.getCraftClass("World")).newInstance(getWorld());
+            dragon = EntityEnderDragon.getConstructor(VersionHandler.getCraftClass("World"))
+                    .newInstance(CommonReflection.getHandle(world));
 
             new MethodBuilder(EntityEnderDragon, "setLocation", dragon, new Class<?>[] { double.class, double.class, double.class, float.class, float.class })
                     .invoke(getX(), getY(), getZ(), getPitch(), getYaw());
