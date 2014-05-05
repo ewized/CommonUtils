@@ -16,6 +16,7 @@ import com.gmail.favorlock.commonutils.entity.EntityHandler;
 
 public class BossBar {
 
+    private static final int DRAGON_HEIGHT_OFFSET = -512;
     // Maps player name to their current FakeDragon
     private static final Map<String, FakeDragon> playerBars = new HashMap<String, FakeDragon>();
     // Maps player name to the task ID of their ticking bar, if applicable
@@ -186,7 +187,7 @@ public class BossBar {
         removeBar(player);
         
         FakeDragon dragon = getBarDragon(player, message);
-        dragon.setName(trim(message));
+        dragon.setName(message);
         dragon.setHealth(FakeDragon.MAX_HEALTH);
         stopTickingBar(player.getName());
         sendBarDragon(dragon, player);
@@ -220,7 +221,7 @@ public class BossBar {
         removeBar(player);
         
         FakeDragon dragon = getBarDragon(player, message);
-        dragon.setName(trim(message));
+        dragon.setName(message);
         dragon.setHealth(percent);
         stopTickingBar(player.getName());
         sendBarDragon(dragon, player);
@@ -340,7 +341,7 @@ public class BossBar {
         removeBar(player);
         
         FakeDragon dragon = getBarDragon(player, message);
-        dragon.setName(trim(message));
+        dragon.setName(message);
         dragon.setHealth(decrement ? FakeDragon.MAX_HEALTH : 0);
         final float healthChange = FakeDragon.MAX_HEALTH / interval[0];
         stopTickingBar(player.getName());
@@ -355,7 +356,7 @@ public class BossBar {
                 } else if (dragon.getHealth() == (decrement ? 0 : FakeDragon.MAX_HEALTH)) {
                     if (completeMessage != null) {
                         dragon.setHealth(decrement ? 0 : FakeDragon.MAX_HEALTH);
-                        dragon.setName(trim(completeMessage));
+                        dragon.setName(completeMessage);
                         sendBarDragon(dragon, player);
                     }
                     sendBarDragon(dragon, player);
@@ -368,14 +369,14 @@ public class BossBar {
     }
     
     private static FakeDragon addBarDragon(Player player, String message) {
-        FakeDragon dragon = newBarDragon(message, player.getLocation().add(0, -384, 0));
+        FakeDragon dragon = newBarDragon(message, player.getLocation().add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0));
         EntityHandler.sendPacket(player, dragon.getSpawnPacket(player.getWorld()));
         playerBars.put(player.getName(), dragon);
         return dragon;
     }
     
     private static FakeDragon addBarDragon(Player player, Location loc, String message) {
-        FakeDragon dragon = newBarDragon(message, loc.add(0, -384, 0));
+        FakeDragon dragon = newBarDragon(message, loc.add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0));
         EntityHandler.sendPacket(player, dragon.getSpawnPacket(player.getWorld()));
         playerBars.put(player.getName(), dragon);
         return dragon;
@@ -385,7 +386,7 @@ public class BossBar {
         if (hasBar(player))
             return playerBars.get(player.getName());
         else
-            return addBarDragon(player, trim(message));
+            return addBarDragon(player, message);
     }
     
     private static FakeDragon newBarDragon(String message, Location loc) {
@@ -395,7 +396,7 @@ public class BossBar {
     
     private static void sendBarDragon(FakeDragon barDragon, Player player) {
         EntityHandler.sendPacket(player, barDragon.getMetaPacket(barDragon.getWatcher()));
-        EntityHandler.sendPacket(player, barDragon.getTeleportPacket(player.getLocation().add(0, -384, 0)));
+        EntityHandler.sendPacket(player, barDragon.getTeleportPacket(player.getLocation().add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0)));
     }
     
     private static void stopTickingBar(String entry) {
@@ -403,13 +404,6 @@ public class BossBar {
         
         if (timerID != null)
             Bukkit.getScheduler().cancelTask(timerID);
-    }
-    
-    // This is no longer a limitation, apparently
-    private static String trim(String message) {
-        // if(message.length() > 64) // Prevents client crash from sending strings longer than 64
-        // message = message.substring(0, 63);
-        return message;
     }
     
     /**
