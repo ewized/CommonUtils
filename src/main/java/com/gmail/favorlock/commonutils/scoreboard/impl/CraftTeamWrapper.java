@@ -98,19 +98,13 @@ public class CraftTeamWrapper implements TeamWrapper, Team {
     }
 
     /**
-     * Get the sum of this Team's scores for the given objective name.
+     * Get the sum of this Team's scores for the given objective.
      * 
-     * @param objective_name    The name of the Objective to use.
-     * @return The sum of this Team's scores, or <code>Integer.MIN_VALUE</code>
-     *         if no Objective is currently registered under the given name.
+     * @param objective The ObjectiveWrapper of the objective to use.
+     * @return The sum of this Team's scores for the given Objective.
      */
-    public int getTotalScores(String objective_name) {
+    public int getTotalScores(ObjectiveWrapper objective) {
         Set<String> entries = getEntries();
-        ObjectiveWrapper objective = wrapper.getObjectiveFor(objective_name);
-        
-        if (objective == null)
-            return Integer.MIN_VALUE;
-        
         int total = 0;
         
         for (String teammate : entries) {
@@ -123,6 +117,22 @@ public class CraftTeamWrapper implements TeamWrapper, Team {
         }
         
         return total;
+    }
+
+    /**
+     * Get the sum of this Team's scores for the given objective name.
+     * 
+     * @param objective_name    The name of the Objective to use.
+     * @return The sum of this Team's scores, or <code>Integer.MIN_VALUE</code>
+     *         if no Objective is currently registered under the given name.
+     */
+    public int getTotalScores(String objective_name) {
+        ObjectiveWrapper objective = wrapper.getObjectiveByName(objective_name);
+        
+        if (objective == null)
+            return Integer.MIN_VALUE;
+        
+        return getTotalScores(objective);
     }
 
     /**

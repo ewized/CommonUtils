@@ -9,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Score;
 
 import com.gmail.favorlock.commonutils.scoreboard.api.events.ScoreboardScoreChangeEvent;
+import com.gmail.favorlock.commonutils.scoreboard.api.events.ScoreboardTeamScoreChangeEvent;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
 
 public class ScoreProxy implements InvocationHandler {
 
@@ -32,8 +34,29 @@ public class ScoreProxy implements InvocationHandler {
                 ObjectiveWrapper objectiveWrapper = wrapper.get();
                 
                 if (objectiveWrapper != null) {
-                    Bukkit.getPluginManager().callEvent(new ScoreboardScoreChangeEvent(
-                            objectiveWrapper.getWrapper(), objectiveWrapper, proxying.getEntry(), oldscore, newscore));
+                    String entry = proxying.getEntry();
+                    ScoreboardScoreChangeEvent scoreChange = new ScoreboardScoreChangeEvent(
+                            objectiveWrapper, entry, oldscore, newscore);
+                    Bukkit.getPluginManager().callEvent(scoreChange);
+                    TeamWrapper teamWrapper = objectiveWrapper.getWrapper().getTeamForEntry(entry);
+                    
+                    if (teamWrapper != null) {
+                        int oldteamscore = teamWrapper.getTotalScores(objectiveWrapper);
+                        int newteamscore = oldteamscore + (newscore - oldscore);
+                        
+                        ScoreboardTeamScoreChangeEvent teamChange = new ScoreboardTeamScoreChangeEvent(
+                                objectiveWrapper, teamWrapper, entry, oldteamscore, newteamscore);
+                        teamChange.setCancelled(scoreChange.isCancelled());
+                        Bukkit.getPluginManager().callEvent(teamChange);
+                        
+                        if (teamChange.isCancelled()) {
+                            return null;
+                        }
+                    } else {
+                        if (scoreChange.isCancelled()) {
+                            return null;
+                        }
+                    }
                 }
             }
         }

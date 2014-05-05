@@ -32,6 +32,14 @@ public interface TeamWrapper extends ScoreboardComponentWrapper {
     public int getOnlineSize();
     
     /**
+     * Get the sum of this Team's scores for the given objective.
+     * 
+     * @param objective The ObjectiveWrapper of the objective to use.
+     * @return The sum of this Team's scores for the given Objective.
+     */
+    public int getTotalScores(ObjectiveWrapper objective);
+    
+    /**
      * Get the sum of this Team's scores for the given objective name.
      * 
      * @param objective_name    The name of the Objective to use.

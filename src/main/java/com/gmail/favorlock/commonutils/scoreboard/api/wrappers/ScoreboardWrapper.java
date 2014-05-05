@@ -168,7 +168,7 @@ public interface ScoreboardWrapper {
      * @return The ObjectiveWrapper for the Objective, or <b>null</b> if the
      *         Objective isn't registered.
      */
-    public ObjectiveWrapper getObjectiveFor(String name);
+    public ObjectiveWrapper getObjectiveByName(String name);
     
     /**
      * Register a Team under the given name. If such a Team already exists, that
@@ -187,5 +187,25 @@ public interface ScoreboardWrapper {
      * @return The TeamWrapper for the Team, or <b>null</b> if the Team isn't
      *         registered.
      */
-    public TeamWrapper getTeamFor(String name);
+    public TeamWrapper getTeamByName(String name);
+    
+    /**
+     * Get the TeamWrapper for the Team that the given Player belongs to, or
+     * null if the given Player isn't present on any team.
+     * 
+     * @param player    The Player whose Team should be looked up.
+     * @return The TeamWeapper for the Player's Team, or <b>null</b> if the
+     *         Player isn't on a Team.
+     */
+    public TeamWrapper getTeamForPlayer(Player player);
+    
+    /**
+     * Get the TeamWrapper for the Team that the given entry belongs to, or null
+     * if the given entry isn't present on any team.
+     * 
+     * @param entry The entry whose Team should be looked up.
+     * @return The TeamWeapper for the entry's Team, or <b>null</b> if the entry
+     *         isn't on a Team.
+     */
+    public TeamWrapper getTeamForEntry(String entry);
 }

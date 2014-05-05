@@ -303,7 +303,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Bukkit.getLogger().warning("Scoreboard util- Newly registered Objective returned without being proxied!");
             return null; // return new CraftObjectiveWrapper(this, registered).setProxy(registered);
         } catch (IllegalArgumentException e) {
-            return getObjectiveFor(name);
+            return getObjectiveByName(name);
         }
     }
 
@@ -315,7 +315,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
      * @return The ObjectiveWrapper for the Objective, or <b>null</b> if the
      *         Objective isn't registered.
      */
-    public ObjectiveWrapper getObjectiveFor(String name) {
+    public ObjectiveWrapper getObjectiveByName(String name) {
         if (name == null)
             throw new IllegalArgumentException("Objective name cannot be null!");
         
@@ -380,7 +380,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Bukkit.getLogger().warning("Scoreboard util- Newly registered Team returned without being proxied!");
             return null; // return new CraftTeamWrapper(this, registered).setProxy(registered);
         } catch (IllegalArgumentException e) {
-            return getTeamFor(name);
+            return getTeamByName(name);
         }
     }
 
@@ -392,7 +392,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
      * @return The TeamWrapper for the Team, or <b>null</b> if the Team isn't
      *         registered.
      */
-    public TeamWrapper getTeamFor(String name) {
+    public TeamWrapper getTeamByName(String name) {
         if (name == null)
             throw new IllegalArgumentException("Team name cannot be null!");
         
@@ -429,10 +429,32 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             return null; // return new CraftTeamWrapper(this, proxy).setProxy(proxy);
         }
     }
+    
+    public TeamWrapper getTeamForPlayer(Player player) {
+        return getTeamForEntry(player.getName());
+    }
+    
+    /**
+     * Get the TeamWrapper for the Team that the given entry belongs to, or null
+     * if the given entry isn't present on any team.
+     * 
+     * @param entry The entry whose Team should be looked up.
+     * @return The TeamWeapper for the entry's Team, or <b>null</b> if the entry
+     *         isn't on a Team.
+     */
+    public TeamWrapper getTeamForEntry(String entry) {
+        for (TeamWrapper team : getTeamSet()) {
+            if (team.hasEntry(entry)) {
+                return team;
+            }
+        }
+        
+        return null;
+    }
 
     // Must override equals for compatibility
     public boolean equals(Object obj) {
-        return board.equals(obj);
+        return board.equals(obj) || original.equals(obj);
     }
     
     // Bukkit Scoreboard delegate methods

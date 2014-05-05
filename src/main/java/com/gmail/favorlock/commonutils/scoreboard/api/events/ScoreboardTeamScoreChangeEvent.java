@@ -6,26 +6,26 @@ import org.bukkit.event.HandlerList;
 
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
 
-/**
- * Represents when an Objective's Score for some entry changes on a
- * ScoreboardAPI Scoreboard.
- */
-public class ScoreboardScoreChangeEvent extends Event implements Cancellable {
+public class ScoreboardTeamScoreChangeEvent extends Event implements Cancellable {
 
     private static HandlerList handlers = new HandlerList();
     
     private final ObjectiveWrapper objective;
+    private final TeamWrapper team;
     private final String entry_name;
     private final int old_score;
     private final int new_score;
     private boolean cancelled;
     
     /**
-     * Create a new ScoreboardScoreChangeEvent with the given parameters.
+     * Create a new ScoreboardTeamScoreChangeEvent with the given parameters.
      */
-    public ScoreboardScoreChangeEvent(ObjectiveWrapper objective, String entry_name, int oldscore, int newscore) {
+    public ScoreboardTeamScoreChangeEvent(ObjectiveWrapper objective, TeamWrapper team,
+            String entry_name, int oldscore, int newscore) {
         this.objective = objective;
+        this.team = team;
         this.entry_name = entry_name;
         this.old_score = oldscore;
         this.new_score = newscore;
@@ -49,9 +49,18 @@ public class ScoreboardScoreChangeEvent extends Event implements Cancellable {
     public ObjectiveWrapper getObjective() {
         return objective;
     }
+    
+    /**
+     * Get the TeamWrapper that this score change took place for.
+     * 
+     * @return The TeamWrapper whose entry has had its score change.
+     */
+    public TeamWrapper getTeam() {
+        return team;
+    }
 
     /**
-     * Get the entry for whom the score has changed.
+     * Get the entry whose score in this Team has changed.
      * 
      * @return The entry whose score has changed.
      */
