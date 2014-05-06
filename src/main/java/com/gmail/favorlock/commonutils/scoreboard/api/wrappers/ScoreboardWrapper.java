@@ -63,6 +63,11 @@ public interface ScoreboardWrapper {
     public boolean clearEntries();
     
     /**
+     * Clear all objective scores for the given entry.
+     */
+    public void clearEntry(String entry);
+    
+    /**
      * Clear (by unregistering) all Objectives from this Scoreboard. Note that
      * this may cause any code that utilizies these objectives directly to begin
      * throwing IllegalStateExceptions.

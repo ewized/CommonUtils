@@ -123,6 +123,13 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
     }
     
     /**
+     * Clear all objective scores for the given entry.
+     */
+    public void clearEntry(String entry) {
+        board.resetScores(entry);
+    }
+    
+    /**
      * Clear (by unregistering) all Objectives from this Scoreboard. Note that
      * this may cause any code that utilizies these objectives directly to begin
      * throwing IllegalStateExceptions.
@@ -158,6 +165,10 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             return false;
         
         for (Team team : teams) {
+            for (String entry : team.getEntries()) {
+                team.removeEntry(entry);
+            }
+            
             team.unregister();
         }
         
@@ -430,6 +441,14 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         }
     }
     
+    /**
+     * Get the TeamWrapper for the Team that the given Player belongs to, or
+     * null if the given Player isn't present on any team.
+     * 
+     * @param entry The Player whose Team should be looked up.
+     * @return The TeamWeapper for the Player's Team, or <b>null</b> if the
+     *         entry isn't on a Team.
+     */
     public TeamWrapper getTeamForPlayer(Player player) {
         return getTeamForEntry(player.getName());
     }
