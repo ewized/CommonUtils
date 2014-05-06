@@ -201,7 +201,7 @@ public class BossBar {
      */
     public static void setAllPercentBar(String message, int percent) {
         if ((percent < 0f) || (percent > 100f))
-            return;
+            percent = Math.min(100, Math.max(0, percent));
         
         for (Player player : Bukkit.getServer().getOnlinePlayers())
             setPercentBar(player, message, percent);
@@ -216,7 +216,7 @@ public class BossBar {
      */
     public static void setPercentBar(Player player, String message, int percent) {
         if ((percent < 0f) || (percent > 100f))
-            return;
+            percent = Math.min(100, Math.max(0, percent));
         
         removeBar(player);
         
