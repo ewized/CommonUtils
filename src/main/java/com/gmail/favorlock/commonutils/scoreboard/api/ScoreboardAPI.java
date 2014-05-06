@@ -86,22 +86,8 @@ public class ScoreboardAPI {
      *         otherwise.
      */
     public static boolean checkState(Objective objective) {
-        Class<?> classCraftScoreboardComponent = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardComponent");
-        Method checkState = CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
-        
-        try {
-            checkState.setAccessible(true);
-            checkState.invoke(objective);
-            
-            return true;
-        } catch (IllegalStateException e) {
-            // checkState() threw an IllegalStateException because the Objective no longer has a valid Scoreboard.
-            return false;
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // Something actually went wrong
-            e.printStackTrace();
-            return false;
-        }
+        Object scoreboard_component = objective;
+        return ScoreboardAPI.checkState(scoreboard_component);
     }
     
     /**
@@ -113,16 +99,21 @@ public class ScoreboardAPI {
      *         otherwise.
      */
     public static boolean checkState(Team team) {
+        Object scoreboard_component = team;
+        return ScoreboardAPI.checkState(scoreboard_component);
+    }
+    
+    private static boolean checkState(Object scoreboard_component) {
         Class<?> classCraftScoreboardComponent = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardComponent");
         Method checkState = CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
         
         try {
             checkState.setAccessible(true);
-            checkState.invoke(team);
+            checkState.invoke(scoreboard_component);
             
             return true;
         } catch (IllegalStateException e) {
-            // checkState() threw an IllegalStateException because the Team no longer has a valid Scoreboard.
+            // checkState() threw an IllegalStateException because the Objective no longer has a valid Scoreboard.
             return false;
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             // Something actually went wrong
