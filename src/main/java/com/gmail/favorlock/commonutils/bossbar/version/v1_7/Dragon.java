@@ -6,13 +6,13 @@ import java.lang.reflect.InvocationTargetException;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import com.gmail.favorlock.commonutils.bossbar.FakeDragon;
+import com.gmail.favorlock.commonutils.bossbar.BarDragon;
 import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
 import com.gmail.favorlock.commonutils.reflection.MethodBuilder;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 
-public class Dragon extends FakeDragon {
+public class Dragon extends BarDragon {
 
     private Object dragon;
     private int id;

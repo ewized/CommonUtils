@@ -11,14 +11,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.favorlock.commonutils.CommonUtils;
-import com.gmail.favorlock.commonutils.bossbar.version.v1_7.Dragon;
 import com.gmail.favorlock.commonutils.entity.EntityHandler;
 
 public class BossBar {
 
     private static final int DRAGON_HEIGHT_OFFSET = -512;
     // Maps player name to their current FakeDragon
-    private static final Map<String, FakeDragon> playerBars = new HashMap<String, FakeDragon>();
+    private static final Map<String, BarDragon> playerBars = new HashMap<String, BarDragon>();
     // Maps player name to the task ID of their ticking bar, if applicable
     private static final Map<String, Integer> tickingBars = new HashMap<String, Integer>();
     
@@ -147,7 +146,7 @@ public class BossBar {
      * @see {@link BossBar#removeOnlineBars()}, {@link BossBar#removeAllBars()}
      */
     public static void removeOfflineBars() {
-        for (Map.Entry<String, FakeDragon> entry : new HashSet<>(playerBars.entrySet())) {
+        for (Map.Entry<String, BarDragon> entry : new HashSet<>(playerBars.entrySet())) {
             if (Bukkit.getPlayer(entry.getKey()) == null) {
                 removeBar(entry.getKey());
             }
@@ -186,9 +185,9 @@ public class BossBar {
     public static void setMessageBar(Player player, String message) {
         removeBar(player);
         
-        FakeDragon dragon = getBarDragon(player, message);
+        BarDragon dragon = getBarDragon(player, message);
         dragon.setName(message);
-        dragon.setHealth(FakeDragon.MAX_HEALTH);
+        dragon.setHealth(BarDragon.MAX_HEALTH);
         stopTickingBar(player.getName());
         sendBarDragon(dragon, player);
     }
@@ -220,7 +219,7 @@ public class BossBar {
         
         removeBar(player);
         
-        FakeDragon dragon = getBarDragon(player, message);
+        BarDragon dragon = getBarDragon(player, message);
         dragon.setName(message);
         dragon.setHealth(percent);
         stopTickingBar(player.getName());
@@ -340,22 +339,22 @@ public class BossBar {
         
         removeBar(player);
         
-        FakeDragon dragon = getBarDragon(player, message);
+        BarDragon dragon = getBarDragon(player, message);
         dragon.setName(message);
-        dragon.setHealth(decrement ? FakeDragon.MAX_HEALTH : 0);
-        final float healthChange = FakeDragon.MAX_HEALTH / interval[0];
+        dragon.setHealth(decrement ? BarDragon.MAX_HEALTH : 0);
+        final float healthChange = BarDragon.MAX_HEALTH / interval[0];
         stopTickingBar(player.getName());
         
         tickingBars.put(player.getName(), Bukkit.getScheduler().runTaskTimer(CommonUtils.getPlugin(), new BukkitRunnable() {
             public void run() {
-                FakeDragon dragon = getBarDragon(player, "");
+                BarDragon dragon = getBarDragon(player, "");
                 dragon.setHealth(dragon.getHealth() + (decrement ? -healthChange : healthChange));
-                if (decrement ? dragon.getHealth() < 0 : dragon.getHealth() > FakeDragon.MAX_HEALTH) {
+                if (decrement ? dragon.getHealth() < 0 : dragon.getHealth() > BarDragon.MAX_HEALTH) {
                     removeBar(player);
                     stopTickingBar(player.getName());
-                } else if (dragon.getHealth() == (decrement ? 0 : FakeDragon.MAX_HEALTH)) {
+                } else if (dragon.getHealth() == (decrement ? 0 : BarDragon.MAX_HEALTH)) {
                     if (completeMessage != null) {
-                        dragon.setHealth(decrement ? 0 : FakeDragon.MAX_HEALTH);
+                        dragon.setHealth(decrement ? 0 : BarDragon.MAX_HEALTH);
                         dragon.setName(completeMessage);
                         sendBarDragon(dragon, player);
                     }
@@ -368,33 +367,33 @@ public class BossBar {
         sendBarDragon(dragon, player);
     }
     
-    private static FakeDragon addBarDragon(Player player, String message) {
-        FakeDragon dragon = newBarDragon(message, player.getLocation().add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0));
+    private static BarDragon addBarDragon(Player player, String message) {
+        BarDragon dragon = newBarDragon(message, player.getLocation().add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0));
         EntityHandler.sendPacket(player, dragon.getSpawnPacket(player.getWorld()));
         playerBars.put(player.getName(), dragon);
         return dragon;
     }
     
-    private static FakeDragon addBarDragon(Player player, Location loc, String message) {
-        FakeDragon dragon = newBarDragon(message, loc.add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0));
+    private static BarDragon addBarDragon(Player player, Location loc, String message) {
+        BarDragon dragon = newBarDragon(message, loc.add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0));
         EntityHandler.sendPacket(player, dragon.getSpawnPacket(player.getWorld()));
         playerBars.put(player.getName(), dragon);
         return dragon;
     }
     
-    private static FakeDragon getBarDragon(Player player, String message) {
+    private static BarDragon getBarDragon(Player player, String message) {
         if (hasBar(player))
             return playerBars.get(player.getName());
         else
             return addBarDragon(player, message);
     }
     
-    private static FakeDragon newBarDragon(String message, Location loc) {
-        FakeDragon barDragon = new Dragon(message, loc);
+    private static BarDragon newBarDragon(String message, Location loc) {
+        BarDragon barDragon = BarDragon.getDragon(message, loc);
         return barDragon;
     }
     
-    private static void sendBarDragon(FakeDragon barDragon, Player player) {
+    private static void sendBarDragon(BarDragon barDragon, Player player) {
         EntityHandler.sendPacket(player, barDragon.getMetaPacket(barDragon.getWatcher()));
         EntityHandler.sendPacket(player, barDragon.getTeleportPacket(player.getLocation().add(0, BossBar.DRAGON_HEIGHT_OFFSET, 0)));
     }
@@ -421,13 +420,13 @@ public class BossBar {
             public void run() {
                 if (!hasBar(player))
                     return;
-                FakeDragon oldBarDragon = getBarDragon(player, "");
+                BarDragon oldBarDragon = getBarDragon(player, "");
                 float oldHealth = oldBarDragon.getHealth();
                 String message = oldBarDragon.getName();
                 EntityHandler.sendPacket(player, getBarDragon(player, "").getDestroyPacket());
                 playerBars.remove(player.getName());
                 
-                FakeDragon newBarDragon = addBarDragon(player, loc, message);
+                BarDragon newBarDragon = addBarDragon(player, loc, message);
                 newBarDragon.setHealth(oldHealth);
                 sendBarDragon(newBarDragon, player);
             }
