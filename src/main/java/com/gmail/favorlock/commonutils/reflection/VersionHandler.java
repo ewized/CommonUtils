@@ -4,10 +4,14 @@ import org.bukkit.Bukkit;
 
 public class VersionHandler {
 
+    public static String getVersion() {
+        String name = Bukkit.getServer().getClass().getPackage().getName();
+        String version = name.substring(name.lastIndexOf('.') + 1);
+        return version;
+    }
+    
     public static Class<?> getCraftClass(String className) {
-        String name = Bukkit.getServer().getClass().getPackage().getName();
-        String version = name.substring(name.lastIndexOf('.') + 1);
-        String clazzName = "net.minecraft.server." + version + "." + className;
+        String clazzName = "net.minecraft.server." + getVersion() + "." + className;
         Class<?> clazz = null;
 
         try {
@@ -18,11 +22,9 @@ public class VersionHandler {
 
         return clazz;
     }
-
+    
     public static Class<?> getCraftBukkitClass(String className) {
-        String name = Bukkit.getServer().getClass().getPackage().getName();
-        String version = name.substring(name.lastIndexOf('.') + 1);
-        String clazzName = "org.bukkit.craftbukkit." + version + "." + className;
+        String clazzName = "org.bukkit.craftbukkit." + getVersion() + "." + className;
         Class<?> clazz = null;
 
         try {
@@ -33,5 +35,4 @@ public class VersionHandler {
 
         return clazz;
     }
-
 }
