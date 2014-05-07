@@ -11,15 +11,12 @@ public class PanelField {
     private final int value_score;
     private String value;
     
-    protected PanelField(ScoreboardPanel parent, String entry, int entry_score,
-            String value) {
+    protected PanelField(ScoreboardPanel parent, String entry, int entry_score, String value) {
         if (parent == null)
-            throw new IllegalArgumentException(
-                    "ScoreboardPanel cannot be null!");
+            throw new IllegalArgumentException("ScoreboardPanel cannot be null!");
         
         if (entry == null)
-            throw new IllegalArgumentException(
-                    "A PanelField's entry cannot be null!");
+            throw new IllegalArgumentException("A PanelField's entry cannot be null!");
         
         this.parent = parent;
         this.entry = entry;
@@ -28,6 +25,12 @@ public class PanelField {
         this.value = value;
         
         initialize();
+    }
+    
+    private void checkstate() {
+        if (!parent.hasField(entry)) {
+            throw new IllegalStateException("This PanelField has been unregistered!");
+        }
     }
     
     private void initialize() {
@@ -45,6 +48,8 @@ public class PanelField {
      * Clear this PanelField's current value, if applicable.
      */
     public void clearValue() {
+        checkstate();
+        
         if (value != null) {
             parent.getScoreboard().clearEntry(value);
             this.value = null;
@@ -78,6 +83,8 @@ public class PanelField {
      *         <b>false</b> otherwise.
      */
     public boolean hasValue() {
+        checkstate();
+        
         return value != null;
     }
     
@@ -93,11 +100,11 @@ public class PanelField {
     /**
      * Set this PanelField's value to a new value.
      * 
-     * @param value
-     *            The new value to set. If <b>null</b>, this call is synonymous
-     *            with {@link PanelField#clearValue()}.
+     * @param value The new value to set. If <b>null</b>, this call is
+     *              synonymous with {@link PanelField#clearValue()}.
      */
     public void setValue(String value) {
+        checkstate();
         clearValue();
         this.value = value;
         updateValue();
@@ -107,6 +114,7 @@ public class PanelField {
      * Unregister this PanelField from the ScoreboardPanel.
      */
     public void unregister() {
+        checkstate();
         clearValue();
         parent.getScoreboard().clearEntry(entry);
         parent.unregister(this);

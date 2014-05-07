@@ -21,16 +21,24 @@ public class ScoreboardPanel {
     private String display;
     private int highest_bound;
     private int lowest_bound;
+    private boolean registered;
     
     private ScoreboardPanel(ScoreboardWrapper scoreboard, String label) {
         this.objective = scoreboard.registerObjective("panel_sidebar");
         this.panel_fields = new HashMap<>();
         this.label = label;
         this.display = label;
-        this.highest_bound = 0;
-        this.lowest_bound = 0;
+        this.highest_bound = -1;
+        this.lowest_bound = -1;
+        this.registered = true;
         
         initialize();
+    }
+    
+    private void checkstate() {
+        if (!registered) {
+            throw new IllegalStateException("This ScoreboardPanel has been unregistered!");
+        }
     }
     
     private void initialize() {
@@ -79,6 +87,30 @@ public class ScoreboardPanel {
     }
     
     /**
+     * Get whether or not this ScoreboardPanel is still registered. This will be
+     * false after {@link ScoreboardPanel#unregister()} has been called.
+     * 
+     * @return <b>true</b> if this ScoreboardPanel has not bee unregistered,
+     *         <b>false</b> otherwise.
+     */
+    public boolean isRegistered() {
+        return registered;
+    }
+    
+    /**
+     * Get whether or not a field of the given name is currently present on this
+     * ScoreboardPanel.
+     * 
+     * @param field_name The name of the field to look for.
+     * @return <b>true</b> if a field of the given name is registered,
+     *         <b>false</b> otherwise.
+     */
+    public boolean hasField(String field_name) {
+        checkstate();
+        return panel_fields.get(field_name) != null;
+    }
+    
+    /**
      * Get an existing PanelField for the given field name.
      * 
      * @param field_name The name of the existing field.
@@ -86,6 +118,8 @@ public class ScoreboardPanel {
      *         is no field of the given name.
      */
     public PanelField getField(String field_name) {
+        checkstate();
+        
         if (panel_fields.get(field_name) != null) {
             return panel_fields.get(field_name);
         } else {
@@ -160,6 +194,8 @@ public class ScoreboardPanel {
      * @return The PanelField that has been created or found for the given name.
      */
     public PanelField registerField(String field_name, String init_value, boolean top) {
+        checkstate();
+        
         if (panel_fields.get(field_name) != null) {
             return panel_fields.get(field_name);
         } else {
@@ -196,7 +232,20 @@ public class ScoreboardPanel {
      * @param field The PanelField to unregister.
      */
     protected void unregister(PanelField field) {
+        checkstate();
+        
         panel_fields.remove(field.getName());
+    }
+    
+    public void unregister() {
+        checkstate();
+        
+        for (Map.Entry<String, PanelField> field : panel_fields.entrySet()) {
+            PanelField panel_field = field.getValue();
+            panel_field.unregister();
+        }
+        
+        this.registered = false;
     }
     
     
