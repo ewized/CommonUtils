@@ -1,7 +1,11 @@
 package com.gmail.favorlock.commonutils.scoreboard.api.panel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.bukkit.ChatColor;
 
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
@@ -17,8 +21,10 @@ public class ScoreboardPanel {
     
     private final ObjectiveWrapper objective;
     private final Map<String, PanelField> panel_fields;
+    private final List<PanelSpacer> spacers;
     private final String label;
     private String display;
+    private String spacer;
     private int highest_bound;
     private int lowest_bound;
     private boolean registered;
@@ -26,8 +32,10 @@ public class ScoreboardPanel {
     private ScoreboardPanel(ScoreboardWrapper scoreboard, String label) {
         this.objective = scoreboard.registerObjective("panel_sidebar");
         this.panel_fields = new HashMap<>();
+        this.spacers = new ArrayList<>();
         this.label = label;
         this.display = label;
+        this.spacer = ChatColor.RESET.toString();
         this.highest_bound = -1;
         this.lowest_bound = -1;
         this.registered = true;
@@ -128,6 +136,58 @@ public class ScoreboardPanel {
     }
     
     /**
+     * Get the spacer at the given index.
+     * 
+     * @param index The index, which corresponds to the order in which the spacers
+     *              were registered.
+     * @return The PanelField that is being used as a spacer, or <b>null</b> if no
+     *         spacer is under the given index.
+     */
+    public PanelSpacer getSpacer(int index) {
+        if (index < 0 || index > this.spacers.size()) {
+            return null;
+        }
+        
+        return this.spacers.get(index);
+    }
+    
+    /**
+     * Register a spacer following the default ordering behavior (added to
+     * bottom of the scoreboard).
+     * 
+     * @return The PanelSpacer that has been created.
+     */
+    public PanelSpacer registerSpacer() {
+        return registerSpacer(false);
+    }
+    
+    /**
+     * Register a spacer, following the ordering behavior specified.
+     * 
+     * @param add_to_top If <b>true<b>, the spacer will be added to the top of
+     *                   the ScoreboardPanel, rather than the bottom.
+     * @return The PanelSpacer that has been created.
+     */
+    public PanelSpacer registerSpacer(boolean add_to_top) {
+        checkstate();
+        
+        int entry_score;
+        
+        if (add_to_top) {
+            highest_bound += 1;
+            entry_score = highest_bound;
+        } else {
+            lowest_bound -= 1;
+            entry_score = lowest_bound;
+        }
+        
+        PanelSpacer field = new PanelSpacer(this, this.spacer, entry_score);
+        this.spacer += ChatColor.RESET.toString();
+        this.spacers.add(field);
+        return field;
+    }
+    
+    /**
      * Register a new PanelField by the given name. If a PanelField already
      * exists by the given name, none will be created, and the existing one will
      * be returned. The PanelField will be initialized without a value, and will
@@ -170,12 +230,12 @@ public class ScoreboardPanel {
      * see in-game.
      * 
      * @param field_name The name of the field to register.
-     * @param top        If <b>true<b>, the PanelField will be added to the top of
+     * @param add_to_top If <b>true<b>, the PanelField will be added to the top of
      *                   the ScoreboardPanel, rather than the bottom.
      * @return The PanelField that has been created or found for the given name.
      */
-    public PanelField registerField(String field_name, boolean top) {
-        return registerField(field_name, null, top);
+    public PanelField registerField(String field_name, boolean add_to_top) {
+        return registerField(field_name, null, add_to_top);
     }
     
     /**
@@ -189,11 +249,11 @@ public class ScoreboardPanel {
      * 
      * @param field_name The name of the field to register.
      * @param init_value The initial value of the field, or <b>null</b> for none.
-     * @param top        If <b>true<b>, the PanelField will be added to the top of
+     * @param add_to_top If <b>true<b>, the PanelField will be added to the top of
      *                   the ScoreboardPanel, rather than the bottom.
      * @return The PanelField that has been created or found for the given name.
      */
-    public PanelField registerField(String field_name, String init_value, boolean top) {
+    public PanelField registerField(String field_name, String init_value, boolean add_to_top) {
         checkstate();
         
         if (panel_fields.get(field_name) != null) {
@@ -201,7 +261,7 @@ public class ScoreboardPanel {
         } else {
             int entry_score;
             
-            if (top) {
+            if (add_to_top) {
                 highest_bound += 2;
                 entry_score = highest_bound;
             } else {
