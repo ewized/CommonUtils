@@ -234,7 +234,19 @@ public class ScoreboardPanel {
     protected void unregister(PanelField field) {
         checkstate();
         
-        panel_fields.remove(field.getName());
+        panel_fields.remove(field.getEntry());
+    }
+    
+    /**
+     * Change the name of the given PanelField to the given new entry.
+     * 
+     * @param field     The PanelField, ensure that {@link PanelField#getEntry()}
+     *                  still returns the old entry.
+     * @param new_entry The new entry that should be used.
+     */
+    protected void changeName(PanelField field, String new_entry) {
+        panel_fields.remove(field.getEntry());
+        panel_fields.put(new_entry, field);
     }
     
     public void unregister() {

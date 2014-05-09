@@ -2,19 +2,25 @@ package com.gmail.favorlock.commonutils.scoreboard.api.panel;
 
 /**
  * A Class for representing a field within a ScoreboardPanel.
+ * <p>
+ * Nomenclature:
+ * <li> The Field is the object, the key and value
+ * <li> The Entry is the key, and is the name that players will
+ *      see on a Scoreboard, above the value, if applicable.
+ * <li> The value is the name that players will see below the
+ *      entry on a Scoreboard, if null, it won't be displayed.
  */
 public class PanelField {
 
     private final ScoreboardPanel parent;
-    private final String entry;
     private final int entry_score;
     private final int value_score;
+    private String entry;
     private String value;
     
     protected PanelField(ScoreboardPanel parent, String entry, int entry_score, String value) {
         if (parent == null)
             throw new IllegalArgumentException("ScoreboardPanel cannot be null!");
-        
         if (entry == null)
             throw new IllegalArgumentException("A PanelField's entry cannot be null!");
         
@@ -34,14 +40,29 @@ public class PanelField {
     }
     
     private void initialize() {
-        parent.getObjective().setScoreFor(entry, entry_score);
+        updateEntry();
         updateValue();
+    }
+    
+    private void updateEntry() {
+        if (entry == null)
+            throw new IllegalStateException("The entry for this PanelField is null!");
+        
+        parent.getObjective().setScoreFor(entry, entry_score);
     }
     
     private void updateValue() {
         if (value != null) {
             parent.getObjective().setScoreFor(value, value_score);
         }
+    }
+    
+    private void changeEntry(String new_entry) {
+        if (new_entry == null)
+            throw new IllegalArgumentException("Cannot set a PanelField entry to null!");
+        
+        parent.getScoreboard().clearEntry(entry);
+        this.entry = new_entry;
     }
     
     /**
@@ -66,14 +87,25 @@ public class PanelField {
     }
     
     /**
-     * Get the name that was used by the ScoreboardPanel to create this
-     * PanelField.
+     * Get the name is being used as the entry name for this PanelField.
      * 
      * @return This PanelField's name, as defined when it was registered with
      *         the ScoreboardPanel.
      */
-    public String getName() {
+    public String getEntry() {
         return entry;
+    }
+    
+    /**
+     * Set the name that should be used as the entry name for this PanelField.
+     * 
+     * @param entry The name that should be used for this PanelField's entry.
+     */
+    public void setEntry(String entry) {
+        checkstate();
+        parent.changeName(this, entry);
+        changeEntry(entry);
+        updateEntry();
     }
     
     /**
