@@ -122,8 +122,12 @@ public class MenuAnvil extends MenuBase {
 
             containerAnvils.put(player.getName(), containerAnvil);
             Inventory inventory = (Inventory) getTopInventory.invoke(getBukkitView.invoke(containerAnvil));
-            
+
             for (int i = 0; i < items.length; i++) {
+                if (items[i] == null) {
+                    continue;
+                }
+
                 inventory.setItem(i, items[i].getItemStack());
             }
 //            for (Entry<Integer, MenuItem> inMenu : items.entrySet()) {
