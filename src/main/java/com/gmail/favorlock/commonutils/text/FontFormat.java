@@ -30,27 +30,27 @@ public enum FontFormat {
     UNDERLINED("n", 3),
     ITALICS("o", 3),
     RESET("r", 3);
-
+    
     private final String value;
     private final int type;
     private static final Map<String, String> translate;
     private static final String COLOR_PREFIX_CHARACTER = "\u00a7";
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf("&") + "[0-9A-FK-OR]");
-
+    
     private FontFormat(String value, int type) {
         this.value = COLOR_PREFIX_CHARACTER + value;
         this.type = type;
     }
-
+    
     public String toString() {
         return this.value;
     }
-
+    
     static {
         translate = new HashMap<String, String>();
         createMap();
     }
-
+    
     private static void createMap() {
         translate.put("&0", COLOR_PREFIX_CHARACTER + "0");
         translate.put("&1", COLOR_PREFIX_CHARACTER + "1");
@@ -75,27 +75,27 @@ public enum FontFormat {
         translate.put("&o", COLOR_PREFIX_CHARACTER + "o");
         translate.put("&r", COLOR_PREFIX_CHARACTER + "r");
     }
-
+    
     public static String translateString(String value) {
         for (String code : translate.keySet()) {
             value = value.replace(code, translate.get(code));
         }
-
+        
         return value;
     }
-
+    
     public static String stripColor(final String input) {
         if (input == null) {
             return null;
         }
-
+        
         return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
     }
-
+    
     public static String rainbow(String text, boolean includeShades, boolean includeDarks) {
         StringBuilder builder = new StringBuilder();
         int readcount = 0;
-
+        
         List<FontFormat> colors = new ArrayList<FontFormat>();
         for (FontFormat format : FontFormat.values()) {
             if (format.type == 0) {
@@ -110,18 +110,18 @@ public enum FontFormat {
                 colors.add(format);
             }
         }
-
+        
         while (readcount < text.length()) {
             for (int i = 0; i <= colors.size(); i++) {
                 if (i == colors.size()) {
                     i = 0;
                 }
-
+                
                 while (text.charAt(readcount) == ' ') {
                     builder.append(text.charAt(readcount));
                     readcount += 1;
                 }
-
+                
                 builder.append(colors.get(i)).append(text.charAt(readcount));
                 readcount += 1;
 
@@ -132,5 +132,31 @@ public enum FontFormat {
         }
         return builder.toString();
     }
-
+    
+    public static List<String> splitLine(String line, int length) {
+        return splitLine(line, length, "");
+    }
+    
+    public static List<String> splitLine(String line, int length, String append) {
+        List<String> lines = new ArrayList<>();
+        
+        if (length >= line.length()) {
+            lines.add(append + line);
+            return lines;
+        }
+        
+        while (line.length() > 0) {
+            if (line.length() >= length) {
+                String l = line.substring(0, length);
+                l = l.substring(0, l.lastIndexOf(" ") + 1);
+                lines.add(append + l);
+                line = line.substring(l.lastIndexOf(" ") + 1);
+            } else {
+                lines.add(append + line);
+                break;
+            }
+        }
+        
+        return lines;
+    }
 }
