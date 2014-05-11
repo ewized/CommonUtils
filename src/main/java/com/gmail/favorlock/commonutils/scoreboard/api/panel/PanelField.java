@@ -46,6 +46,8 @@ public class PanelField {
     }
     
     private void updateEntry() {
+        if (hidden)
+            return;
         if (entry == null)
             throw new IllegalStateException("The entry for this PanelField is null!");
         
@@ -53,6 +55,8 @@ public class PanelField {
     }
     
     private void updateValue() {
+        if (hidden)
+            return;
         if (value != null) {
             parent.getObjective().setScoreFor(value, value_score);
         }
