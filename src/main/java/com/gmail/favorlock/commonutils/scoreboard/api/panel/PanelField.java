@@ -17,6 +17,7 @@ public class PanelField {
     private final int value_score;
     private String entry;
     private String value;
+    private boolean hidden;
     
     protected PanelField(ScoreboardPanel parent, String entry, int entry_score, String value) {
         if (parent == null)
@@ -140,6 +141,20 @@ public class PanelField {
         clearValue();
         this.value = value;
         updateValue();
+    }
+    
+    public void setHidden(boolean hidden) {
+        if (this.hidden != hidden) {
+            this.hidden = hidden;
+            
+            if (hidden) {
+                parent.getScoreboard().clearEntry(entry);
+                parent.getScoreboard().clearEntry(value);
+            } else {
+                updateEntry();
+                updateValue();
+            }
+        }
     }
     
     /**
