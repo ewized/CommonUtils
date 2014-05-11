@@ -168,7 +168,9 @@ public class PanelField {
             
             if (hidden) {
                 parent.getScoreboard().clearEntry(entry);
-                parent.getScoreboard().clearEntry(value);
+                
+                if (value != null)
+                    parent.getScoreboard().clearEntry(value);
             } else {
                 updateEntry();
                 updateValue();
