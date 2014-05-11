@@ -147,6 +147,21 @@ public class PanelField {
         updateValue();
     }
     
+    /**
+     * Get whether or not this PanelField is currently hidden.
+     * 
+     * @return <b>true</b> if this PanelField is currently hidden, <b>false</b>
+     *         otherwise.
+     */
+    public boolean isHidden() {
+        return this.hidden;
+    }
+    
+    /**
+     * Set whether or not this PanelField should be hidden.
+     * 
+     * @param hidden If true, this PanelField will be hidden.
+     */
     public void setHidden(boolean hidden) {
         if (this.hidden != hidden) {
             this.hidden = hidden;
