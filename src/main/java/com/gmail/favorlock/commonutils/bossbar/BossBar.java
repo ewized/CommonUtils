@@ -187,7 +187,7 @@ public class BossBar {
         
         BarDragon dragon = getBarDragon(player, message);
         dragon.setName(message);
-        dragon.setHealth(BarDragon.MAX_HEALTH);
+        dragon.setHealth(100f);
         stopTickingBar(player.getName());
         sendBarDragon(dragon, player);
     }
