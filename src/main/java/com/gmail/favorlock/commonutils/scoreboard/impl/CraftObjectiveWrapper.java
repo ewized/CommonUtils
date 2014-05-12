@@ -75,35 +75,38 @@ public class CraftObjectiveWrapper implements ObjectiveWrapper, Objective {
     
     /**
      * Format an extended Scoreboard entry, using a team's prefix and suffix
-     * ability. This can allow for a Scoreboard entry to have a maximum of 80
+     * ability. This can allow for a Scoreboard entry to have a maximum of 48
      * characters.
      * 
-     * @param prefix_32 The prefix, can be up to 32 characters.
+     * @param prefix_16 The prefix, can be up to 16 characters.
      * @param entry_16  The main entry, 16 char limit; this is also the
      *                  name of the team that will be changed by this operation.
-     * @param suffix_32 The suffix, can be up to 32 characters.
+     * @param suffix_16 The suffix, can be up to 16 characters.
      * @param score     The score to set this entry as.
      */
-    public void formatExtended(String prefix_32, String entry_16, String suffix_32, int score) {
-        formatExtended(entry_16, prefix_32, entry_16, suffix_32, score);
+    public void formatExtended(String prefix_16, String entry_16, String suffix_16, int score) {
+        formatExtended(entry_16, prefix_16, entry_16, suffix_16, score);
     }
     
     /**
      * Format an extended Scoreboard entry, using a team's prefix and suffix
-     * ability. This can allow for a Scoreboard entry to have a maximum of 80
+     * ability. This can allow for a Scoreboard entry to have a maximum of 48
      * characters.
      * 
      * @param team_name The name of the team that should be used.
-     * @param prefix_32 The prefix, can be up to 32 characters.
+     * @param prefix_16 The prefix, can be up to 16 characters.
      * @param entry_16  The main entry, 16 char limit.
-     * @param suffix_32 The suffix, can be up to 32 characters.
+     * @param suffix_16 The suffix, can be up to 16 characters.
      * @param score     The score to set this entry as.
      */
-    public void formatExtended(String team_name, String prefix_32, String entry_16, String suffix_32, int score) {
+    public void formatExtended(String team_name, String prefix_16, String entry_16, String suffix_16, int score) {
+        if (prefix_16.length() > 16 || suffix_16.length() > 16 || entry_16.length() > 16)
+            throw new IllegalArgumentException("Cannot use a string longer than 16 characters!");
+        
         TeamWrapper team = wrapper.registerTeam(team_name);
         team.addEntry(entry_16);
-        team.setDisplayPrefix(prefix_32);
-        team.setDisplaySuffix(suffix_32);
+        team.setDisplayPrefix(prefix_16);
+        team.setDisplaySuffix(suffix_16);
         objective.getScore(entry_16).setScore(score);
     }
     
