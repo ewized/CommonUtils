@@ -13,6 +13,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import com.gmail.favorlock.commonutils.scoreboard.api.ScoreboardAPI;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ObjectiveWrapper;
 import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.ScoreboardWrapper;
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
 
 /**
  * A wrapper for a Bukkit scoreboard Objective, providing API methods for
@@ -70,6 +71,40 @@ public class CraftObjectiveWrapper implements ObjectiveWrapper, Objective {
      */
     public boolean isValid() {
         return ScoreboardAPI.checkState(objective);
+    }
+    
+    /**
+     * Format an extended Scoreboard entry, using a team's prefix and suffix
+     * ability. This can allow for a Scoreboard entry to have a maximum of 80
+     * characters.
+     * 
+     * @param prefix_32 The prefix, can be up to 32 characters.
+     * @param entry_16  The main entry, 16 char limit; this is also the
+     *                  name of the team that will be changed by this operation.
+     * @param suffix_32 The suffix, can be up to 32 characters.
+     * @param score     The score to set this entry as.
+     */
+    public void formatExtended(String prefix_32, String entry_16, String suffix_32, int score) {
+        formatExtended(entry_16, prefix_32, entry_16, suffix_32, score);
+    }
+    
+    /**
+     * Format an extended Scoreboard entry, using a team's prefix and suffix
+     * ability. This can allow for a Scoreboard entry to have a maximum of 80
+     * characters.
+     * 
+     * @param team_name The name of the team that should be used.
+     * @param prefix_32 The prefix, can be up to 32 characters.
+     * @param entry_16  The main entry, 16 char limit.
+     * @param suffix_32 The suffix, can be up to 32 characters.
+     * @param score     The score to set this entry as.
+     */
+    public void formatExtended(String team_name, String prefix_32, String entry_16, String suffix_32, int score) {
+        TeamWrapper team = wrapper.registerTeam(team_name);
+        team.addEntry(entry_16);
+        team.setDisplayPrefix(prefix_32);
+        team.setDisplaySuffix(suffix_32);
+        objective.getScore(entry_16).setScore(score);
     }
     
     /**

@@ -32,6 +32,32 @@ public interface ObjectiveWrapper extends ScoreboardComponentWrapper {
     public Set<String> getHighestScore();
     
     /**
+     * Format an extended Scoreboard entry, using a team's prefix and suffix
+     * ability. This can allow for a Scoreboard entry to have a maximum of 80
+     * characters.
+     * 
+     * @param prefix_32 The prefix, can be up to 32 characters.
+     * @param entry_16  The main entry, 16 char limit; this is also the
+     *                  name of the team that will be changed by this operation.
+     * @param suffix_32 The suffix, can be up to 32 characters.
+     * @param score     The score to set this entry as.
+     */
+    public void formatExtended(String prefix_32, String entry_16, String suffix_32, int score);
+    
+    /**
+     * Format an extended Scoreboard entry, using a team's prefix and suffix
+     * ability. This can allow for a Scoreboard entry to have a maximum of 80
+     * characters.
+     * 
+     * @param team_name The name of the team that should be used.
+     * @param prefix_32 The prefix, can be up to 32 characters.
+     * @param entry_16  The main entry, 16 char limit.
+     * @param suffix_32 The suffix, can be up to 32 characters.
+     * @param score     The score to set this entry as.
+     */
+    public void formatExtended(String team_name, String prefix_32, String entry_16, String suffix_32, int score);
+    
+    /**
      * Sort through the given entries (in O(n) time) and compile a Set with the
      * entries that have the highest score.
      * <p/>
