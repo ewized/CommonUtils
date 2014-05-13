@@ -32,13 +32,10 @@ import java.util.*;
 
 public abstract class ConfigObject {
 
-    /*
-      * loading and saving
-      */
-
     protected void onLoad(ConfigurationSection cs) throws Exception {
         for (Field field : getClass().getDeclaredFields()) {
             String path = field.getName().replaceAll("_", ".");
+            
             if (doSkip(field)) {
                 // Do nothing
             } else if (cs.isSet(path)) {
@@ -48,10 +45,11 @@ public abstract class ConfigObject {
             }
         }
     }
-
+    
     protected void onSave(ConfigurationSection cs) throws Exception {
         for (Field field : getClass().getDeclaredFields()) {
             String path = field.getName().replaceAll("_", ".");
+            
             if (doSkip(field)) {
                 // Do nothing
             } else {
@@ -59,15 +57,15 @@ public abstract class ConfigObject {
             }
         }
     }
-
+    
     protected Object loadObject(Field field, ConfigurationSection cs, String path) throws Exception {
         return loadObject(field, cs, path, 0);
     }
-
+    
     protected Object saveObject(Object obj, Field field, ConfigurationSection cs, String path) throws Exception {
         return saveObject(obj, field, cs, path, 0);
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected Object loadObject(Field field, ConfigurationSection cs, String path, int depth) throws Exception {
         Class clazz = getClassAtDepth(field.getGenericType(), depth);
@@ -83,6 +81,7 @@ public abstract class ConfigObject {
             return getEnum(clazz, (String) cs.get(path));
         } else if (List.class.isAssignableFrom(clazz) && isConfigurationSection(cs.get(path))) {
             Class subClazz = getClassAtDepth(field.getGenericType(), depth + 1);
+            
             if (ConfigObject.class.isAssignableFrom(subClazz) || Location.class.isAssignableFrom(subClazz) || Vector.class.isAssignableFrom(subClazz) || Map.class.isAssignableFrom(subClazz) || List.class.isAssignableFrom(subClazz) || subClazz.isEnum()) {
                 return getList(field, cs.getConfigurationSection(path), path, depth);
             } else {
@@ -92,7 +91,7 @@ public abstract class ConfigObject {
             return cs.get(path);
         }
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected Object saveObject(Object obj, Field field, ConfigurationSection cs, String path, int depth) throws Exception {
         Class clazz = getClassAtDepth(field.getGenericType(), depth);
@@ -108,6 +107,7 @@ public abstract class ConfigObject {
             return getEnum((Enum) obj);
         } else if (List.class.isAssignableFrom(clazz) && isList(obj)) {
             Class subClazz = getClassAtDepth(field.getGenericType(), depth + 1);
+            
             if (ConfigObject.class.isAssignableFrom(subClazz) || Location.class.isAssignableFrom(subClazz) || Vector.class.isAssignableFrom(subClazz) || Map.class.isAssignableFrom(subClazz) || List.class.isAssignableFrom(subClazz) || subClazz.isEnum()) {
                 return getList((List) obj, field, cs, path, depth);
             } else {
@@ -117,21 +117,20 @@ public abstract class ConfigObject {
             return obj;
         }
     }
-
-    /*
-      * class detection
-      */
-
+    
     @SuppressWarnings("rawtypes")
     protected Class getClassAtDepth(Type type, int depth) throws Exception {
         if (depth <= 0) {
             String className = type.toString();
+            
             if (className.length() >= 6 && className.substring(0, 6).equalsIgnoreCase("class ")) {
                 className = className.substring(6);
             }
+            
             if (className.indexOf("<") >= 0) {
                 className = className.substring(0, className.indexOf("<"));
             }
+            
             try {
                 return Class.forName(className);
             } catch (ClassNotFoundException ex) {
@@ -147,19 +146,22 @@ public abstract class ConfigObject {
                 throw ex;
             }
         }
+        
         depth--;
         ParameterizedType pType = (ParameterizedType) type;
         Type[] typeArgs = pType.getActualTypeArguments();
+        
         return getClassAtDepth(typeArgs[typeArgs.length - 1], depth);
     }
-
+    
     protected boolean isString(Object obj) {
         if (obj instanceof String) {
             return true;
         }
+        
         return false;
     }
-
+    
     protected boolean isConfigurationSection(Object o) {
         try {
             return (ConfigurationSection) o != null;
@@ -167,11 +169,12 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     protected boolean isJSON(Object obj) {
         try {
             if (obj instanceof String) {
                 String str = (String) obj;
+                
                 if (str.startsWith("{")) {
                     return new JSONParser().parse(str) != null;
                 }
@@ -181,7 +184,7 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     protected boolean isConfigObject(Object obj) {
         try {
             return (ConfigObject) obj != null;
@@ -189,7 +192,7 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     protected boolean isLocation(Object obj) {
         try {
             return (Location) obj != null;
@@ -197,7 +200,7 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     protected boolean isVector(Object obj) {
         try {
             return (Vector) obj != null;
@@ -205,7 +208,7 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected boolean isMap(Object obj) {
         try {
@@ -214,7 +217,7 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected boolean isList(Object obj) {
         try {
@@ -223,10 +226,12 @@ public abstract class ConfigObject {
             return false;
         }
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected boolean isEnum(Class clazz, Object obj) {
-        if (!clazz.isEnum()) return false;
+        if (!clazz.isEnum())
+            return false;
+        
         for (Object constant : clazz.getEnumConstants()) {
             if (constant.equals(obj)) {
                 return true;
@@ -234,18 +239,15 @@ public abstract class ConfigObject {
         }
         return false;
     }
-
-    /*
-      * loading conversion
-      */
-
+    
     @SuppressWarnings("rawtypes")
     protected ConfigObject getConfigObject(Class clazz, ConfigurationSection cs) throws Exception {
         ConfigObject obj = (ConfigObject) clazz.newInstance();
         obj.onLoad(cs);
+        
         return obj;
     }
-
+    
     protected Location getLocation(String json) throws Exception {
         JSONObject data = (JSONObject) new JSONParser().parse(json);
         // world
@@ -261,9 +263,10 @@ public abstract class ConfigObject {
         Location loc = new Location(world, x, y, z);
         loc.setPitch(pitch);
         loc.setYaw(yaw);
+        
         return loc;
     }
-
+    
     protected Vector getVector(String json) throws Exception {
         JSONObject data = (JSONObject) new JSONParser().parse(json);
         // x, y, z
@@ -273,12 +276,13 @@ public abstract class ConfigObject {
         // generate Vector
         return new Vector(x, y, z);
     }
-
+    
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected Map getMap(Field field, ConfigurationSection cs, String path, int depth) throws Exception {
         depth++;
         Set<String> keys = cs.getKeys(false);
         Map map = new HashMap();
+        
         if (keys != null && keys.size() > 0) {
             for (String key : keys) {
                 Object in = cs.get(key);
@@ -286,21 +290,26 @@ public abstract class ConfigObject {
                 map.put(key, in);
             }
         }
+        
         return map;
     }
-
+    
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected List getList(Field field, ConfigurationSection cs, String path, int depth) throws Exception {
         depth++;
         int listSize = cs.getKeys(false).size();
         String key = path;
+        
         if (key.lastIndexOf(".") >= 0) {
             key = key.substring(key.lastIndexOf("."));
         }
+        
         List list = new ArrayList();
+        
         if (listSize > 0) {
             int loaded = 0;
             int i = 0;
+            
             while (loaded < listSize) {
                 if (cs.isSet(key + i)) {
                     Object in = cs.get(key + i);
@@ -308,35 +317,37 @@ public abstract class ConfigObject {
                     list.add(in);
                     loaded++;
                 }
+                
                 i++;
                 // ugly overflow guard... should only be needed if config was manually edited very badly
                 if (i > (listSize * 3)) loaded = listSize;
             }
         }
+        
         return list;
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected Enum getEnum(Class clazz, String string) throws Exception {
-        if (!clazz.isEnum()) throw new Exception("Class " + clazz.getName() + " is not an enum.");
+        if (!clazz.isEnum())
+            throw new Exception("Class " + clazz.getName() + " is not an enum.");
+        
         for (Object constant : clazz.getEnumConstants()) {
             if (((Enum) constant).toString().equals(string)) {
                 return (Enum) constant;
             }
         }
+        
         throw new Exception("String " + string + " not a valid enum constant for " + clazz.getName());
     }
-
-    /*
-      * saving conversion
-      */
-
+    
     protected ConfigurationSection getConfigObject(ConfigObject obj, String path, ConfigurationSection cs) throws Exception {
         ConfigurationSection subCS = cs.createSection(path);
         obj.onSave(subCS);
+        
         return subCS;
     }
-
+    
     protected String getLocation(Location loc) {
         String ret = "{";
         ret += "\"world\":\"" + loc.getWorld().getName() + "\"";
@@ -346,7 +357,10 @@ public abstract class ConfigObject {
         ret += ",\"pitch\":\"" + loc.getPitch() + "\"";
         ret += ",\"yaw\":\"" + loc.getYaw() + "\"";
         ret += "}";
-        if (!isJSON(ret)) return getLocationJSON(loc);
+        
+        if (!isJSON(ret))
+            return getLocationJSON(loc);
+        
         try {
             getLocation(ret);
         } catch (Exception ex) {
@@ -354,7 +368,7 @@ public abstract class ConfigObject {
         }
         return ret;
     }
-
+    
     @SuppressWarnings("unchecked")
     protected String getLocationJSON(Location loc) {
         JSONObject data = new JSONObject();
@@ -369,22 +383,25 @@ public abstract class ConfigObject {
         data.put("yaw", String.valueOf(loc.getYaw()));
         return data.toJSONString();
     }
-
+    
     protected String getVector(Vector vec) {
         String ret = "{";
         ret += "\"x\":\"" + vec.getX() + "\"";
         ret += ",\"y\":\"" + vec.getY() + "\"";
         ret += ",\"z\":\"" + vec.getZ() + "\"";
         ret += "}";
-        if (!isJSON(ret)) return getVectorJSON(vec);
+        if (!isJSON(ret))
+            return getVectorJSON(vec);
+        
         try {
             getVector(ret);
         } catch (Exception ex) {
             return getVectorJSON(vec);
         }
+        
         return ret;
     }
-
+    
     @SuppressWarnings("unchecked")
     protected String getVectorJSON(Vector vec) {
         JSONObject data = new JSONObject();
@@ -392,14 +409,16 @@ public abstract class ConfigObject {
         data.put("x", String.valueOf(vec.getX()));
         data.put("y", String.valueOf(vec.getY()));
         data.put("z", String.valueOf(vec.getZ()));
+        
         return data.toJSONString();
     }
-
+    
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected ConfigurationSection getMap(Map map, Field field, ConfigurationSection cs, String path, int depth) throws Exception {
         depth++;
         ConfigurationSection subCS = cs.createSection(path);
         Set<String> keys = map.keySet();
+        
         if (keys != null && keys.size() > 0) {
             for (String key : keys) {
                 Object out = map.get(key);
@@ -407,17 +426,20 @@ public abstract class ConfigObject {
                 subCS.set(key, out);
             }
         }
+        
         return subCS;
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected ConfigurationSection getList(List list, Field field, ConfigurationSection cs, String path, int depth) throws Exception {
         depth++;
         ConfigurationSection subCS = cs.createSection(path);
         String key = path;
+        
         if (key.lastIndexOf(".") >= 0) {
             key = key.substring(key.lastIndexOf("."));
         }
+        
         if (list != null && list.size() > 0) {
             for (int i = 0; i < list.size(); i++) {
                 Object out = list.get(i);
@@ -425,21 +447,18 @@ public abstract class ConfigObject {
                 subCS.set(key + (i + 1), out);
             }
         }
+        
         return subCS;
     }
-
+    
     @SuppressWarnings("rawtypes")
     protected String getEnum(Enum enumObj) {
         return enumObj.toString();
     }
-
-    /*
-      * utility
-      */
-
+    
     protected boolean doSkip(Field field) {
-        return Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())
-                || Modifier.isFinal(field.getModifiers()) || Modifier.isProtected(field.getModifiers())
-                || Modifier.isPrivate(field.getModifiers());
+        return  Modifier.isTransient(field.getModifiers()) ||
+                Modifier.isStatic(field.getModifiers()) ||
+                Modifier.isFinal(field.getModifiers());
     }
 }
