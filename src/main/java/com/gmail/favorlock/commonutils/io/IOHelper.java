@@ -16,11 +16,12 @@ import java.io.ObjectOutputStream;
 public class IOHelper<T> {
 
     /**
-     * Attempt to read an object of the type {@link T} from the specified File.
+     * Attempt to read an object of the parameterized type from the specified
+     * File.
      * 
      * @param file The File to read an Object from.
-     * @return The loaded Object of type {@link T}, or <b>null</b> if there was
-     *         an error during read.
+     * @return The loaded Object of the parameterized type, or <b>null</b> if
+     *         there was an error during read.
      */
     @SuppressWarnings("unchecked")
     public T read(File file) {
@@ -33,11 +34,12 @@ public class IOHelper<T> {
     }
     
     /**
-     * Attempt to read an object of the type {@link T} from the specified File.
+     * Attempt to read an object of the parameterized type from the specified
+     * File.
      * 
      * @param file_path The path to the File to read an Object from.
-     * @return The loaded Object of type {@link T}, or <b>null</b> if there was
-     *         an error during read.
+     * @return The loaded Object of the parameterized type, or <b>null</b> if
+     *         there was an error during read.
      */
     public T read(String file_path) {
         return read(new File(file_path));
@@ -46,9 +48,9 @@ public class IOHelper<T> {
     /**
      * Write the specified Object to the specified File, returning the success.
      * 
-     * @param object The Object of type {@link T} to write to File.
+     * @param object The Object of the parameterized type to write to File.
      * @param file   The File to write an Object to.
-     * @return <b>true</b> if the Object was written successfully, <b>false<b>
+     * @return <b>true</b> if the Object was written successfully, <b>false</b>
      *         if errors occurred during write.
      */
     public boolean write(T object, File file) {
@@ -67,9 +69,9 @@ public class IOHelper<T> {
     /**
      * Write the specified Object to the specified File, returning the success.
      * 
-     * @param object    The Object of type {@link T} to write to File.
+     * @param object    The Object of the parameterized type to write to File.
      * @param file_path The path to the File to write an Object to.
-     * @return <b>true</b> if the Object was written successfully, <b>false<b>
+     * @return <b>true</b> if the Object was written successfully, <b>false</b>
      *         if errors occurred during write.
      */
     public boolean write(T object, String file_path) {
