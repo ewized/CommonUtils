@@ -14,7 +14,7 @@ import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
  */
 public class PanelField {
 
-    private static final int MAX_LENGTH = 16;
+    private static final int MAX_LENGTH = 48;
     
     private final ScoreboardPanel parent;
     private final int entry_score;
@@ -38,10 +38,6 @@ public class PanelField {
         initialize();
     }
     
-    public int getMaxStringLength() {
-        return MAX_LENGTH;
-    }
-    
     private void checkstate() {
         if (!parent.hasField(this)) {
             throw new IllegalStateException("This PanelField has been unregistered!");
@@ -59,11 +55,11 @@ public class PanelField {
         if (entry == null)
             throw new IllegalStateException("The entry for this PanelField is null!");
         
-        String main_entry;
-        String entry_prefix;
-        String entry_suffix;
-        
         if (entry.length() > 16) {
+            String main_entry;
+            String entry_prefix;
+            String entry_suffix;
+            
             if (entry.length() > 32) {
                 entry_prefix = entry.substring(0, 16);
                 main_entry = entry.substring(16, 32);
@@ -73,13 +69,11 @@ public class PanelField {
                 main_entry = entry.substring(0, 16);
                 entry_suffix = entry.substring(16);
             }
+            
+            parent.getObjective().formatExtended(entry_prefix, main_entry, entry_suffix, entry_score);
         } else {
-            entry_prefix = "";
-            main_entry = entry;
-            entry_suffix = "";
+            parent.getObjective().setScoreFor(entry, entry_score);
         }
-        
-        parent.getObjective().formatExtended(entry_prefix, main_entry, entry_suffix, entry_score);
     }
     
     void updateValue() {
@@ -88,11 +82,11 @@ public class PanelField {
         if (value == null)
             return;
         
-        String main_value;
-        String value_prefix;
-        String value_suffix;
-        
         if (value.length() > 16) {
+            String main_value;
+            String value_prefix;
+            String value_suffix;
+            
             if (value.length() > 32) {
                 value_prefix = value.substring(0, 16);
                 main_value = value.substring(16, 32);
@@ -103,13 +97,11 @@ public class PanelField {
                 main_value = value.substring(0, 16);
                 value_suffix = value.substring(16);
             }
+            
+            parent.getObjective().formatExtended(value_prefix, main_value, value_suffix, value_score);
         } else {
-            value_prefix = "";
-            main_value = value;
-            value_suffix = "";
+            parent.getObjective().setScoreFor(value, value_score);
         }
-        
-        parent.getObjective().formatExtended(value_prefix, main_value, value_suffix, value_score);
     }
     
     private void changeEntry(String new_entry) {
@@ -254,5 +246,15 @@ public class PanelField {
         clearValue();
         parent.getScoreboard().clearEntry(entry);
         parent.unregister(this);
+    }
+    
+    /**
+     * Get the maximum length of a String that this PanelField implementation
+     * can utilize.
+     * 
+     * @return The maximum String length.
+     */
+    public static int getMaxStringLength() {
+        return MAX_LENGTH;
     }
 }

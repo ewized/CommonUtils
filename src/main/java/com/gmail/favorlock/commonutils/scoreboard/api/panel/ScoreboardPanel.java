@@ -289,7 +289,7 @@ public class ScoreboardPanel {
     public PanelField registerField(String field_name, String init_value, boolean add_to_top) {
         checkstate();
         
-        if (field_name.length() > 48) {
+        if (field_name.length() > PanelField.getMaxStringLength()) {
             throw new IllegalArgumentException(String.format(
                     "Cannot utilize a String with length greater than 48! (given %s)", field_name.length()));
         }
