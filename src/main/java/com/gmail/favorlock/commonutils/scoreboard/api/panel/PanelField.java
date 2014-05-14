@@ -1,5 +1,7 @@
 package com.gmail.favorlock.commonutils.scoreboard.api.panel;
 
+import com.gmail.favorlock.commonutils.scoreboard.api.wrappers.TeamWrapper;
+
 /**
  * A Class for representing a field within a ScoreboardPanel.
  * <p>
@@ -12,6 +14,8 @@ package com.gmail.favorlock.commonutils.scoreboard.api.panel;
  */
 public class PanelField {
 
+    private static final int MAX_LENGTH = 16;
+    
     private final ScoreboardPanel parent;
     private final int entry_score;
     private final int value_score;
@@ -34,8 +38,12 @@ public class PanelField {
         initialize();
     }
     
+    public int getMaxStringLength() {
+        return MAX_LENGTH;
+    }
+    
     private void checkstate() {
-        if (!parent.hasField(entry)) {
+        if (!parent.hasField(this)) {
             throw new IllegalStateException("This PanelField has been unregistered!");
         }
     }
@@ -45,21 +53,63 @@ public class PanelField {
         updateValue();
     }
     
-    private void updateEntry() {
+    void updateEntry() {
         if (hidden)
             return;
         if (entry == null)
             throw new IllegalStateException("The entry for this PanelField is null!");
         
-        parent.getObjective().setScoreFor(entry, entry_score);
+        String main_entry;
+        String entry_prefix;
+        String entry_suffix;
+        
+        if (entry.length() > 16) {
+            if (entry.length() > 32) {
+                entry_prefix = entry.substring(0, 16);
+                main_entry = entry.substring(16, 32);
+                entry_suffix = entry.substring(32);
+            } else {
+                entry_prefix = "";
+                main_entry = entry.substring(0, 16);
+                entry_suffix = entry.substring(16);
+            }
+        } else {
+            entry_prefix = "";
+            main_entry = entry;
+            entry_suffix = "";
+        }
+        
+        parent.getObjective().formatExtended(entry_prefix, main_entry, entry_suffix, entry_score);
     }
     
-    private void updateValue() {
+    void updateValue() {
         if (hidden)
             return;
-        if (value != null) {
-            parent.getObjective().setScoreFor(value, value_score);
+        if (value == null)
+            return;
+        
+        String main_value;
+        String value_prefix;
+        String value_suffix;
+        
+        if (value.length() > 16) {
+            if (value.length() > 32) {
+                value_prefix = value.substring(0, 16);
+                main_value = value.substring(16, 32);
+                value_suffix = value.substring(32);
+                
+            } else {
+                value_prefix = "";
+                main_value = value.substring(0, 16);
+                value_suffix = value.substring(16);
+            }
+        } else {
+            value_prefix = "";
+            main_value = value;
+            value_suffix = "";
         }
+        
+        parent.getObjective().formatExtended(value_prefix, main_value, value_suffix, value_score);
     }
     
     private void changeEntry(String new_entry) {
@@ -67,6 +117,11 @@ public class PanelField {
             throw new IllegalArgumentException("Cannot set a PanelField entry to null!");
         
         parent.getScoreboard().clearEntry(entry);
+        TeamWrapper team = parent.getScoreboard().getTeamForEntry(entry);
+        
+        if (team != null)
+            team.removeEntry(entry);
+        
         this.entry = new_entry;
     }
     
@@ -78,6 +133,11 @@ public class PanelField {
         
         if (value != null) {
             parent.getScoreboard().clearEntry(value);
+            TeamWrapper team = parent.getScoreboard().getTeamForEntry(value);
+            
+            if (team != null)
+                team.removeEntry(value);
+            
             this.value = null;
         }
     }
@@ -108,6 +168,10 @@ public class PanelField {
      */
     public void setEntry(String entry) {
         checkstate();
+        
+        if (entry.length() > 48)
+            throw new IllegalArgumentException("Cannot set the entry to a String longer than 48 characters!");
+        
         parent.changeName(this, entry);
         changeEntry(entry);
         updateEntry();
@@ -142,6 +206,10 @@ public class PanelField {
      */
     public void setValue(String value) {
         checkstate();
+        
+        if (value.length() > 48)
+            throw new IllegalArgumentException("Cannot set the entry to a String longer than 48 characters!");
+        
         clearValue();
         this.value = value;
         updateValue();

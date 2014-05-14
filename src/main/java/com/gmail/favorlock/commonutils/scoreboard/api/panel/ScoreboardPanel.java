@@ -106,6 +106,26 @@ public class ScoreboardPanel {
     }
     
     /**
+     * Get whether or not the given field is currently present on this
+     * ScoreboardPanel
+     * 
+     * @param field The field to check the presence of.
+     * @return <b>true</b> if the field is registered, <b>false</b>
+     *         otherwise.
+     */
+    protected boolean hasField(PanelField field) {
+        checkstate();
+        
+        for (PanelField registered : panel_fields.values()) {
+            if (registered.equals(field)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Get whether or not a field of the given name is currently present on this
      * ScoreboardPanel.
      * 
@@ -133,6 +153,19 @@ public class ScoreboardPanel {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Get whether or not there is a spacer at the given index.
+     * 
+     * @param index The index, which corresponds to the order in which the spacers
+     *              were registered.
+     * @return <b>true</b> if a field is registered for the given field name and is
+     *         an extended field, <b>false</b> otherwise.
+     */
+    public boolean hasSpacer(int index) {
+        checkstate();
+        return getSpacer(index) != null;
     }
     
     /**
@@ -255,6 +288,11 @@ public class ScoreboardPanel {
      */
     public PanelField registerField(String field_name, String init_value, boolean add_to_top) {
         checkstate();
+        
+        if (field_name.length() > 48) {
+            throw new IllegalArgumentException(String.format(
+                    "Cannot utilize a String with length greater than 48! (given %s)", field_name.length()));
+        }
         
         if (panel_fields.get(field_name) != null) {
             return panel_fields.get(field_name);
