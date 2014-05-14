@@ -1,5 +1,7 @@
 package com.gmail.favorlock.commonutils.io;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,6 +18,7 @@ import java.io.Serializable;
  */
 public class IOHelper<T extends Serializable> {
 
+    // FILE I/O
     /**
      * Attempt to read an object of the parameterized type from the specified
      * File.
@@ -40,7 +43,10 @@ public class IOHelper<T extends Serializable> {
     public T read(File file, boolean verbose) {
         try (   FileInputStream f_in = new FileInputStream(file);
                 ObjectInputStream in = new ObjectInputStream(f_in)) {
-            return (T) in.readObject();
+            Object read = in.readObject();
+            in.close();
+            
+            return (T) read;
         } catch (Exception e) {
             if (verbose) {
                 e.printStackTrace();
@@ -133,5 +139,50 @@ public class IOHelper<T extends Serializable> {
      */
     public boolean write(T object, String file_path) {
         return write(object, new File(file_path));
+    }
+    
+    // BYTE ARRAY I/O
+    @SuppressWarnings("unchecked")
+    public T readBytes(byte[] bytes, boolean verbose) {
+        try (   ByteArrayInputStream bar_in = new ByteArrayInputStream(bytes);
+                ObjectInputStream object_in = new ObjectInputStream(bar_in)) {
+            Object read = object_in.readObject();
+            object_in.close();
+            
+            return (T) read;
+        } catch (Exception e) {
+            if (verbose) {
+                e.printStackTrace();
+            }
+            
+            return null;
+        }
+    }
+    
+    public T readBytes(byte[] bytes) {
+        return readBytes(bytes, false);
+    }
+    
+    public byte[] writeBytes(T object, boolean verbose) {
+        try (   ByteArrayOutputStream bar_out = new ByteArrayOutputStream();
+                ObjectOutputStream object_out = new ObjectOutputStream(bar_out)) {
+            object_out.writeObject(object);
+            object_out.flush();
+            object_out.close();
+            bar_out.flush();
+            bar_out.close();
+            
+            return bar_out.toByteArray();
+        } catch (IOException e) {
+            if (verbose) {
+                e.printStackTrace();
+            }
+            
+            return null;
+        }
+    }
+    
+    public byte[] writeBytes(T object) {
+        return writeBytes(object, false);
     }
 }
