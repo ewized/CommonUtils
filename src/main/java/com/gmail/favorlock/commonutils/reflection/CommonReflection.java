@@ -67,16 +67,16 @@ public class CommonReflection {
         }
     }
     
-    public static Constructor<?> getConstructor(Class<?> cls, Class<?>[] param_classes) {
+    public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>[] param_classes) {
         try {
-            Constructor<?> constructor = cls.getConstructor(param_classes);
+            Constructor<T> constructor = cls.getConstructor(param_classes);
             return constructor;
         } catch (NoSuchMethodException | SecurityException e) {
             return null;
         }
     }
     
-    public static Object constructNewInstance(Constructor<?> constructor, Object[] parameters) {
+    public static <T> T constructNewInstance(Constructor<T> constructor, Object[] parameters) {
         constructor.setAccessible(true);
         
         try {
