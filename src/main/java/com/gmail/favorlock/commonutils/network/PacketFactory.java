@@ -7,7 +7,7 @@ import org.bukkit.Location;
 public class PacketFactory {
 
     public static Object getEntityDestroyPacket(int entityId) {
-        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutEntityDestroy");
+        Class<?> clazz = VersionHandler.getNMSClass("PacketPlayOutEntityDestroy");
         Object packet = null;
 
         try {
@@ -23,7 +23,7 @@ public class PacketFactory {
     }
 
     public static Object getEntityMetadataPacket(int entityId, Object watcher) {
-        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutEntityMetadata");
+        Class<?> clazz = VersionHandler.getNMSClass("PacketPlayOutEntityMetadata");
         Object packet = null;
 
         try {
@@ -41,7 +41,7 @@ public class PacketFactory {
     }
 
     public static Object getSpawnEntityLivingPacket(int entityId, int mobId, Location location, Object watcher) {
-        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutSpawnEntityLiving");
+        Class<?> clazz = VersionHandler.getNMSClass("PacketPlayOutSpawnEntityLiving");
         Object packet = null;
 
         try {
@@ -68,7 +68,7 @@ public class PacketFactory {
     }
 
     public static Object getWorldParticlesPacket(String effect, Location location, float xDeviation, float yDeviation, float zDeviation, float speed, int amount) {
-        Class<?> clazz = VersionHandler.getCraftClass("PacketPlayOutWorldParticles");
+        Class<?> clazz = VersionHandler.getNMSClass("PacketPlayOutWorldParticles");
         Object packet = null;
 
         try {

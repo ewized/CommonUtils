@@ -23,13 +23,13 @@ public class Dragon extends BarDragon {
 
     @Override
     public Object getSpawnPacket(World world) {
-        Class<?> Entity = VersionHandler.getCraftClass("Entity");
-        Class<?> EntityLiving = VersionHandler.getCraftClass("EntityLiving");
-        Class<?> EntityEnderDragon = VersionHandler.getCraftClass("EntityEnderDragon");
+        Class<?> Entity = VersionHandler.getNMSClass("Entity");
+        Class<?> EntityLiving = VersionHandler.getNMSClass("EntityLiving");
+        Class<?> EntityEnderDragon = VersionHandler.getNMSClass("EntityEnderDragon");
         Object packet = null;
 
         try {
-            dragon = EntityEnderDragon.getConstructor(VersionHandler.getCraftClass("World"))
+            dragon = EntityEnderDragon.getConstructor(VersionHandler.getNMSClass("World"))
                     .newInstance(CommonReflection.getHandle(world));
 
             new MethodBuilder(EntityEnderDragon, "setLocation", dragon, new Class<?>[] { double.class, double.class, double.class, float.class, float.class })
@@ -52,7 +52,7 @@ public class Dragon extends BarDragon {
 
             this.id = (Integer) new MethodBuilder(EntityEnderDragon, "getId", dragon, new Class<?>[] {}).invokeReturn();
 
-            Class<?> PacketPlayOutSpawnEntityLiving = VersionHandler.getCraftClass("PacketPlayOutSpawnEntityLiving");
+            Class<?> PacketPlayOutSpawnEntityLiving = VersionHandler.getNMSClass("PacketPlayOutSpawnEntityLiving");
 
             packet = PacketPlayOutSpawnEntityLiving.getConstructor(new Class<?>[] { EntityLiving }).newInstance(dragon);
         } catch (NoSuchMethodException e) {
@@ -70,7 +70,7 @@ public class Dragon extends BarDragon {
 
     @Override
     public Object getDestroyPacket() {
-        Class<?> PacketPlayOutEntityDestroy = VersionHandler.getCraftClass("PacketPlayOutEntityDestroy");
+        Class<?> PacketPlayOutEntityDestroy = VersionHandler.getNMSClass("PacketPlayOutEntityDestroy");
         Object packet = null;
 
         try {
@@ -91,8 +91,8 @@ public class Dragon extends BarDragon {
 
     @Override
     public Object getMetaPacket(Object watcher) {
-        Class<?> DataWatcher = VersionHandler.getCraftClass("DataWatcher");
-        Class<?> PacketPlayOutEntityMetadata = VersionHandler.getCraftClass("PacketPlayOutEntityMetadata");
+        Class<?> DataWatcher = VersionHandler.getNMSClass("DataWatcher");
+        Class<?> PacketPlayOutEntityMetadata = VersionHandler.getNMSClass("PacketPlayOutEntityMetadata");
         Object packet = null;
 
         try {
@@ -112,7 +112,7 @@ public class Dragon extends BarDragon {
 
     @Override
     public Object getTeleportPacket(Location loc) {
-        Class<?> PacketPlayOutEntityTeleport = VersionHandler.getCraftClass("PacketPlayOutEntityTeleport");
+        Class<?> PacketPlayOutEntityTeleport = VersionHandler.getNMSClass("PacketPlayOutEntityTeleport");
         Object packet = null;
 
         try {

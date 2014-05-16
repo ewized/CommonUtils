@@ -74,7 +74,7 @@ public class TeamProxy implements InvocationHandler {
             return proxy;
         }
         
-        Class<?> classCraftScoreboard = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboard");
+        Class<?> classCraftScoreboard = VersionHandler.getOBCClass("scoreboard.CraftScoreboard");
         Field fieldTeamsMap = CommonReflection.getField(classCraftScoreboard, "teams");
         fieldTeamsMap.setAccessible(true);
         

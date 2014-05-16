@@ -311,11 +311,11 @@ public class ToolTip {
     }
     
     private static Object getSlotChangePacket(int slot, ItemStack item) {
-        Class<?> classCraftItemStack = VersionHandler.getCraftBukkitClass("inventory.CraftItemStack");
+        Class<?> classCraftItemStack = VersionHandler.getOBCClass("inventory.CraftItemStack");
         Method asNMSCopy = CommonReflection.getMethod(classCraftItemStack, "asNMSCopy", new Class<?>[] {ItemStack.class});
-        Class<?> classNMSItemStack = VersionHandler.getCraftClass("ItemStack");
+        Class<?> classNMSItemStack = VersionHandler.getNMSClass("ItemStack");
         
-        Class<?> classPacketPlayOutSetSlot = VersionHandler.getCraftClass("PacketPlayOutSetSlot");
+        Class<?> classPacketPlayOutSetSlot = VersionHandler.getNMSClass("PacketPlayOutSetSlot");
         Constructor<?> packetPlayOutSetSlot = CommonReflection.getConstructor(classPacketPlayOutSetSlot,
                 new Class<?>[] {int.class, int.class, classNMSItemStack});
         

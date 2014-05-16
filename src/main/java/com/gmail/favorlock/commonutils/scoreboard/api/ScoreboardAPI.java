@@ -104,7 +104,7 @@ public class ScoreboardAPI {
     }
     
     private static boolean checkState(Object scoreboard_component) {
-        Class<?> classCraftScoreboardComponent = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboardComponent");
+        Class<?> classCraftScoreboardComponent = VersionHandler.getOBCClass("scoreboard.CraftScoreboardComponent");
         Method checkState = CommonReflection.getMethod(classCraftScoreboardComponent, "checkState", 0);
         
         try {

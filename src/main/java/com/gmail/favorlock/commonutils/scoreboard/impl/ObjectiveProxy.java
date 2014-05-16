@@ -95,7 +95,7 @@ public class ObjectiveProxy implements InvocationHandler {
             return proxy;
         }
         
-        Class<?> classCraftScoreboard = VersionHandler.getCraftBukkitClass("scoreboard.CraftScoreboard");
+        Class<?> classCraftScoreboard = VersionHandler.getOBCClass("scoreboard.CraftScoreboard");
         Field fieldObjectivesMap = CommonReflection.getField(classCraftScoreboard, "objectives");
         fieldObjectivesMap.setAccessible(true);
         

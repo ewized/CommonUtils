@@ -45,7 +45,7 @@ public class EntityHandler {
     }
 
     public static Object getWatcher(Entity entity, boolean visible, float health, String name) {
-        Class<?> clazz = VersionHandler.getCraftClass("DataWatcher");
+        Class<?> clazz = VersionHandler.getNMSClass("DataWatcher");
         Object watcher = null;
 
         try {
@@ -73,7 +73,7 @@ public class EntityHandler {
     }
 
     public static Object getWatcher(Object entity, boolean visible, float health, String name) {
-        Class<?> clazz = VersionHandler.getCraftClass("DataWatcher");
+        Class<?> clazz = VersionHandler.getNMSClass("DataWatcher");
         Object watcher = null;
 
         try {

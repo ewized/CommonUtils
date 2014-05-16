@@ -19,8 +19,8 @@ public class MenuDispenser extends MenuHolder {
         super(9);
         inventory = Bukkit.createInventory(this, TYPE);
         this.title = title;
-        Class<?> craftInventoryClass = VersionHandler.getCraftBukkitClass("inventory.CraftInventory");
-        Class<?> craftInventoryCustomClass = VersionHandler.getCraftBukkitClass("inventory.CraftInventoryCustom");
+        Class<?> craftInventoryClass = VersionHandler.getOBCClass("inventory.CraftInventory");
+        Class<?> craftInventoryCustomClass = VersionHandler.getOBCClass("inventory.CraftInventoryCustom");
         Class<?> minecraftInventoryClass = null;
 
         Class<?>[] craftInventoryCustomInnerClasses = craftInventoryCustomClass.getDeclaredClasses();
