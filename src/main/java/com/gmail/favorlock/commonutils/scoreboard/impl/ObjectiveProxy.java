@@ -57,7 +57,16 @@ public class ObjectiveProxy implements InvocationHandler {
                 }
             }
             
-            return method.invoke(noproxy, args);
+            try {
+                return method.invoke(noproxy, args);
+            } catch (IllegalStateException e) {
+                // Anticipated an unregistered component, if it isn't print stacktrace.
+                if (!e.getMessage().toLowerCase().contains("unregistered")) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
         }
         
         return method.invoke(proxying, args);

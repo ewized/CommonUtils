@@ -36,7 +36,16 @@ public class TeamProxy implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // This proxy doesn't need to intercept any methods, but its function is still vital.
         if (method.getDeclaringClass().equals(Team.class)) {
-            method.invoke(noproxy, args);
+            try {
+                method.invoke(noproxy, args);
+            } catch (IllegalStateException e) {
+                // Anticipated an unregistered component, if it isn't print stacktrace.
+                if (!e.getMessage().toLowerCase().contains("unregistered")) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
         }
         
         return method.invoke(proxying, args);
