@@ -111,6 +111,19 @@ public class ScoreboardProxy implements InvocationHandler {
                 }
                 
                 return new HashSet<Score>();
+            case "getPlayerTeam":
+                // Our hacky means would also be foiled by this method.
+                if (params.length == 1 && params[0].equals(OfflinePlayer.class)) {
+                    OfflinePlayer offlineplayer = (OfflinePlayer) args[0];
+                    
+                    if (offlineplayer == null) {
+                        return null;
+                    }
+                    
+                    return proxying.getTeamForEntry(offlineplayer.getName());
+                }
+                
+                return null;
             default:
                 break;
             }
