@@ -6,7 +6,7 @@
 
     <groupId>com.gmail.favorlock</groupId>
     <artifactId>CommonUtils</artifactId>
-    <version>0.2.18-SNAPSHOT</version>
+    <version>0.2.19-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

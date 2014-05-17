@@ -356,6 +356,7 @@ public class ScoreboardPanel {
         }
         
         this.registered = false;
+        this.objective.getWrapper().unregisterWrapper();
     }
     
     
