@@ -118,6 +118,24 @@ public class ConfigReader<T extends ConfigModel> {
     }
     
     /**
+     * Set the arguments for the Constructor of this ConfigReader. If this
+     * ConfigReader was not instantiated with a specified Constructor, this
+     * method will have no effect.
+     * 
+     * @param args The new arguments to set, if applicable.
+     * @return This ConfigReader instance, for chaining.
+     */
+    public ConfigReader<T> setConstructorArguments(Object... args) {
+        if (isConstructorSpecified()) {
+            for (int i = 0; i < Math.min(constructor_args.length, args.length); i++) {
+                constructor_args[i] = args[i];
+            }
+        }
+        
+        return this;
+    }
+    
+    /**
      * Read a config instance from the given file path, returning the default
      * config in any case of InvalidConfigurationException.
      * 
