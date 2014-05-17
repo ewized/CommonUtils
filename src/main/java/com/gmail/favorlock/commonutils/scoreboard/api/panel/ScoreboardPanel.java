@@ -350,7 +350,7 @@ public class ScoreboardPanel {
     public void unregister() {
         checkstate();
         
-        for (Map.Entry<String, PanelField> field : panel_fields.entrySet()) {
+        for (Map.Entry<String, PanelField> field : new HashMap<>(panel_fields).entrySet()) {
             PanelField panel_field = field.getValue();
             panel_field.unregister();
         }
