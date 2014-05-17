@@ -144,7 +144,11 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             return false;
         
         for (Objective objective : objectives) {
-            objective.unregister();
+            try {
+                objective.unregister();
+            } catch (IllegalStateException e) {
+                // Objective was already unregistered. Somehow.
+            }
         }
         
         return true;
@@ -169,7 +173,11 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
                 team.removeEntry(entry);
             }
             
-            team.unregister();
+            try {
+                team.unregister();
+            } catch (IllegalStateException e) {
+                // Team was already registered. Somehow.
+            }
         }
         
         return true;
