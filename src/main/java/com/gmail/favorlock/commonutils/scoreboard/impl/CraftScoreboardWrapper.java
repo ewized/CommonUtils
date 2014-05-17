@@ -146,7 +146,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         for (Objective objective : objectives) {
             try {
                 objective.unregister();
-            } catch (IllegalStateException e) {
+            } catch (Exception e) {
                 // Objective was already unregistered. Somehow.
             }
         }
@@ -175,7 +175,7 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             
             try {
                 team.unregister();
-            } catch (IllegalStateException e) {
+            } catch (Exception e) {
                 // Team was already registered. Somehow.
             }
         }
