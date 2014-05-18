@@ -56,7 +56,12 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
         return board;
     }
     
-    protected Scoreboard bypassProxy() {
+    /**
+     * Bypass the ScoreboardProxy that would otherwise be returned.
+     * 
+     * @return The original, unproxied scoreboard.
+     */
+    public Scoreboard bypassProxy() {
         return original;
     }
     
