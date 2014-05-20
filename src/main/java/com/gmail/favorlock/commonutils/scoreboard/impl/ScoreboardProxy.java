@@ -27,8 +27,16 @@ public class ScoreboardProxy implements InvocationHandler {
         this.main = main;
     }
     
-    protected CraftScoreboardWrapper getProxiedScoreboardWrapper() {
+    public CraftScoreboardWrapper getProxiedScoreboardWrapper() {
         return proxying;
+    }
+    
+    public Scoreboard getUnproxiedScoreboard() {
+        return noproxy;
+    }
+    
+    public boolean isMain() {
+        return main;
     }
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Exception {

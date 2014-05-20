@@ -29,8 +29,12 @@ public class TeamProxy implements InvocationHandler {
         this.wrapper = wrapper;
     }
     
-    protected CraftTeamWrapper getTeamWrapper() {
+    public CraftTeamWrapper getTeamWrapper() {
         return wrapper;
+    }
+    
+    public Team getUnproxiedTeam() {
+        return noproxy;
     }
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

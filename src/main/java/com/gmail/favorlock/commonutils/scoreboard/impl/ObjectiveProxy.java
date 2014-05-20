@@ -31,8 +31,12 @@ public class ObjectiveProxy implements InvocationHandler {
         this.wrapper = wrapper;
     }
     
-    protected CraftObjectiveWrapper getObjectiveWrapper() {
+    public CraftObjectiveWrapper getObjectiveWrapper() {
         return wrapper;
+    }
+    
+    public Objective getUnproxiedObjective() {
+        return noproxy;
     }
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
