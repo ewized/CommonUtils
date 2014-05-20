@@ -17,6 +17,9 @@ import com.google.common.collect.ImmutableSet;
 
 public class ScoreboardProxy implements InvocationHandler {
 
+    private static final boolean PROXY_OBJECTIVES = true;
+    private static final boolean PROXY_TEAMS = false;
+    
     private final CraftScoreboardWrapper proxying;
     private final Scoreboard noproxy;
     private final boolean main;
@@ -48,7 +51,15 @@ public class ScoreboardProxy implements InvocationHandler {
                 if (params.length == 2 && params[0].equals(String.class) && params[1].equals(String.class)) {
                     for (Objective objective : noproxy.getObjectives()) {
                         if (objective.getName().equals((String) args[0])) {
-                            return ObjectiveProxy.newProxy(proxying, objective, main);
+                            if (Proxy.isProxyClass(objective.getClass())) {
+                                return objective;
+                            } else {
+                                if (PROXY_OBJECTIVES) {
+                                    return ObjectiveProxy.newProxy(proxying, objective, main);
+                                } else {
+                                    return objective;
+                                }
+                            }
                         }
                     }
                     
@@ -58,7 +69,11 @@ public class ScoreboardProxy implements InvocationHandler {
                         return created;
                     }
                     
-                    return ObjectiveProxy.newProxy(proxying, created, main);
+                    if (PROXY_OBJECTIVES) {
+                        return ObjectiveProxy.newProxy(proxying, created, main);
+                    } else {
+                        return created;
+                    }
                 }
                 
                 break;
@@ -66,7 +81,15 @@ public class ScoreboardProxy implements InvocationHandler {
                 if (params.length == 1 && params[0].equals(String.class)) {
                     for (Team team : noproxy.getTeams()) {
                         if (team.getName().equals((String) args[0])) {
-                            return TeamProxy.newProxy(proxying, team, main);
+                            if (Proxy.isProxyClass(team.getClass())) {
+                                return team;
+                            } else {
+                                if (PROXY_TEAMS) {
+                                    return TeamProxy.newProxy(proxying, team, main);
+                                } else {
+                                    return team;
+                                }
+                            }
                         }
                     }
                     
@@ -76,7 +99,11 @@ public class ScoreboardProxy implements InvocationHandler {
                         return created;
                     }
                     
-                    return TeamProxy.newProxy(proxying, created, main);
+                    if (PROXY_TEAMS) {
+                        return TeamProxy.newProxy(proxying, created, main);
+                    } else {
+                        return created;
+                    }
                 }
                 
                 break;
