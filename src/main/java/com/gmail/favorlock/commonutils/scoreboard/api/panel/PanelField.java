@@ -91,7 +91,6 @@ public class PanelField {
                 value_prefix = value.substring(0, 16);
                 main_value = value.substring(16, 32);
                 value_suffix = value.substring(32);
-                
             } else {
                 value_prefix = "";
                 main_value = value.substring(0, 16);
@@ -108,13 +107,31 @@ public class PanelField {
         if (new_entry == null)
             throw new IllegalArgumentException("Cannot set a PanelField entry to null!");
         
-        parent.getScoreboard().clearEntry(entry);
-        TeamWrapper team = parent.getScoreboard().getTeamForEntry(entry);
-        
-        if (team != null)
-            team.removeEntry(entry);
-        
-        this.entry = new_entry;
+        if (entry.length() > 16) {
+            String main_value;
+            
+            if (entry.length() > 32) {
+                main_value = entry.substring(16, 32);
+            } else {
+                main_value = entry.substring(0, 16);
+            }
+            
+            parent.getScoreboard().clearEntry(main_value);
+            TeamWrapper team = parent.getScoreboard().getTeamForEntry(main_value);
+            
+            if (team != null)
+                team.removeEntry(main_value);
+            
+            this.entry = new_entry;
+        } else {
+            parent.getScoreboard().clearEntry(entry);
+            TeamWrapper team = parent.getScoreboard().getTeamForEntry(entry);
+            
+            if (team != null)
+                team.removeEntry(entry);
+            
+            this.entry = new_entry;
+        }
     }
     
     /**
@@ -124,13 +141,31 @@ public class PanelField {
         checkstate();
         
         if (value != null) {
-            parent.getScoreboard().clearEntry(value);
-            TeamWrapper team = parent.getScoreboard().getTeamForEntry(value);
-            
-            if (team != null)
-                team.removeEntry(value);
-            
-            this.value = null;
+            if (value.length() > 16) {
+                String main_value;
+                
+                if (value.length() > 32) {
+                    main_value = value.substring(16, 32);
+                } else {
+                    main_value = value.substring(0, 16);
+                }
+                
+                parent.getScoreboard().clearEntry(main_value);
+                TeamWrapper team = parent.getScoreboard().getTeamForEntry(main_value);
+                
+                if (team != null)
+                    team.removeEntry(main_value);
+                
+                this.value = null;
+            } else {
+                parent.getScoreboard().clearEntry(value);
+                TeamWrapper team = parent.getScoreboard().getTeamForEntry(value);
+                
+                if (team != null)
+                    team.removeEntry(value);
+                
+                this.value = null;
+            }
         }
     }
     
