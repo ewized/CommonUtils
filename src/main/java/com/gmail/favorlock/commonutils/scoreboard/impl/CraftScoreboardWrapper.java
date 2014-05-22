@@ -323,9 +323,13 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
                     return proxy.getObjectiveWrapper();
                 }
             }
-
-            Bukkit.getLogger().warning("Scoreboard util- Newly registered Objective returned without being proxied!");
-            return null; // return new CraftObjectiveWrapper(this, registered).setProxy(registered);
+            
+            if (ScoreboardProxy.PROXY_OBJECTIVES) {
+                Bukkit.getLogger().warning("Scoreboard util- Newly registered Objective returned without being proxied!");
+                return null; // return new CraftObjectiveWrapper(this, registered).setProxy(registered);
+            } else {
+                return new CraftObjectiveWrapper(this, registered).setProxy(registered);
+            }
         } catch (IllegalArgumentException e) {
             return getObjectiveByName(name);
         }
@@ -360,20 +364,28 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Bukkit.getLogger().warning("Scoreboard util- Existing Objective proxy was not a ObjectiveProxy!");
             return null; // return new CraftObjectiveWrapper(this, objective).setProxy(objective);
         } else {
-            Objective proxy = ObjectiveProxy.newProxy(this, objective, main);
-            
-            if (Proxy.isProxyClass(proxy.getClass())) {
-                InvocationHandler ih = Proxy.getInvocationHandler(proxy);
+            if (ScoreboardProxy.PROXY_OBJECTIVES) {
+                Objective proxy = ObjectiveProxy.newProxy(this, objective, main);
                 
-                if (ih instanceof ObjectiveProxy) {
-                    ObjectiveProxy proxyHandler = (ObjectiveProxy) ih;
+                if (Proxy.isProxyClass(proxy.getClass())) {
+                    InvocationHandler ih = Proxy.getInvocationHandler(proxy);
                     
-                    return proxyHandler.getObjectiveWrapper();
+                    if (ih instanceof ObjectiveProxy) {
+                        ObjectiveProxy proxyHandler = (ObjectiveProxy) ih;
+                        
+                        return proxyHandler.getObjectiveWrapper();
+                    }
+                }
+                
+                Bukkit.getLogger().warning("Scoreboard util- Existing Objective could not be proxied!");
+                return null; // return new CraftObjectiveWrapper(this, proxy).setProxy(proxy);
+            } else {
+                if (objective instanceof ObjectiveWrapper) {
+                    return (ObjectiveWrapper) objective;
+                } else {
+                    return new CraftObjectiveWrapper(this, objective).setProxy(objective);
                 }
             }
-            
-            Bukkit.getLogger().warning("Scoreboard util- Existing Objective could not be proxied!");
-            return null; // return new CraftObjectiveWrapper(this, proxy).setProxy(proxy);
         }
     }
 
@@ -401,8 +413,12 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
                 }
             }
             
-            Bukkit.getLogger().warning("Scoreboard util- Newly registered Team returned without being proxied!");
-            return null; // return new CraftTeamWrapper(this, registered).setProxy(registered);
+            if (ScoreboardProxy.PROXY_TEAMS) {
+                Bukkit.getLogger().warning("Scoreboard util- Newly registered Team returned without being proxied!");
+                return null; // return new CraftTeamWrapper(this, registered).setProxy(registered);
+            } else {
+                return new CraftTeamWrapper(this, registered).setProxy(registered);
+            }
         } catch (IllegalArgumentException e) {
             return getTeamByName(name);
         }
@@ -437,20 +453,28 @@ public class CraftScoreboardWrapper implements ScoreboardWrapper, Scoreboard {
             Bukkit.getLogger().warning("Scoreboard util- Existing Team proxy was not a TeamProxy!");
             return null; // return new CraftTeamWrapper(this, team).setProxy(team);
         } else {
-            Team proxy = TeamProxy.newProxy(this, team, main);
-            
-            if (Proxy.isProxyClass(proxy.getClass())) {
-                InvocationHandler ih = Proxy.getInvocationHandler(proxy);
+            if (ScoreboardProxy.PROXY_TEAMS) {
+                Team proxy = TeamProxy.newProxy(this, team, main);
                 
-                if (ih instanceof TeamProxy) {
-                    TeamProxy proxyHandler = (TeamProxy) ih;
+                if (Proxy.isProxyClass(proxy.getClass())) {
+                    InvocationHandler ih = Proxy.getInvocationHandler(proxy);
                     
-                    return proxyHandler.getTeamWrapper();
+                    if (ih instanceof TeamProxy) {
+                        TeamProxy proxyHandler = (TeamProxy) ih;
+                        
+                        return proxyHandler.getTeamWrapper();
+                    }
+                }
+                
+                Bukkit.getLogger().warning("Scoreboard util- Existing Team could not be proxied!");
+                return null; // return new CraftTeamWrapper(this, proxy).setProxy(proxy);
+            } else {
+                if (team instanceof TeamWrapper) {
+                    return (TeamWrapper) team;
+                } else {
+                    return new CraftTeamWrapper(this, team).setProxy(team);
                 }
             }
-            
-            Bukkit.getLogger().warning("Scoreboard util- Existing Team could not be proxied!");
-            return null; // return new CraftTeamWrapper(this, proxy).setProxy(proxy);
         }
     }
     

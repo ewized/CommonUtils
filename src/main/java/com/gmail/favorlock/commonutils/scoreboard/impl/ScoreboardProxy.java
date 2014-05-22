@@ -17,8 +17,8 @@ import com.google.common.collect.ImmutableSet;
 
 public class ScoreboardProxy implements InvocationHandler {
 
-    private static final boolean PROXY_OBJECTIVES = true;
-    private static final boolean PROXY_TEAMS = false;
+    public static final boolean PROXY_OBJECTIVES = true;
+    public static final boolean PROXY_TEAMS = false;
     
     private final CraftScoreboardWrapper proxying;
     private final Scoreboard noproxy;
