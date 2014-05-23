@@ -10,10 +10,14 @@ public class Menu extends MenuHolder {
     private Inventory inventory;
     
     public Menu(String title, int rows) {
-        super(9 * rows);
+        super(9 * 6);
         
         this.title = title;
         this.rows = rows;
+    }
+    
+    public int getMaxItems() {
+        return rows * 9;
     }
     
     public boolean addMenuItem(MenuItem item, int x, int y) {

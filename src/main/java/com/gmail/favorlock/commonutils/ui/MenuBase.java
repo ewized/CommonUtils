@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 public abstract class MenuBase {
 
 //    HashMap<Integer, MenuItem> items = new HashMap<>();
-    final int max_items;
+    private final int max_items;
     MenuItem[] items;
     boolean exitOnClickOutside = true;
     MenuCloseBehavior menuCloseBehavior;

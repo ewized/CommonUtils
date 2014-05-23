@@ -30,7 +30,7 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
     
     @SuppressWarnings("deprecation")
     protected void selectMenuItem(Inventory inventory, Player player, int index) {
-        if (index > -1 && index < super.max_items) {
+        if (index > -1 && index < getMaxItems()) {
             MenuItem item = items[index];
             
             if (item != null)
@@ -45,7 +45,7 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
         
         if (slot != null && slot.getType() != Material.AIR) {
             return false;
-        } else if (index < 0 || index >= super.max_items) {
+        } else if (index < 0 || index >= getMaxItems()) {
             return false;
         }
         
@@ -61,7 +61,7 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
         
         if (slot == null || slot.getType() == Material.AIR) {
             return false;
-        } else if (index < 0 || index >= super.max_items) {
+        } else if (index < 0 || index >= getMaxItems()) {
             return false;
         }
         
@@ -86,7 +86,7 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
     public void updateInventory() {
         getInventory().clear();
         
-        for (int i = 0; i < super.max_items; i++) {
+        for (int i = 0; i < getMaxItems(); i++) {
             MenuItem item = super.items[i];
             
             if (item != null) {

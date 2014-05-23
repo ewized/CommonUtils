@@ -21,7 +21,7 @@ public class PaginatedMenu extends MenuHolder {
             throw new IllegalArgumentException("Cannot instantiate a PaginatedMenu with a nonpositive page count!");
         }
         
-        this.true_items = new MenuItem[initial_pages][super.max_items];
+        this.true_items = new MenuItem[initial_pages][getMaxItems()];
         this.title = title;
         this.rows = rows;
         this.inventories = new Inventory[initial_pages];
@@ -33,7 +33,7 @@ public class PaginatedMenu extends MenuHolder {
     
     @SuppressWarnings("deprecation")
     protected void selectMenuItem(Inventory inventory, Player player, int index) {
-        if (index > -1 && index < super.max_items) {
+        if (index > -1 && index < getMaxItems()) {
             for (int i = 0; i < inventories.length; i++) {
                 Inventory inv = inventories[i];
                 
@@ -204,7 +204,7 @@ public class PaginatedMenu extends MenuHolder {
      * @return The number of items per page.
      */
     public int getItemsPerPage() {
-        return super.max_items;
+        return getMaxItems();
     }
     
     /**
@@ -222,12 +222,12 @@ public class PaginatedMenu extends MenuHolder {
      *         otherwise.
      */
     public boolean setPage(int page, MenuItem[] set_to, boolean overwrite) {
-        if (set_to.length != super.max_items)
+        if (set_to.length != getMaxItems())
             return false;
         
         if (overwrite) {
             true_items[page] = set_to.clone();
-            for (int i = 0; i < super.max_items; i++) {
+            for (int i = 0; i < getMaxItems(); i++) {
                 removeMenuItem(page, i);
                 
                 if (set_to[i] == null)
@@ -236,7 +236,7 @@ public class PaginatedMenu extends MenuHolder {
                 addMenuItem(page, set_to[i], i);
             }
         } else {
-            for (int i = 0; i < super.max_items; i++) {
+            for (int i = 0; i < getMaxItems(); i++) {
                 if (set_to[i] != null)
                     addMenuItem(page, set_to[i], i);
             }
@@ -257,13 +257,13 @@ public class PaginatedMenu extends MenuHolder {
      *         otherwise.
      */
     public boolean addPage(MenuItem[] new_page) {
-        if (super.max_items != new_page.length)
+        if (getMaxItems() != new_page.length)
             return false;
         
         addPages(1);
         int page = getPageCount() - 1;
         
-        for (int i = 0; i < super.max_items; i++) {
+        for (int i = 0; i < getMaxItems(); i++) {
             if (new_page[i] == null)
                 continue;
             
@@ -288,7 +288,7 @@ public class PaginatedMenu extends MenuHolder {
      * @param count The number of pages to add.
      */
     public void addPages(int count) {
-        MenuItem[][] new_items = new MenuItem[true_items.length + count][super.max_items];
+        MenuItem[][] new_items = new MenuItem[true_items.length + count][getMaxItems()];
         
         for (int i = 0; i < getPageCount(); i++) {
             new_items[i] = true_items[i];
@@ -326,7 +326,7 @@ public class PaginatedMenu extends MenuHolder {
         
         if (slot != null && !slot.getType().equals(Material.AIR)) {
             return false;
-        } else if (index < 0 || index >= super.max_items) {
+        } else if (index < 0 || index >= getMaxItems()) {
             return false;
         }
         
@@ -355,7 +355,7 @@ public class PaginatedMenu extends MenuHolder {
         
         if (slot == null || slot.getType().equals(Material.AIR)) {
             return false;
-        } else if (index < 0 || index >= super.max_items) {
+        } else if (index < 0 || index >= getMaxItems()) {
             return false;
         }
         

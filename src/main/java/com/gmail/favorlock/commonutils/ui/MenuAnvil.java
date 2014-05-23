@@ -186,7 +186,7 @@ public class MenuAnvil extends MenuBase {
     }
     
     public boolean removeMenuItem(int index) {
-        if (index < 0 || index >= super.max_items)
+        if (index < 0 || index >= getMaxItems())
             return false;
         
         MenuItem remove = items[index];

@@ -71,7 +71,7 @@ public class MenuHopper extends MenuHolder {
         
         if (slot != null && slot.getType() != Material.AIR) {
             return false;
-        } else if (index < 0 || index >= super.max_items) {
+        } else if (index < 0 || index >= getMaxItems()) {
             return false;
         }
         
@@ -88,7 +88,7 @@ public class MenuHopper extends MenuHolder {
         
         if (slot == null || slot.getType() == Material.AIR) {
             return false;
-        } else if (index < 0 || index >= super.max_items) {
+        } else if (index < 0 || index >= getMaxItems()) {
             return false;
         }
         
