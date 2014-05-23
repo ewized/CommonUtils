@@ -30,6 +30,10 @@ public abstract class MenuBase {
     public boolean exitOnClickOutside() {
         return exitOnClickOutside;
     }
+    
+    public int getMaxItems() {
+        return max_items;
+    }
 
     public abstract void openMenu(Player player);
 
