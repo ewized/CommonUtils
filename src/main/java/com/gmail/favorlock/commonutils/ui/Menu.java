@@ -6,7 +6,7 @@ import org.bukkit.inventory.Inventory;
 public class Menu extends MenuHolder {
 
     private final String title;
-    private final int rows;
+    private int rows;
     private Inventory inventory;
     
     public Menu(String title, int rows) {
@@ -28,12 +28,24 @@ public class Menu extends MenuHolder {
         return rows;
     }
     
-    public Inventory getInventory() {
-        if (inventory == null) {
-            inventory = Bukkit.createInventory(this, rows * 9, title);
+    public void setRows(int newrows) {
+        if (this.rows != newrows) {
+            if (this.inventory != null) {
+                inventory.clear();
+            }
+            
+            this.rows = newrows;
+            this.inventory = Bukkit.createInventory(this, rows * 9, title);
+            updateInventory();
         }
-
-        return inventory;
+    }
+    
+    public Inventory getInventory() {
+        if (this.inventory == null) {
+            this.inventory = Bukkit.createInventory(this, rows * 9, title);
+        }
+        
+        return this.inventory;
     }
     
     protected MenuHolder clone() {
@@ -41,6 +53,7 @@ public class Menu extends MenuHolder {
         clone.setExitOnClickOutside(exitOnClickOutside);
         clone.setMenuCloseBehavior(menuCloseBehavior);
         clone.items = items.clone();
+        clone.updateInventory();
         
         return clone;
     }
