@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 
 import com.gmail.favorlock.commonutils.network.PacketFactory;
-import com.gmail.favorlock.commonutils.entity.EntityHandler;
+import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 
 public enum ParticleEffect {
 

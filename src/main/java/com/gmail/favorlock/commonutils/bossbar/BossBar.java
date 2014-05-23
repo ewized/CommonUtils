@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.favorlock.commonutils.CommonUtils;
-import com.gmail.favorlock.commonutils.entity.EntityHandler;
+import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 
 public class BossBar {
 

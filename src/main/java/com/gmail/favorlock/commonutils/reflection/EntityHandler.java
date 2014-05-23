@@ -1,18 +1,20 @@
-package com.gmail.favorlock.commonutils.entity;
-
-import com.gmail.favorlock.commonutils.reflection.CommonReflection;
-import com.gmail.favorlock.commonutils.reflection.MethodBuilder;
-import com.gmail.favorlock.commonutils.reflection.VersionHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+package com.gmail.favorlock.commonutils.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+
 public class EntityHandler {
 
+    public static <T extends Entity> T spawnEntity(Location spawn, Class<T> entity_class) {
+        return spawn.getWorld().spawn(spawn, entity_class);
+    }
+    
     public static void sendPacketToAll(Object packet) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             sendPacket(player, packet);

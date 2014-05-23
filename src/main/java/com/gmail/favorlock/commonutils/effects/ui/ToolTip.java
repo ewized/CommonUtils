@@ -23,8 +23,8 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
+import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 
 public class ToolTip {

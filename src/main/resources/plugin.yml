@@ -1,7 +1,7 @@
 name: CommonUtils
 version: ${version}
 description: Common utilities for Bukkit.
-author: Favorlock
+authors: [Favorlock, Gjosiah]
 
 main: com.gmail.favorlock.commonutils.CommonUtils
 database: false

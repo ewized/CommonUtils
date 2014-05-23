@@ -2,11 +2,11 @@ package com.gmail.favorlock.commonutils.effects.particle;
 
 import java.io.Serializable;
 
-import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.gmail.favorlock.commonutils.network.PacketFactory;
+import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 
 /**
  * A serializable class for representing a Particle Effect.

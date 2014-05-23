@@ -7,8 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import com.gmail.favorlock.commonutils.bossbar.BarDragon;
-import com.gmail.favorlock.commonutils.entity.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.CommonReflection;
+import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.MethodBuilder;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 
