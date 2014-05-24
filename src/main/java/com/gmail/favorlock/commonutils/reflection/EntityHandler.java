@@ -3,14 +3,63 @@ package com.gmail.favorlock.commonutils.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import com.gmail.favorlock.commonutils.CommonUtils;
 
 public class EntityHandler {
 
+    public static boolean injectCustomEntity(
+            JavaPlugin plugin, Class<?> entity_class, EntityType emulate) {
+        return injectCustomEntity(plugin, entity_class, emulate, false);
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
+    public static boolean injectCustomEntity(
+            JavaPlugin plugin, Class<?> entity_class, EntityType emulate, boolean overwrite_id) {
+        String entity_name = String.format("%s:%s", plugin.getName(), entity_class.getSimpleName());
+        Class<?> classEntityTypes = VersionHandler.getNMSClass("EntityTypes");
+        Field fieldStringToClass, fieldClassToString, fieldIdToClass, fieldClassToId, fieldStringToId;
+        Map string_class, class_string, id_class, class_id, string_id;
+        
+        try {
+            (fieldStringToClass = classEntityTypes.getDeclaredField("c")).setAccessible(true);
+            (fieldClassToString = classEntityTypes.getDeclaredField("d")).setAccessible(true);
+            (fieldClassToId = classEntityTypes.getDeclaredField("f")).setAccessible(true);
+            (fieldStringToId = classEntityTypes.getDeclaredField("g")).setAccessible(true);
+            (string_class = (Map) fieldStringToClass.get(null)).put(entity_name, entity_class);
+            (class_string = (Map) fieldClassToString.get(null)).put(entity_class, entity_name);
+            (class_id = (Map) fieldClassToId.get(null)).put(entity_class, new Integer(emulate.getTypeId()));
+            (string_id = (Map) fieldStringToId.get(null)).put(entity_name, new Integer(emulate.getTypeId()));
+            fieldStringToClass.set(null, string_class);
+            fieldClassToString.set(null, class_string);
+            fieldClassToId.set(null, class_id);
+            fieldStringToId.set(null, string_id);
+            
+            if (overwrite_id) {
+                (fieldIdToClass = classEntityTypes.getDeclaredField("e")).setAccessible(true);
+                (id_class = (Map) fieldIdToClass.get(null)).put(new Integer(emulate.getTypeId()), entity_class);
+                fieldIdToClass.set(null, id_class);
+            }
+            
+            CommonUtils.getPlugin().getLogger().info(String.format(
+                    "Injected a custom entity %s -> %s", entity_name, emulate.name()));
+            return true;
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            CommonUtils.getPlugin().getLogger().info(String.format(
+                    "Failed to inject a custom entity %s -> %s", entity_name, emulate.name()));
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     public static <T extends Entity> T spawnEntity(Location spawn, Class<T> entity_class) {
         return spawn.getWorld().spawn(spawn, entity_class);
     }
