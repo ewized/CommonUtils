@@ -6,7 +6,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class WeakList<T> extends ArrayList<WeakReference<T>> {
+/**
+ * An extension of an ArrayList that stores values as WeakReferences,
+ * with convenience methods to automatically wrap and unwrap values.
+ * 
+ * @param <T> The desired type of elements to store in this List.
+ */
+public class WeakList<T> extends ArrayList<WeakReference<T>> implements WeakCollection<T> {
 
     private static final long serialVersionUID = 488462089918650743L;
     
@@ -38,7 +44,7 @@ public class WeakList<T> extends ArrayList<WeakReference<T>> {
     /**
      * Construct a new WeakList with the given elements.
      * 
-     * @param values An array of WeakReferences
+     * @param values An array of WeakReferences of the desired type.
      */
     public WeakList(WeakReference<? extends T>[] values) {
         this.clean = true;
@@ -206,14 +212,14 @@ public class WeakList<T> extends ArrayList<WeakReference<T>> {
         boolean contains = false;
         
         for (int i = 0; i < size(); i++) {
-            WeakReference<T> value = get(i);
+            WeakReference<T> ref = get(i);
             
-            if (clean && (value == null || value.get() == null)) {
+            if (clean && (ref == null || ref.get() == null)) {
                 remove(i);
                 i--;
             }
             
-            if (equalReferences(value, object)) {
+            if (equalReferences(ref, object)) {
                 contains = true;
             }
         }
@@ -366,6 +372,17 @@ public class WeakList<T> extends ArrayList<WeakReference<T>> {
         }
         
         return values;
+    }
+    
+    /**
+     * Get an array that represents the values contained within this WeakList.
+     * Any invalid references will have been cleaned from the returned List.
+     * 
+     * @return An array containing the values of the remaining valid references
+     *         from this WeakList.
+     */
+    public T[] valueArray(T[] array) {
+        return values().toArray(array);
     }
     
     
