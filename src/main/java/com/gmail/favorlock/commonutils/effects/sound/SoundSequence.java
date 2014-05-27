@@ -34,7 +34,7 @@ public class SoundSequence implements Serializable {
      */
     public void play(final Location location) {
         initTransient();
-        tasks.add(new TaskPlaySound(sequence, location, null, SoundPlayType.LOCATION, tasks).start());
+        tasks.add(new TaskPlaySound(sequence, location, null, SoundPlayType.LOCATION).start());
     }
 
     /**
@@ -46,7 +46,7 @@ public class SoundSequence implements Serializable {
      */
     public void play(final Location location, final Player... players) {
         initTransient();
-        tasks.add(new TaskPlaySound(sequence, location, players, SoundPlayType.LOCATION_PLAYERS, tasks).start());
+        tasks.add(new TaskPlaySound(sequence, location, players, SoundPlayType.LOCATION_PLAYERS).start());
     }
 
     /**
@@ -57,7 +57,7 @@ public class SoundSequence implements Serializable {
      */
     public void play(final Player... players) {
         initTransient();
-        tasks.add(new TaskPlaySound(sequence, null, players, SoundPlayType.PLAYERS, tasks).start());
+        tasks.add(new TaskPlaySound(sequence, null, players, SoundPlayType.PLAYERS).start());
     }
 
     /**
@@ -210,21 +210,19 @@ public class SoundSequence implements Serializable {
 
     private static enum SoundPlayType {LOCATION, LOCATION_PLAYERS, PLAYERS}
 
-    private static class TaskPlaySound extends BukkitRunnable {
+    private class TaskPlaySound extends BukkitRunnable {
         private final Map<Integer, List<SoundDisplay>> seq;
         private final Location location;
         private Player[] players;
         private final SoundPlayType type;
-        private final List<TaskPlaySound> running_tasks;
         private int tick = 0;
         private int found = 0;
 
-        private TaskPlaySound(Map<Integer, List<SoundDisplay>> sequence, Location initial, Player[] players, SoundPlayType type, List<TaskPlaySound> tasks) {
+        private TaskPlaySound(Map<Integer, List<SoundDisplay>> sequence, Location initial, Player[] players, SoundPlayType type) {
             this.seq = new HashMap<>(sequence);
             this.location = initial;
             this.players = players;
             this.type = type;
-            this.running_tasks = tasks;
         }
 
         public TaskPlaySound start() {
@@ -276,13 +274,13 @@ public class SoundSequence implements Serializable {
                 found++;
             }
 
-            if (found > seq.size()) {
+            if (found >= seq.size()) {
                 try {
                     this.cancel();
                 } catch (IllegalStateException e) {
                 }
 
-                running_tasks.remove(this);
+                tasks.remove(this);
             }
         }
     }

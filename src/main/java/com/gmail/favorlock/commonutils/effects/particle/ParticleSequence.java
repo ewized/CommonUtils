@@ -34,7 +34,7 @@ public class ParticleSequence implements Serializable {
      */
     public void play(Location location) {
         initTransient();
-        tasks.add(new TaskDisplayParticles(sequence, location, null, ParticleDisplayType.LOCATION, tasks).start());
+        tasks.add(new TaskDisplayParticles(sequence, location, null, ParticleDisplayType.LOCATION).start());
     }
 
     /**
@@ -46,7 +46,7 @@ public class ParticleSequence implements Serializable {
      */
     public void play(final Location location, final Player... players) {
         initTransient();
-        tasks.add(new TaskDisplayParticles(sequence, location, players, ParticleDisplayType.LOCATION_PLAYERS, tasks).start());
+        tasks.add(new TaskDisplayParticles(sequence, location, players, ParticleDisplayType.LOCATION_PLAYERS).start());
     }
 
     /**
@@ -197,23 +197,21 @@ public class ParticleSequence implements Serializable {
         }
     }
 
-    private static enum ParticleDisplayType {LOCATION, LOCATION_PLAYERS}
+    private static enum ParticleDisplayType { LOCATION, LOCATION_PLAYERS }
 
-    private static class TaskDisplayParticles extends BukkitRunnable {
+    private class TaskDisplayParticles extends BukkitRunnable {
         private final Map<Integer, List<ParticleDisplay>> seq;
         private final Location location;
         private Player[] players;
         private final ParticleDisplayType type;
-        private final List<TaskDisplayParticles> running_tasks;
         private int tick = 0;
         private int found = 0;
 
-        private TaskDisplayParticles(Map<Integer, List<ParticleDisplay>> sequence, Location initial, Player[] players, ParticleDisplayType type, List<TaskDisplayParticles> tasks) {
+        private TaskDisplayParticles(Map<Integer, List<ParticleDisplay>> sequence, Location initial, Player[] players, ParticleDisplayType type) {
             this.seq = new HashMap<>(sequence);
             this.location = initial;
             this.players = players;
             this.type = type;
-            this.running_tasks = tasks;
         }
 
         public TaskDisplayParticles start() {
@@ -257,13 +255,13 @@ public class ParticleSequence implements Serializable {
                 found++;
             }
 
-            if (found > seq.size()) {
+            if (found >= seq.size()) {
                 try {
                     this.cancel();
                 } catch (IllegalStateException e) {
                 }
 
-                running_tasks.remove(this);
+                tasks.remove(this);
             }
         }
     }
