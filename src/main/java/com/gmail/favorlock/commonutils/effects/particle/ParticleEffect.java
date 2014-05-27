@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 
-import com.gmail.favorlock.commonutils.network.PacketFactory;
+import com.gmail.favorlock.commonutils.network.packets.WrapperPlayOutWorldParticles;
 import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 
 public enum ParticleEffect {
@@ -88,7 +88,10 @@ public enum ParticleEffect {
      * @param players  The player(s) that should see these particles.
      */
     public void send(Location location, float xDev, float yDev, float zDev, float speed, int amount, Player... players) {
-        Object packet = PacketFactory.getWorldParticlesPacket(particleName, location, xDev, yDev, zDev, speed, amount);
+        Object packet = new WrapperPlayOutWorldParticles(particleName, location)
+            .setDeviations(xDev, yDev, zDev)
+            .setSpeed(speed)
+            .setAmount(amount).get();
         EntityHandler.sendPacket(players, packet);
     }
 
@@ -158,7 +161,10 @@ public enum ParticleEffect {
         public static void send(MaterialData materialdata, Location location, float xDev, float yDev, float zDev, float speed, int amount, Player... players) {
             int id = materialdata.getItemType().getId();
             byte data = materialdata.getData() > 0 ? materialdata.getData() : 0;
-            Object packet = PacketFactory.getWorldParticlesPacket("blockdust_" + id + "_" + data, location, xDev, yDev, zDev, speed, amount);
+            Object packet = new WrapperPlayOutWorldParticles("blockdust_" + id + "_" + data, location)
+                .setDeviations(xDev, yDev, zDev)
+                .setSpeed(speed)
+                .setAmount(amount).get();
             EntityHandler.sendPacket(players, packet);
         }
 
@@ -228,7 +234,10 @@ public enum ParticleEffect {
         @SuppressWarnings("deprecation")
         public static void send(Material material, Location location, float xDev, float yDev, float zDev, float speed, int amount, Player... players) {
             int id = material.getId();
-            Object packet = PacketFactory.getWorldParticlesPacket("iconcrack_" + id, location, xDev, yDev, zDev, speed, amount);
+            Object packet = new WrapperPlayOutWorldParticles("iconcrack_" + id, location)
+                .setDeviations(xDev, yDev, zDev)
+                .setSpeed(speed)
+                .setAmount(amount).get();
             EntityHandler.sendPacket(players, packet);
         }
 
@@ -261,7 +270,10 @@ public enum ParticleEffect {
      * in a later version.
      */
     public static void sendPacket(Player player, Location location, ParticleEffect effect, float xDev, float yDev, float zDev, float speed, int amount) {
-        Object packet = PacketFactory.getWorldParticlesPacket(effect.particleName, location, xDev, yDev, zDev, speed, amount);
+        Object packet = new WrapperPlayOutWorldParticles(effect.particleName, location)
+            .setDeviations(xDev, yDev, zDev)
+            .setSpeed(speed)
+            .setAmount(amount).get();
         EntityHandler.sendPacket(player, packet);
     }
 }

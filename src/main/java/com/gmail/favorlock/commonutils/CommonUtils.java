@@ -1,6 +1,7 @@
 package com.gmail.favorlock.commonutils;
 
-import com.gmail.favorlock.commonutils.network.PacketListener;
+import com.gmail.favorlock.commonutils.network.packets.PacketListener;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.favorlock.commonutils.ui.MenuAPI;

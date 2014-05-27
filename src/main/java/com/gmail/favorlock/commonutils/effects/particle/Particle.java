@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.gmail.favorlock.commonutils.network.PacketFactory;
+import com.gmail.favorlock.commonutils.network.packets.WrapperPlayOutWorldParticles;
 import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 
 /**
@@ -39,7 +39,10 @@ public class Particle implements Serializable {
      * @param players  The players to display particles to.
      */
     public void play(Location location, Player... players) {
-        Object packet = PacketFactory.getWorldParticlesPacket(name, location, x, y, z, speed, amount);
+        Object packet = new WrapperPlayOutWorldParticles(name, location)
+            .setDeviations(x, y, z)
+            .setSpeed(speed)
+            .setAmount(amount).get();
         EntityHandler.sendPacket(players, packet);
     }
 
