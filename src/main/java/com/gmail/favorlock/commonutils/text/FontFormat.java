@@ -83,6 +83,16 @@ public enum FontFormat {
         
         return value;
     }
+
+    public static String translateString(String value, boolean unicode) {
+        String message = translateString(value);
+
+        if (unicode) {
+            message = replaceUnicodeEscapes(message);
+        }
+
+        return message;
+    }
     
     public static String stripColor(final String input) {
         if (input == null) {
@@ -158,5 +168,16 @@ public enum FontFormat {
         }
         
         return lines;
+    }
+
+    private static String replaceUnicodeEscapes(String message) {
+        while (message.contains("\\u")) {
+            String code = message.substring(message.indexOf("\\u") + 2, message.indexOf("\\u") + 6);
+            int icode = Integer.parseInt(code, 16);
+            char ccode = (char) icode;
+            message = message.replace("\\u" + code, ccode + "");
+        }
+
+        return message;
     }
 }
