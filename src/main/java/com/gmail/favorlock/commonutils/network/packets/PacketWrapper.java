@@ -1,5 +1,9 @@
 package com.gmail.favorlock.commonutils.network.packets;
 
+import org.bukkit.entity.Player;
+
+import com.gmail.favorlock.commonutils.reflection.EntityHandler;
+
 public abstract class PacketWrapper {
 
     private final Class<?> packet_class;
@@ -13,8 +17,18 @@ public abstract class PacketWrapper {
      * 
      * @return The Class of the Packet.
      */
-    public Class<?> getPacketClass() {
+    public final Class<?> getPacketClass() {
         return packet_class;
+    }
+    
+    /**
+     * Send an instance of the Packet represented by this class (as it would be
+     * returned by {@link PacketWrapper#get()}) to the given player(s).
+     * 
+     * @param players The Player(s) to send this Packet to.
+     */
+    public void send(Player... players) {
+        EntityHandler.sendPacket(players, get());
     }
     
     /**

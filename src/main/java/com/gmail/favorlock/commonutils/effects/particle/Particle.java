@@ -39,7 +39,8 @@ public class Particle implements Serializable {
      * @param players  The players to display particles to.
      */
     public void play(Location location, Player... players) {
-        Object packet = new WrapperPlayOutWorldParticles(name, location)
+        Object packet = new WrapperPlayOutWorldParticles(name)
+            .setLocation(location)
             .setDeviations(x, y, z)
             .setSpeed(speed)
             .setAmount(amount).get();

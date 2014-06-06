@@ -88,7 +88,8 @@ public enum ParticleEffect {
      * @param players  The player(s) that should see these particles.
      */
     public void send(Location location, float xDev, float yDev, float zDev, float speed, int amount, Player... players) {
-        Object packet = new WrapperPlayOutWorldParticles(particleName, location)
+        Object packet = new WrapperPlayOutWorldParticles(particleName)
+            .setLocation(location)
             .setDeviations(xDev, yDev, zDev)
             .setSpeed(speed)
             .setAmount(amount).get();
@@ -161,7 +162,8 @@ public enum ParticleEffect {
         public static void send(MaterialData materialdata, Location location, float xDev, float yDev, float zDev, float speed, int amount, Player... players) {
             int id = materialdata.getItemType().getId();
             byte data = materialdata.getData() > 0 ? materialdata.getData() : 0;
-            Object packet = new WrapperPlayOutWorldParticles("blockdust_" + id + "_" + data, location)
+            Object packet = new WrapperPlayOutWorldParticles("blockdust_" + id + "_" + data)
+                .setLocation(location)
                 .setDeviations(xDev, yDev, zDev)
                 .setSpeed(speed)
                 .setAmount(amount).get();
@@ -234,7 +236,8 @@ public enum ParticleEffect {
         @SuppressWarnings("deprecation")
         public static void send(Material material, Location location, float xDev, float yDev, float zDev, float speed, int amount, Player... players) {
             int id = material.getId();
-            Object packet = new WrapperPlayOutWorldParticles("iconcrack_" + id, location)
+            Object packet = new WrapperPlayOutWorldParticles("iconcrack_" + id)
+                .setLocation(location)
                 .setDeviations(xDev, yDev, zDev)
                 .setSpeed(speed)
                 .setAmount(amount).get();
@@ -270,7 +273,8 @@ public enum ParticleEffect {
      * in a later version.
      */
     public static void sendPacket(Player player, Location location, ParticleEffect effect, float xDev, float yDev, float zDev, float speed, int amount) {
-        Object packet = new WrapperPlayOutWorldParticles(effect.particleName, location)
+        Object packet = new WrapperPlayOutWorldParticles(effect.particleName)
+            .setLocation(location)
             .setDeviations(xDev, yDev, zDev)
             .setSpeed(speed)
             .setAmount(amount).get();
