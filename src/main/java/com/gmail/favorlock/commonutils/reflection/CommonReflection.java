@@ -1,12 +1,13 @@
 package com.gmail.favorlock.commonutils.reflection;
 
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.scoreboard.Objective;
 
 public class CommonReflection {
 
@@ -42,6 +43,18 @@ public class CommonReflection {
         }
 
         return nmsEntity;
+    }
+    
+    public static Object getHandle(Objective objective) {
+        Class<?> classCraftObjective = VersionHandler.getOBCClass("scoreboard.CraftObjective");
+        Method getHandle = CommonReflection.getMethod(classCraftObjective, "getHandle", 0);
+        
+        try {
+            return getHandle.invoke(objective);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static Field getField(Class<?> clazz, String fieldName) {
