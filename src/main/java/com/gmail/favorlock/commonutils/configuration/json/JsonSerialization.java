@@ -5,6 +5,7 @@ import com.archeinteractive.ason.io.impl.JSONWriter;
 import com.archeinteractive.ason.io.objects.ObjectConstructorSet;
 import com.archeinteractive.ason.io.objects.ObjectReader;
 import com.archeinteractive.ason.io.objects.ObjectWriter;
+import com.gmail.favorlock.commonutils.CommonUtils;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -23,6 +24,7 @@ public class JsonSerialization {
     private JsonSerialization() {}
 
     public static <T extends Serializable> boolean writeObject(T object, File file) {
+        initFile(file);
         return toJson.compose(fromObject.parse(object), file);
     }
 
@@ -35,6 +37,7 @@ public class JsonSerialization {
     }
 
     public static <T extends Serializable> T readObject(Class<T> cls, File file) {
+        initFile(file);
         return toObject.compose(fromJson.parse(file), cls);
     }
 
@@ -91,5 +94,15 @@ public class JsonSerialization {
         boolean isEnclosingScope = f.getType().equals(f.getDeclaringClass().getEnclosingClass());
 
         return !(isFinal || isStatic || isTransient || isEnclosingScope);
+    }
+
+    private static void initFile(File file) {
+        try {
+            if (file.exists() == false) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            CommonUtils.getPlugin().getLogger().info(file.getName() + " does not exists!");
+        }
     }
 }
