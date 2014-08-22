@@ -99,10 +99,14 @@ public class JsonSerialization {
     private static void initFile(File file) {
         try {
             if (file.exists() == false) {
+                if (file.getParentFile().exists() == false) {
+                    file.getParentFile().mkdirs();
+                }
+
                 file.createNewFile();
             }
         } catch (IOException e) {
-            CommonUtils.getPlugin().getLogger().info(file.getName() + " does not exists!");
+            CommonUtils.getPlugin().getLogger().info(file.getPath() + " does not exists!");
         }
     }
 }
