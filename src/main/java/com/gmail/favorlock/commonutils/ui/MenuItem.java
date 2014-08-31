@@ -99,9 +99,12 @@ public abstract class MenuItem extends MenuClickBehavior {
     public ItemStack getItemStack() {
         ItemStack slot = new ItemStack(getIcon().getItemType(), getQuantity(), data);
         ItemMeta meta = slot.getItemMeta();
-        meta.setDisplayName(getText());
-        meta.setLore(descriptions);
-        slot.setItemMeta(meta);
+        
+        if (meta != null) {
+            meta.setDisplayName(getText());
+            meta.setLore(descriptions);
+            slot.setItemMeta(meta);
+        }
 
         return slot;
     }
