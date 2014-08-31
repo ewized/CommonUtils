@@ -39,7 +39,13 @@ public abstract class MenuBase {
 
     public abstract void closeMenu(Player player);
 
+    @Deprecated
     public void switchMenu(Player player, MenuBase menu) {
-        MenuAPI.switchMenu(player, this, menu);
+        throw new UnsupportedOperationException("Use #switchMenu(MenuAPI, Player, MenuBase)");
+//        MenuAPI.switchMenu(player, this, menu);
+    }
+    
+    public void switchMenu(MenuAPI api, Player player, MenuBase menu) {
+        api.switchMenu(player, this, menu);
     }
 }

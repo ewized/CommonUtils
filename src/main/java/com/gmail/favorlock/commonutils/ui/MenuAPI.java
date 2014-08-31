@@ -11,71 +11,28 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.favorlock.commonutils.CommonUtils;
 
 public class MenuAPI implements Listener {
 
-    protected static CommonUtils instance;
+    private static boolean listener = false;
+    
+    private final JavaPlugin instance;
 
-    public MenuAPI(CommonUtils plugin) {
-        instance = plugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-    public static Menu createMenu(String title, int rows) {
-        return new Menu(title, rows);
-    }
-
-    public static Menu createMenu(String title, boolean center, int rows) {
-        if (!center) {
-            return new Menu(title, rows);
-        }
-        int spaces = (32 - title.length()) / 2;
-        String name = "";
-        for (int i = 0; i < spaces; i++) {
-            name += " ";
-        }
-        name += title;
-        return new Menu(name, rows);
-    }
-
-    public static MenuAnvil createMenuAnvil() {
-        return new MenuAnvil();
-    }
-
-    public static MenuCommandBlock createMenuCommandBlock(String defaultText) {
-        if (CommonUtils.isPacketListenerActive()) {
-            return new MenuCommandBlock(defaultText);
-        } else {
-            return null;
+    public MenuAPI(JavaPlugin plugin) {
+        this.instance = plugin;
+        
+        if (!listener) {
+            MenuAPI.listener = true;
+            plugin.getServer().getPluginManager().registerEvents(this, plugin);
+            plugin.getLogger().info("Registering MenuAPI listener to " + plugin.getName());
         }
     }
 
-    public static MenuDispenser createMenuDispenser(String title) {
-        return new MenuDispenser(title);
-    }
-
-    public static MenuHopper createMenuHopper(String title) {
-        return new MenuHopper(title);
-    }
-
-    public static MenuHolder cloneMenu(MenuHolder menu) {
-        return menu.clone();
-    }
-
-    public static void removeMenu(MenuHolder menu) {
-        for (HumanEntity viewer : menu.getInventory().getViewers()) {
-            if (viewer instanceof Player) {
-                menu.closeMenu((Player) viewer);
-            } else {
-                viewer.closeInventory();
-            }
-        }
-    }
-
-    public static void switchMenu(final Player player, MenuBase fromMenu, final MenuBase toMenu) {
+    public void switchMenu(final Player player, MenuBase fromMenu, final MenuBase toMenu) {
         fromMenu.closeMenu(player);
 
         new BukkitRunnable() {
@@ -174,6 +131,58 @@ public class MenuAPI implements Listener {
             }
 
             MenuCommandBlock.cancelFor(event.getPlayer());
+        }
+    }
+    
+    
+    public static Menu createMenu(String title, int rows) {
+        return new Menu(title, rows);
+    }
+
+    public static Menu createMenu(String title, boolean center, int rows) {
+        if (!center) {
+            return new Menu(title, rows);
+        }
+        int spaces = (32 - title.length()) / 2;
+        String name = "";
+        for (int i = 0; i < spaces; i++) {
+            name += " ";
+        }
+        name += title;
+        return new Menu(name, rows);
+    }
+
+    public static MenuAnvil createMenuAnvil() {
+        return new MenuAnvil();
+    }
+
+    public static MenuCommandBlock createMenuCommandBlock(String defaultText) {
+        if (CommonUtils.isPacketListenerActive()) {
+            return new MenuCommandBlock(defaultText);
+        } else {
+            return null;
+        }
+    }
+
+    public static MenuDispenser createMenuDispenser(String title) {
+        return new MenuDispenser(title);
+    }
+
+    public static MenuHopper createMenuHopper(String title) {
+        return new MenuHopper(title);
+    }
+
+    public static MenuHolder cloneMenu(MenuHolder menu) {
+        return menu.clone();
+    }
+
+    public static void removeMenu(MenuHolder menu) {
+        for (HumanEntity viewer : menu.getInventory().getViewers()) {
+            if (viewer instanceof Player) {
+                menu.closeMenu((Player) viewer);
+            } else {
+                viewer.closeInventory();
+            }
         }
     }
 }
