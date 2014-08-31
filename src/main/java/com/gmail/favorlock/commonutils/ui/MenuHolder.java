@@ -3,6 +3,7 @@ package com.gmail.favorlock.commonutils.ui;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -29,15 +30,19 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
     }
     
     @SuppressWarnings("deprecation")
-    protected void selectMenuItem(Inventory inventory, Player player, int index) {
+    protected boolean selectMenuItem(Inventory inventory, Player player, int index, InventoryClickEvent e) {
+        boolean allow = false;
+        
         if (index > -1 && index < getMaxItems()) {
             MenuItem item = items[index];
             
-            if (item != null)
-                item.onClick(player);
+            if (item != null) {
+                allow = item.onClick(player, e);
+            }
         }
         
         player.updateInventory();
+        return allow;
     }
     
     public boolean addMenuItem(MenuItem item, int index) {

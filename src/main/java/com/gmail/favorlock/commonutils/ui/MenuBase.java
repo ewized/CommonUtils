@@ -6,9 +6,9 @@ public abstract class MenuBase {
 
 //    HashMap<Integer, MenuItem> items = new HashMap<>();
     private final int max_items;
-    MenuItem[] items;
-    boolean exitOnClickOutside = true;
-    MenuCloseBehavior menuCloseBehavior;
+    protected MenuItem[] items;
+    protected boolean exitOnClickOutside = true;
+    protected MenuCloseBehavior menuCloseBehavior;
     
     protected MenuBase(int max_items) {
         this.max_items = max_items;

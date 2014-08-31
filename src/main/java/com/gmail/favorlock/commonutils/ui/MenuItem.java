@@ -2,6 +2,7 @@ package com.gmail.favorlock.commonutils.ui;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
@@ -123,4 +124,9 @@ public abstract class MenuItem extends MenuClickBehavior {
 
     @Override
     public abstract void onClick(Player player);
+
+    public boolean onClick(Player player, InventoryClickEvent e) {
+        onClick(player);
+        return false;
+    }
 }

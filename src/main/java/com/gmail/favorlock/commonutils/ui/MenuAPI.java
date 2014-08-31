@@ -47,12 +47,16 @@ public class MenuAPI implements Listener {
     public void onMenuItemClicked(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
         Player player = (Player) event.getWhoClicked();
+        
         if (inventory.getHolder() instanceof MenuHolder) {
             MenuHolder menu = (MenuHolder) inventory.getHolder();
+            boolean allow = false;
+            
             if (event.isRightClick()) {
                 event.setCancelled(true);
                 return;
             }
+            
             if (event.getWhoClicked() instanceof Player) {
                 if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
                     if (menu.exitOnClickOutside()) {
@@ -60,8 +64,9 @@ public class MenuAPI implements Listener {
                     }
                 } else {
                     int index = event.getRawSlot();
+                    
                     if (index < inventory.getSize()) {
-                        menu.selectMenuItem(inventory, player, index);
+                        allow = menu.selectMenuItem(inventory, player, index, event);
                     } else {
                         if (menu.exitOnClickOutside()) {
                             menu.closeMenu(player);
@@ -69,13 +74,16 @@ public class MenuAPI implements Listener {
                     }
                 }
             }
-            event.setCancelled(true);
+            
+            event.setCancelled(!allow);
         } else if (MenuAnvil.hasOpenAnvil(player)) {
             MenuAnvil menu = MenuAnvil.getOpenAnvil(player);
+            
             if (event.isRightClick()) {
                 event.setCancelled(true);
                 return;
             }
+            
             if (event.getWhoClicked() instanceof Player) {
                 if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
                     if (menu.exitOnClickOutside()) {
@@ -83,6 +91,7 @@ public class MenuAPI implements Listener {
                     }
                 } else {
                     int index = event.getRawSlot();
+                    
                     if (index < inventory.getSize()) {
                         menu.selectMenuItem(player, index);
                     } else {
@@ -92,6 +101,7 @@ public class MenuAPI implements Listener {
                     }
                 }
             }
+            
             event.setCancelled(true);
         }
     }
