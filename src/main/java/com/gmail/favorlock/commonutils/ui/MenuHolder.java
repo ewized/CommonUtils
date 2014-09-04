@@ -73,7 +73,10 @@ public abstract class MenuHolder extends MenuBase implements InventoryHolder {
         getInventory().clear(index);
         MenuItem remove = items[index];
         items[index] = null;
-        remove.removeFromMenu(this);
+        
+        if (remove != null) {
+            remove.removeFromMenu(this);
+        }
         
         return true;
     }
