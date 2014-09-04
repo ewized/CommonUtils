@@ -115,7 +115,7 @@ public class Dragon extends BarDragon {
 
     @Override
     public Object getTeleportPacket(Location loc) {
-        if (VersionHandler.getVersion().equalsIgnoreCase("1_7_R4")) {
+        if (VersionHandler.getVersion().equalsIgnoreCase("v1_7_R4")) {
             return teleportPacket1_7_R4(loc);
         } else {
             return teleportPacket1_7_R123(loc);
