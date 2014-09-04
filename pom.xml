@@ -123,11 +123,5 @@
             <artifactId>gson</artifactId>
             <version>2.2.2</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.archeinteractive</groupId>
-            <artifactId>ASON</artifactId>
-            <version>0.6.1</version>
-        </dependency>
     </dependencies>
 </project>
