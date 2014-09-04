@@ -6,8 +6,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
@@ -42,6 +44,15 @@ public class MenuAPI implements Listener {
             }
         }.runTask(instance);
     }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onMenuItemDragged(InventoryDragEvent event) {
+        Inventory inventory = event.getInventory();
+        
+        if (inventory != null && inventory.getHolder() instanceof MenuHolder) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onMenuItemClicked(InventoryClickEvent event) {
@@ -70,6 +81,9 @@ public class MenuAPI implements Listener {
                     } else {
                         if (menu.exitOnClickOutside()) {
                             menu.closeMenu(player);
+                        } else {
+                            // If the Menu allows clicking outside, we'll allow left clicks only
+                            allow = ClickType.LEFT.equals(event.getClick());
                         }
                     }
                 }
