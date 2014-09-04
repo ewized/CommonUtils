@@ -12,6 +12,9 @@ import com.gmail.favorlock.commonutils.reflection.EntityHandler;
 import com.gmail.favorlock.commonutils.reflection.MethodBuilder;
 import com.gmail.favorlock.commonutils.reflection.VersionHandler;
 
+/**
+ * An EntityEnderDragon wrapper for the 1_7_R* versions.
+ */
 public class Dragon extends BarDragon {
 
     private Object dragon;
@@ -112,25 +115,46 @@ public class Dragon extends BarDragon {
 
     @Override
     public Object getTeleportPacket(Location loc) {
+        if (VersionHandler.getVersion().equalsIgnoreCase("1_7_R4")) {
+            return teleportPacket1_7_R4(loc);
+        } else {
+            return teleportPacket1_7_R123(loc);
+        }
+    }
+    
+    private Object teleportPacket1_7_R4(Location loc) {
         Class<?> PacketPlayOutEntityTeleport = VersionHandler.getNMSClass("PacketPlayOutEntityTeleport");
         Object packet = null;
 
         try {
-            packet = PacketPlayOutEntityTeleport.getConstructor(new Class<?>[] { int.class, int.class, int.class, int.class, byte.class, byte.class })
+            packet = PacketPlayOutEntityTeleport.getConstructor(new Class<?>[] {
+                    int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class })
+                    .newInstance(this.id, loc.getBlockX() * 32,
+                            loc.getBlockY() * 32, loc.getBlockZ() * 32,
+                            (byte) ((int) loc.getYaw() * 256 / 360),
+                            (byte) ((int) loc.getPitch() * 256 / 360), false);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+        
+        return packet;
+    }
+    
+    private Object teleportPacket1_7_R123(Location loc) {
+        Class<?> PacketPlayOutEntityTeleport = VersionHandler.getNMSClass("PacketPlayOutEntityTeleport");
+        Object packet = null;
+
+        try {
+            packet = PacketPlayOutEntityTeleport.getConstructor(new Class<?>[] {
+                    int.class, int.class, int.class, int.class, byte.class, byte.class })
                     .newInstance(this.id, loc.getBlockX() * 32,
                             loc.getBlockY() * 32, loc.getBlockZ() * 32,
                             (byte) ((int) loc.getYaw() * 256 / 360),
                             (byte) ((int) loc.getPitch() * 256 / 360));
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
-
+        
         return packet;
     }
 
