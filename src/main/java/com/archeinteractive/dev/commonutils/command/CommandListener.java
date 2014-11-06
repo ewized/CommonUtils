@@ -27,8 +27,9 @@ public class CommandListener implements Listener {
         
         
         if (command.length > 0 && (v = CommandRegistry.getCommand(command[0])) != null && v.hasPlayerExecution()) {
-            v.player.invoke(e.getPlayer(), Arrays.copyOfRange(command, 1, command.length));
-            e.setCancelled(true);
+            if (v.invokePlayer(e.getPlayer(), Arrays.copyOfRange(command, 1, command.length))) {
+                e.setCancelled(true);
+            }
         }
     }
     
@@ -38,8 +39,9 @@ public class CommandListener implements Listener {
         VirtualCommand v;
         
         if (command.length > 0 && (v = CommandRegistry.getCommand(command[0])) != null && v.hasConsoleExecution()) {
-            v.console.invoke(Bukkit.getConsoleSender(), Arrays.copyOfRange(command, 1, command.length));
-            e.setCommand(""); // ServerCommandEvents aren't cancellable
+            if (v.invokeConsole(Bukkit.getConsoleSender(), Arrays.copyOfRange(command, 1, command.length))) {
+                e.setCommand(""); // ServerCommandEvents aren't cancellable
+            }
         }
     }
     
