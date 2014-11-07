@@ -52,7 +52,12 @@ class VirtualCommand {
         VirtualSubCommand s;
         
         if (args.length < 1 || (s = getSubCommand(args[0])) == null) {
-            player.invoke(sender, args);
+            if (hasPlayerExecution()) {
+                player.invoke(sender, args);
+                return true;
+            }
+            
+            return false;
         }
         
         if (s.hasPlayerExecution()) {

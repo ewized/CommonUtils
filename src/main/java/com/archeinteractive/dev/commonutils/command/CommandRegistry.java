@@ -1,6 +1,5 @@
 package com.archeinteractive.dev.commonutils.command;
 
-import java.nio.channels.IllegalSelectorException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,8 +17,8 @@ public class CommandRegistry {
             throw new IllegalArgumentException("A virtual command is already registered under the given label!");
         }
         
-        registerVirtualPlayerCommand(plugin, label, action);
-        registerVirtualConsoleCommand(plugin, label, action);
+        registerPlayerCommand(plugin, label, action);
+        registerConsoleCommand(plugin, label, action);
     }
     
     public static void registerPlayerCommand(JavaPlugin plugin, String label, CommandAction<? super Player> action) {
