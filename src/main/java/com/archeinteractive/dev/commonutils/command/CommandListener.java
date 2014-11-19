@@ -1,13 +1,13 @@
 package com.archeinteractive.dev.commonutils.command;
 
-import java.util.Arrays;
-
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
 
 public class CommandListener implements Listener {
 

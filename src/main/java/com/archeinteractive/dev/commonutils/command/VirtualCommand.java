@@ -1,18 +1,17 @@
 package com.archeinteractive.dev.commonutils.command;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A Class for representing a VirtualCommand, which is registered from an
  * implementation of the functional interfaces
- * {@link io.xime.core.command.CommandAction} and
- * {@link io.xime.core.command.CommandCompleter}
  */
 class VirtualCommand {
 
@@ -20,12 +19,18 @@ class VirtualCommand {
     final Map<String, VirtualSubCommand> subcommands;
     volatile CommandAction<? super Player> player;
     volatile CommandAction<? super ConsoleCommandSender> console;
+    volatile String permission = "";
 
     VirtualCommand(Class<? extends JavaPlugin> plugincls) {
         this.plugincls = plugincls;
         this.subcommands = new HashMap<>();
         this.player = null;
         this.console = null;
+    }
+
+    VirtualCommand(Class<? extends JavaPlugin> plugincls, String permission) {
+        this(plugincls);
+        this.permission = permission;
     }
     
     boolean invokeConsole(ConsoleCommandSender sender, String[] args) {
@@ -53,7 +58,11 @@ class VirtualCommand {
         
         if (args.length < 1 || (s = getSubCommand(args[0])) == null) {
             if (hasPlayerExecution()) {
-                player.invoke(sender, args);
+                if (permission.equalsIgnoreCase("") || sender.hasPermission(permission)) {
+                    player.invoke(sender, args);
+                } else {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+                }
                 return true;
             }
             
@@ -61,7 +70,11 @@ class VirtualCommand {
         }
         
         if (s.hasPlayerExecution()) {
-            s.player.invoke(sender, Arrays.copyOfRange(args, 1, args.length));
+            if (permission.equalsIgnoreCase("") || sender.hasPermission(permission)) {
+                s.player.invoke(sender, Arrays.copyOfRange(args, 1, args.length));
+            } else {
+                sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+            }
             return true;
         }
         
@@ -95,6 +108,13 @@ class VirtualCommand {
     
         volatile CommandAction<? super Player> player;
         volatile CommandAction<? super ConsoleCommandSender> console;
+        volatile String permission;
+
+        public VirtualSubCommand() {}
+
+        public VirtualSubCommand(String permission) {
+            this.permission = permission;
+        }
         
         boolean hasPlayerExecution() {
             return player != null;
